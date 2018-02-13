@@ -40,7 +40,7 @@ APサーバをステートレスな構造とし、クラウドベンダが提供
     - | セッション情報をクラウドベンダが提供するキャッシュサービス上で管理し、APサーバをステートレスな構造とする。
     - | セッションを利用するアプリケーションについては対応必須。RESTful Web Serviceなどの、セッションを利用しないアプリケーションでは対応不要。
   * - | ②
-    - | :doc:`../ImplementationAtEachLayer/UploadFileManagement`
+    - | :doc:`../ImplementationAtEachLayer/FileManagement/UploadFileManagement`
     - | アップロードファイルをクラウドベンダが提供するストレージサービス上で管理し、APサーバをステートレスな構造とする。
     - | 仮アップロードなどのアプリケーションが処理中の状態をファイルで保持するアプリケーションについては対応必須。
   * - | ③
@@ -48,7 +48,7 @@ APサーバをステートレスな構造とし、クラウドベンダが提供
     - | データ永続層についてスケール可能なアプリケーション構造とする。
     - | データ永続層にRDBを利用し、将来的なスケール性を確保する要件がある場合に対応する。
   * - | ④
-    - | :doc:`../ImplementationAtEachLayer/AsynchronousProcessing`
+    - | :doc:`../ImplementationAtEachLayer/Queuing/AsynchronousProcessing`
     - | 高負荷処理をメッセージサービスにより非同期実行し、レスポンスタイムを確保する。
     - | レスポンスタイムを優先し、高負荷処理を別サーバで非同期実行させる要件がある場合に対応する。
   * - | ⑤
@@ -102,9 +102,9 @@ AWSクラウドデザインパターンとの対応
   * - | `動的コンテンツを処理するパターン <http://aws.clouddesignpattern.org/index.php/%E3%82%AB%E3%83%86%E3%82%B4%E3%83%AA:CDP:%E5%8B%95%E7%9A%84%E3%82%B3%E3%83%B3%E3%83%86%E3%83%B3%E3%83%84%E3%82%92%E5%87%A6%E7%90%86%E3%81%99%E3%82%8B%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3>`_
     - | `State Sharingパターン（ステート情報の共有） <http://aws.clouddesignpattern.org/index.php/CDP:State_Sharing%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3>`_
     - | :doc:`../ImplementationAtEachLayer/SessionManagement`
-      | :doc:`../ImplementationAtEachLayer/UploadFileManagement`
+      | :doc:`../ImplementationAtEachLayer/FileManagement/UploadFileManagement`
       | :doc:`../ImplementationAtEachLayer/LogManagement`
-    - | :doc:`../AWSCollaboration/UploadFileManagement`
+    - | :doc:`../AWSCollaboration/FileManagement/UploadFileManagement`
       | :doc:`../AWSCollaboration/LogManagement`
   * - |
     - | `URL Rewritingパターン（静的コンテンツの退避） <http://aws.clouddesignpattern.org/index.php/CDP:URL_Rewriting%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3>`_
@@ -112,8 +112,8 @@ AWSクラウドデザインパターンとの対応
     - | :doc:`../AWSCollaboration/StaticContents`
   * - | `静的コンテンツを処理するパターン <http://aws.clouddesignpattern.org/index.php/%E3%82%AB%E3%83%86%E3%82%B4%E3%83%AA:CDP:%E9%9D%99%E7%9A%84%E3%82%B3%E3%83%B3%E3%83%86%E3%83%B3%E3%83%84%E3%82%92%E5%87%A6%E7%90%86%E3%81%99%E3%82%8B%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3>`_
     - | `Web Storageパターン（可用性の高いインターネットストレージ活用） <http://aws.clouddesignpattern.org/index.php/CDP:Web_Storage%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3>`_
-    - | :doc:`../ImplementationAtEachLayer/UploadFileManagement`
-    - | :doc:`../AWSCollaboration/UploadFileManagement`
+    - | :doc:`../ImplementationAtEachLayer/FileManagement/UploadFileManagement`
+    - | :doc:`../AWSCollaboration/FileManagement/UploadFileManagement`
   * - |
     - | `Direct Hostingパターン（インターネットストレージで直接ホスティング） <http://aws.clouddesignpattern.org/index.php/CDP:Direct_Hosting%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3>`_
     - | なし
@@ -136,12 +136,12 @@ AWSクラウドデザインパターンとの対応
     - | なし
   * - | `データをアップロードするパターン <http://aws.clouddesignpattern.org/index.php/%E3%82%AB%E3%83%86%E3%82%B4%E3%83%AA:CDP:%E3%83%87%E3%83%BC%E3%82%BF%E3%82%92%E3%82%A2%E3%83%83%E3%83%97%E3%83%AD%E3%83%BC%E3%83%89%E3%81%99%E3%82%8B%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3>`_
     - | `Write Proxyパターン（インターネットストレージへの高速アップロード） <http://aws.clouddesignpattern.org/index.php/CDP:Write_Proxy%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3>`_
-    - | :doc:`../ImplementationAtEachLayer/UploadFileManagement`
-    - | :doc:`../AWSCollaboration/UploadFileManagement`
+    - | :doc:`../ImplementationAtEachLayer/FileManagement/UploadFileManagement`
+    - | :doc:`../AWSCollaboration/FileManagement/UploadFileManagement`
   * - |
     - | `Storage Indexパターン（インターネットストレージの効率化） <http://aws.clouddesignpattern.org/index.php/CDP:Storage_Index%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3>`_
-    - | なし
-    - | なし
+    - | :doc:`../ImplementationAtEachLayer/FileManagement/StorageFileSearch`
+    - | :doc:`../AWSCollaboration/FileManagement/StorageFileSearch`
   * - |
     - | `Direct Object Uploadパターン（アップロード手順の簡略化） <http://aws.clouddesignpattern.org/index.php/CDP:Direct_Object_Upload%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3>`_
     - | なし
@@ -162,10 +162,10 @@ AWSクラウドデザインパターンとの対応
     - | :doc:`../AWSCollaboration/DatabaseSharding`
   * - |  `非同期処理/バッチ処理のパターン <http://aws.clouddesignpattern.org/index.php/%E3%82%AB%E3%83%86%E3%82%B4%E3%83%AA:CDP:%E9%9D%9E%E5%90%8C%E6%9C%9F%E5%87%A6%E7%90%86/%E3%83%90%E3%83%83%E3%83%81%E5%87%A6%E7%90%86%E3%81%AE%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3>`_
     - | `Queuing Chainパターン（システムの疎結合化） <http://aws.clouddesignpattern.org/index.php/CDP:Queuing_Chain%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3>`_
-    - | :doc:`../ImplementationAtEachLayer/AsynchronousProcessing`
-    - | :doc:`../AWSCollaboration/AsynchronousProcessing`
+    - | :doc:`../ImplementationAtEachLayer/Queuing/AsynchronousProcessing`
+    - | :doc:`../AWSCollaboration/Queuing/AsynchronousProcessing`
   * - |
-    - | `Priority Queueパターン（優先順位の変更） <http://aws.clouddesignpattern.org/index.php/CDP:Priority_Queue%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3>`_
+    - | `Priority Queueパターン（優先順位の設定） <http://aws.clouddesignpattern.org/index.php/CDP:Priority_Queue%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3>`_
     - | なし
     - | なし
   * - |
@@ -220,32 +220,32 @@ Twelve-Factor Appとの対応
     - | 共通のみ
   * - | `IV. バックエンドサービス <https://12factor.net/ja/backing-services>`_
     - | :doc:`../ArchitectureInDetail/DataAccessDetail/CacheAbstraction`
-    - | :doc:`../AWSCollaboration/UploadFileManagement`
+    - | :doc:`../AWSCollaboration/FileManagement/UploadFileManagement`
       | :doc:`../AWSCollaboration/DatabaseSharding`
-      | :doc:`../AWSCollaboration/AsynchronousProcessing`
+      | :doc:`../AWSCollaboration/Queuing/AsynchronousProcessing`
       | :doc:`../AWSCollaboration/MailSending`
   * - | `V. ビルド、リリース、実行 <https://12factor.net/ja/build-release-run>`_
     - | フレームワークのスコープ外
     - | フレームワークのスコープ外
   * - | `VI. プロセス <https://12factor.net/ja/processes>`_
     - | :doc:`../ImplementationAtEachLayer/SessionManagement`
-      | :doc:`../ImplementationAtEachLayer/UploadFileManagement`
-    - | :doc:`../AWSCollaboration/UploadFileManagement`
+      | :doc:`../ImplementationAtEachLayer/FileManagement/UploadFileManagement`
+    - | :doc:`../AWSCollaboration/FileManagement/UploadFileManagement`
   * - | `VII. ポートバインディング <https://12factor.net/ja/port-binding>`_
     - | なし
     - | なし
   * - | `VIII. 並行性 <https://12factor.net/ja/concurrency>`_
     - | :doc:`../ImplementationAtEachLayer/SessionManagement`
-      | :doc:`../ImplementationAtEachLayer/UploadFileManagement`
+      | :doc:`../ImplementationAtEachLayer/FileManagement/UploadFileManagement`
       | :doc:`../ImplementationAtEachLayer/PersistenceLayerScalability`
-      | :doc:`../ImplementationAtEachLayer/AsynchronousProcessing`
+      | :doc:`../ImplementationAtEachLayer/Queuing/AsynchronousProcessing`
       | :doc:`../ArchitectureInDetail/DataAccessDetail/DataAccessMyBatis3`
       | :doc:`../ArchitectureInDetail/DataAccessDetail/CacheAbstraction`
     - | :doc:`../AWSCollaboration/DatabaseSharding`
       | :doc:`../AWSCollaboration/DatabaseReadReplica`
   * - | `IX. 廃棄容易性 <https://12factor.net/ja/disposability>`_
     - | :doc:`../ImplementationAtEachLayer/SessionManagement`
-      | :doc:`../ImplementationAtEachLayer/UploadFileManagement`
+      | :doc:`../ImplementationAtEachLayer/FileManagement/UploadFileManagement`
       | :doc:`../ImplementationAtEachLayer/LogManagement`
     - | :doc:`../AWSCollaboration/LogManagement`
   * - | `X. 開発/本番一致 <https://12factor.net/ja/dev-prod-parity>`_
@@ -294,19 +294,19 @@ Springを開発、提供しているPivotal社が提示している
       | :doc:`../ImplementationAtEachLayer/PersistenceLayerScalability`
       | :doc:`../ArchitectureInDetail/DataAccessDetail/DataAccessMyBatis3`
       | :doc:`../ArchitectureInDetail/DataAccessDetail/CacheAbstraction`
-      | :doc:`../ImplementationAtEachLayer/AsynchronousProcessing`
+      | :doc:`../ImplementationAtEachLayer/Queuing/AsynchronousProcessing`
     - | :doc:`../AWSCollaboration/DatabaseSharding`
-      | :doc:`../AWSCollaboration/AsynchronousProcessing`
+      | :doc:`../AWSCollaboration/Queuing/AsynchronousProcessing`
       | :doc:`../AWSCollaboration/DatabaseReadReplica`
   * - | Cloud Ready
     - | No permanent disk access
       | Self-contained application
       | Platform-managed ports and networking
       | Consumes platform-managed backing services
-    - | :doc:`../ImplementationAtEachLayer/UploadFileManagement`
+    - | :doc:`../ImplementationAtEachLayer/FileManagement/UploadFileManagement`
       | :doc:`../ImplementationAtEachLayer/EnvironmentValuesExternalManagement`
       | :doc:`../ImplementationAtEachLayer/LogManagement`
-    - | :doc:`../AWSCollaboration/UploadFileManagement`
+    - | :doc:`../AWSCollaboration/FileManagement/UploadFileManagement`
       | :doc:`../AWSCollaboration/StaticContents`
       | :doc:`../AWSCollaboration/MailSending`
       | :doc:`../AWSCollaboration/LogManagement`
@@ -339,7 +339,7 @@ Springを開発、提供しているPivotal社が提示している
 
 共通ライブラリ
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-|base_framework_name| が提供する\ `共通ライブラリ <http://macchinetta.github.io/server-guideline/1.4.0.RELEASE/ja/Overview/FrameworkStack.html#frameworkstack-common-library>`_\ の対応状況は以下の通り。
+|base_framework_name| が提供する\ `共通ライブラリ <https://macchinetta.github.io/server-guideline/1.5.0.RELEASE/ja/Overview/FrameworkStack.html#frameworkstack-common-library>`_\ の対応状況は以下の通り。
 
 .. tabularcolumns:: |p{0.15\linewidth}|p{0.25\linewidth}|p{0.40\linewidth}|p{0.25\linewidth}|
 .. list-table::
@@ -475,7 +475,7 @@ Springを開発、提供しているPivotal社が提示している
 
 提供機能
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-|base_framework_name| \ `Development Guideline <http://macchinetta.github.io/server-guideline/1.4.0.RELEASE/ja/index.html>`_\ が提供する機能の対応状況は以下の通り。
+|base_framework_name| \ `Development Guideline <https://macchinetta.github.io/server-guideline/1.5.0.RELEASE/ja/index.html>`_\ が提供する機能の対応状況は以下の通り。
 
 .. tabularcolumns:: |p{0.33\linewidth}|p{0.33\linewidth}|p{0.33\linewidth}|
 .. list-table::

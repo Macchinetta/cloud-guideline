@@ -5,14 +5,15 @@
 本ガイドラインでは以下のような開発の流れを想定している。
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
 
    ImplementationPolicy
    CreateWebApplicationProject
    SessionManagement
-   UploadFileManagement
+   FileManagement/index
+   StaticContents
    PersistenceLayerScalability
-   AsynchronousProcessing
+   Queuing/index
    EnvironmentValuesExternalManagement
    HealthCheck
    LogManagement
@@ -20,4 +21,3 @@
 .. raw:: latex
 
    \newpage
-

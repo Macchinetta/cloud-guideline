@@ -11,87 +11,23 @@
 
 Overview
 --------------------------------------------------------------------------------
-本ガイドラインではAWSサービスを使用した静的コンテンツ（画像、 CSS、JavaScript...etc)の配信について説明する。
-
-|
-
-.. _sc_contents_delivery_network:
-
-CDNによる静的コンテンツの配信
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-CDN(コンテンツデリバリーネットワーク)とは、コンテンツをネットワーク経由で配信するために最適化されたネットワークのことである。
-画像や動画、CSSなどの静的コンテンツが配置されているサーバ（オリジンサーバ）から、別の複数のサーバ（エッジサーバ）にキャッシュし、
-アクセスするユーザを最寄りのエッジサーバに誘導し配信することで最適なネットワークを実現する。
-
-
-CDNを用いることで下記が期待できる。
-
-* **世界中にある最適なエッジサーバにユーザを誘導することで高速な配信を行えること**
-* **コンテンツをエッジサーバでキャッシュしてオリジンサーバの負荷を減らし、可用性を高めること**
-
-.. _sc_cdn_image:
-
-CDNによる配信イメージ
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-ここでは、CDNを利用しない場合とCDNを利用した場合の配信イメージを紹介する。
-
-* CDNを利用しない配信
-
-.. figure:: ./imagesStaticContents/StaticContentsNonCDN.png
-   :width: 50%
-
-.. tabularcolumns:: |p{0.10\linewidth}|p{0.90\linewidth}|
-.. list-table::
-   :header-rows: 1
-   :widths: 10 150
-
-   * - 項番
-     - 説明
-   * - | (1)
-     - | APサーバ内に配置された静的コンテンツを動的コンテンツとともに配信する。
-
-|
-
-* CDNを利用した配信
-
-APサーバから静的コンテンツを排除し、オリジンサーバに配置する。
-エッジサーバは静的コンテンツをキャッシュし、クライアントへ静的コンテンツを配信する。
-
-.. figure:: ./imagesStaticContents/StaticContentsCDN.png
-   :width: 60%
-
-.. tabularcolumns:: |p{0.10\linewidth}|p{0.90\linewidth}|
-.. list-table::
-   :header-rows: 1
-   :widths: 10 150
-
-   * - 項番
-     - 説明
-   * - | (1)
-     - | 複数存在するエッジサーバはオリジンサーバから取得したデータをキャッシュする。
-   * - | (2)
-     - | エンドユーザに最適なエッジサーバからデータを配信する。
-
-|
-
-.. _sc_contents_delivery_network_aws:
+本ガイドラインでは、AWSサービスを使用した静的コンテンツ（画像、 CSS、JavaScript...etc)の配信について説明する。
 
 AWSを利用したCDNによる静的コンテンツの配信
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 AWSではコンテンツ配信ネットワークサービスとして、\ `Amazon CloudFront <https://aws.amazon.com/jp/cloudfront/>`_\ が提供されている。
 本ガイドラインでは、オリジン（コンテンツの保存先）として\ `Amazon S3 <https://aws.amazon.com/jp/s3/>`_\ を利用し、S3上の静的コンテンツをCloudFrontを使用してCDNで配信する方法を説明する。
 
-
 .. _sc_cdn_image_aws:
 
-AWSを用いたCDNによる配信イメージ
+AWSを用いたCDNによる配信
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-ここでは、S3とCloudFrontを組み合わせたCDNによる静的コンテンツの配信イメージを紹介する。
+ここでは、S3とCloudFrontを組み合わせたCDNによる静的コンテンツの配信方式を紹介する。
 
 * S3とCloudFrontを利用したCDN
 
 S3をオリジンサーバとし、配信する静的コンテンツを配置する。
-CloudFrontは複数のエッジサーバへキャッシュを行い、最適なエッジサーバから配信を行う。
+CloudFrontは複数のエッジロケーションへキャッシュを行い、最適なエッジロケーションから配信を行う。
 
 .. figure:: ./imagesStaticContents/StaticContentsCDNAWS.png
    :width: 60%
@@ -104,9 +40,92 @@ CloudFrontは複数のエッジサーバへキャッシュを行い、最適な�
     * - 項番
       - 説明
     * - | (1)
-      - | CloudFrontはS3から多数あるエッジサーバへコンテンツをキャッシュする。
+      - | CloudFrontはS3から多数あるエッジロケーションへコンテンツをキャッシュする。
     * - | (2)
-      - | CloudFrontはアクセスするユーザを最寄りのエッジサーバへ誘導しコンテンツを配信する。
+      - | CloudFrontはアクセスするユーザを最寄りのエッジロケーションへ誘導しコンテンツを配信する。
+
+AWSを用いたCDN利用時の静的コンテンツの更新
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ここでは、S3とCloudFrontを組み合わせたCDNによる、更新後の静的コンテンツをキャッシュタイムアウトを待たずに配信する方式を紹介する。
+
+方式としては、:ref:`impl_sc_cdn_clear_cache_update_contents` と、:ref:`impl_sc_cdn_update_contents_version` がある。方式の詳細と使い分けについては、:ref:`impl_sc_cdn_update_contents` を参照されたい。
+
+キャッシュクリア方式
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+キャッシュクリア方式とは、CloudFrontのキャッシュをクリアすることで、
+キャッシュタイムアウトを待たずに更新後の静的コンテンツをクライアントに配信する方式である。
+
+.. figure:: ./imagesStaticContents/StaticContentsClearCache.png
+   :width: 60%
+
+.. tabularcolumns:: |p{0.10\linewidth}|p{0.90\linewidth}|
+.. list-table::
+    :header-rows: 1
+    :widths: 10 150
+
+    * - 項番
+      - 説明
+    * - | (1)
+      - | S3に保存されている静的コンテンツを更新する。
+    * - | (2)
+      - | 管理者は、CloudFrontにある(1)で更新した静的コンテンツのキャッシュをCloudFront のCreateInvalidation APIでクリアする。
+    * - | (3)
+      - | CloudFrontはアクセスするユーザを最寄りのエッジロケーションへ誘導する。
+    * - | (4)
+      - | CloudFrontに静的コンテンツのキャッシュがないため、S3から更新後の静的コンテンツを取得し、CloudFrontにキャッシュする。更新後の静的コンテンツをCloudFrontから配信する。
+
+コンテンツバージョン管理方式
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+コンテンツバージョン管理方式とは、静的コンテンツをバージョン管理して、整合性を保った状態で更新を行うための方式である。
+
+S3上で更新対象の静的コンテンツをバージョン別フォルダに入れておくなどし、バージョンごとに静的コンテンツへのパスが異なるようにする。更新時には、依存元(更新対象の静的コンテンツを参照している静的コンテンツ)で、更新後の静的コンテンツを利用するようにパスを書き換える。その後、CloudFrontから依存元のキャッシュをクリアする。
+
+依存関係のある静的コンテンツへのパスを整合性のある状態で切り替えることで、更新前と更新後の静的コンテンツが混在した状態でクライアントが取得することを防ぎ、整合性のとれた状態で静的コンテンツを配信する。
+
+以下にHTMLファイルでJavaScriptファイル(main.jsでsub.jsの関数を呼び出している)を読み込んでいる時の例を示す。
+
+* v1リリース時
+
+.. figure:: ./imagesStaticContents/StaticContentsChangePathDeliver_1.png
+   :width: 60%
+
+.. tabularcolumns:: |p{0.10\linewidth}|p{0.90\linewidth}|
+.. list-table::
+    :header-rows: 1
+    :widths: 10 150
+
+    * - 項番
+      - 説明
+    * - | (1)
+      - | HTMLファイルでは、v1フォルダ配下にあるJavaScriptファイルを読み込むように記述する。
+    * - | (2)
+      - | (1)でのHTMLファイルの記述に従い、v1フォルダ配下のJavaScriptファイルをCloudFrontのキャッシュ、キャッシュがなければ、S3から取得する。
+    * - | (3)
+      - | CloudFrontはコンテンツをクライアントへ配信する。
+
+* v2リリース時
+
+.. figure:: ./imagesStaticContents/StaticContentsChangePathDeliver_2.png
+   :width: 60%
+
+.. tabularcolumns:: |p{0.10\linewidth}|p{0.90\linewidth}|
+.. list-table::
+    :header-rows: 1
+    :widths: 10 150
+
+    * - 項番
+      - 説明
+    * - | (1)
+      - | S3上のHTMLファイルを、v2フォルダ配下にあるJavaScriptファイルを読み込むように更新する。
+    * - | (2)
+      - | CloudFrontのHTMLファイルのキャッシュをクリアする。
+    * - | (3)
+      - | クライアントがHTMLファイルを取得しようとすると、CloudFrontにHTMLファイルのキャッシュがないため、S3から更新後のHTMLファイルを取得し、CloudFrontにキャッシュして配信する。
+          HTMLファイルがキャッシュクリアされる前に、クライアントがHTMLファイルを読み込んだ場合でも、JavaScriptファイルは、HTMLファイルに記述したパスに従って読み込むため、整合性が保たれる。
+    * - | (4)
+      - | (1)でのHTMLファイルの記述に従い、v2フォルダ配下のJavaScriptファイルをCloudFrontのキャッシュ、キャッシュがなければ、S3から取得する。
+    * - | (5)
+      - | CloudFrontはコンテンツをクライアントへ配信する。
 
 .. _sc_how_to_use:
 
@@ -201,7 +220,6 @@ AWS側の設定は\ `Amazon S3 での CloudFront の使用 <http://docs.aws.amaz
     <img alt="" src="${contentUrl}/resources/image/logo.jpg">
     <!-- omitted -->
 
-
 .. tabularcolumns:: |p{0.10linewidth}|p{0.90\linewidth}|
 .. list-table::
    :header-rows: 1
@@ -221,6 +239,19 @@ AWS側の設定は\ `Amazon S3 での CloudFront の使用 <http://docs.aws.amaz
 .. note::
 
   \ ``content.url``\ を環境依存プロパティにすることで、環境ごとに静的コンテンツの参照先を変更することができる。
+
+.. _sc_access_cache_clear:
+
+Amazon CloudFront利用時のAmazon S3上のコンテンツの更新
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+コンテンツバージョン管理方式
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+コンテンツバージョン管理方式はクラウドベンダーに依存しない方式であるため、実装方法は :ref:`impl_sc_cdn_update_how_to_use_contents_version` を参照されたい。
+
+Amazon CloudFrontのキャッシュクリア方式
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+CloudFrontのキャッシュクリア方法の詳細は \ `オブジェクトの無効化（ウェブディストリビューションのみ） <http://docs.aws.amazon.com/ja_jp/AmazonCloudFront/latest/DeveloperGuide/Invalidation.html>`_\ を参照されたい。
 
 .. _sc_how_to_extend:
 
@@ -262,14 +293,628 @@ WAFに定義可能な制限項目の詳細はAWS公式ドキュメント\ `What 
 
 署名による制限
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-有料コンテンツなどのプライベートコンテンツへのアクセスコントロールを行いたい場合、
-署名付きURLまたはCookieを使用してアクセスするように設定することでアクセスを制限することができる。
-
-CDNを利用して最適なコンテンツ配信を行いつつ、有料コンテンツ購読者などの特定の選ばれたユーザにのみコンテンツを配信したい場合、
-署名によるアクセス制限は有効な制限方法である。
+CloudFrontはコンテンツへのアクセスコントロールを行いたい場合、署名付きURLまたはCookieを使用して制限することができる。
+CDNを使用してプライベートコンテンツを供給する場合に有効な制限方法である。
 
 詳細は\ `CloudFront を使用してプライベートコンテンツを供給する <http://docs.aws.amazon.com/ja_jp/AmazonCloudFront/latest/DeveloperGuide/PrivateContent.html>`_\
 を参照されたい。
+
+署名付きURLと署名付きCookieのどちらを使用するかの選択については\ `署名付き URL と署名付き Cookie の選択 <http://docs.aws.amazon.com/ja_jp/AmazonCloudFront/latest/DeveloperGuide/private-content-choosing-signed-urls-cookies.html>`_\
+を参照されたい。
+
+.. note::
+
+  署名付き URL や署名付き Cookie を作成するために、有効なCloudFront キーペアが必要となる。
+  IAM ユーザーでは CloudFront キーペアを作成することができず、AWS アカウントのルート認証情報を使用してキーペアを作成する必要があるので注意されたい。
+  詳細は\ `信頼された署名者の CloudFront キーペアを作成する <http://docs.aws.amazon.com/ja_jp/AmazonCloudFront/latest/DeveloperGuide/private-content-trusted-signers.html#private-content-creating-cloudfront-key-pairs>`_\ を参照されたい。
+
+.. _sc_signed-cookies:
+
+署名付きCookie
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+署名付きCookieを作成してプライベートコンテンツを配信する実装方法を紹介する。
+本ガイドラインでは、有料会員向けに複数の制限されたファイルへのアクセスを提供するアプリケーションを実装例として説明する。
+
+実装例では、プライベートコンテンツの配信が必要なアクセスに対して署名付きCookieを発行する仕組みを透過的に実現する実装として、Controllerに付与されたアノテーションをインターセプトして署名付きCookie発行する実装を紹介する。
+また、その際に署名付きCookieが不要となった場合の削除方法もあわせて紹介する。
+
+.. warning::
+
+  署名付きCookieを使用してプライベートコンテンツを配信する際には、署名付きCookieの悪用の防止について配慮する必要がある。
+  詳細は公式ドキュメント\ `署名付き Cookie の悪用の防止 <http://docs.aws.amazon.com/ja_jp/AmazonCloudFront/latest/DeveloperGuide/private-content-signed-cookies.html#private-content-signed-cookie-misuse>`_\ を参照されたい。
+
+* 有料会員の権限保持者のみに署名付きCookieを発行するために、コントローラに付与するアノテーションの作成
+
+ .. code-block:: java
+
+   @Target(METHOD)
+   @Retention(RetentionPolicy.RUNTIME)
+   @Documented
+   public @interface PresignedCookie {
+
+       // (1)
+       String[] value();
+
+   }
+
+
+
+ .. tabularcolumns:: |p{0.10linewidth}|p{0.90\linewidth}|
+ .. list-table::
+     :header-rows: 1
+     :widths: 10 90
+
+     * - 項番
+       - 説明
+     * - | (1)
+       - | 署名付きCookieの発行対象のロールを指定する為の属性。
+
+|
+
+* 有料会員の権限保持者のみに署名付きCookieを発行するためのインターセプタの作成
+
+ .. code-block:: java
+
+   public class PresignedCookieHandlerInterceptor implements HandlerInterceptor {
+
+       // (1)
+       @Inject
+       CloudFrontSignatureHelper signatureHelper;
+
+       @Override
+       public boolean preHandle(HttpServletRequest request,
+               HttpServletResponse response, Object handler) throws Exception {
+           // omitted
+           return true;
+       }
+
+       @Override
+       public void postHandle(HttpServletRequest request,
+               HttpServletResponse response, Object handler,
+               ModelAndView modelAndView) throws Exception {
+
+           if (!enablePresignedCookie(handler)) { // (2)
+               return;
+           }
+
+
+           CookiesForCustomPolicy cookies = signatureHelper.getSignedCookies(); // (3)
+
+           // (4)
+           Cookie cookiePolicy = new Cookie(cookies.getPolicy().getKey(), cookies
+                   .getPolicy().getValue());
+           cookiePolicy.setHttpOnly(true);
+           cookiePolicy.setSecure(signatureHelper.isSecure());
+           cookiePolicy.setDomain(signatureHelper.getDomain());
+           cookiePolicy.setPath(signatureHelper.getCookiePath());
+           response.addCookie(cookiePolicy);
+
+           Cookie cookieSignature = new Cookie(cookies.getSignature()
+                   .getKey(), cookies.getSignature().getValue());
+           cookieSignature.setHttpOnly(true);
+           cookieSignature.setSecure(signatureHelper.isSecure());
+           cookieSignature.setDomain(signatureHelper.getDomain());
+           cookieSignature.setPath(signatureHelper.getCookiePath());
+           response.addCookie(cookieSignature);
+
+           Cookie cookieKeyPairId = new Cookie(cookies.getKeyPairId()
+                   .getKey(), cookies.getKeyPairId().getValue());
+           cookieKeyPairId.setHttpOnly(true);
+           cookieKeyPairId.setSecure(signatureHelper.isSecure());
+           cookieKeyPairId.setDomain(signatureHelper.getDomain());
+           cookieKeyPairId.setPath(signatureHelper.getCookiePath());
+           response.addCookie(cookieKeyPairId);
+       }
+
+
+       @Override
+       public void afterCompletion(HttpServletRequest request,
+               HttpServletResponse response, Object handler,
+               Exception ex) throws Exception {
+           // omitted
+       }
+
+       private Collection<? extends GrantedAuthority> getAuthorities() {
+           Authentication authentication = SecurityContextHolder.getContext()
+                   .getAuthentication();
+           if (authentication != null) {
+               return authentication.getAuthorities();
+           }
+           return null;
+       }
+
+       private boolean enablePresignedCookie(Object handler) {
+           if (!(handler instanceof HandlerMethod)) {
+               return false;
+           }
+
+           PresignedCookie presignedCookie = HandlerMethod.class.cast(handler)
+                   .getMethodAnnotation(PresignedCookie.class);
+
+           if (presignedCookie == null) {
+               return false;
+           }
+
+           Collection<? extends GrantedAuthority> authorities = getAuthorities();
+           if (authorities == null) {
+               return false;
+           }
+
+           for (String role : presignedCookie.value()) {
+               if (authorities.toString().contains(role)) {
+                   return true;
+               }
+           }
+           return false;
+       }
+   }
+
+
+
+ .. tabularcolumns:: |p{0.10linewidth}|p{0.90\linewidth}|
+ .. list-table::
+     :header-rows: 1
+     :widths: 10 90
+
+     * - 項番
+       - 説明
+     * - | (1)
+       - | CloudFrontの署名付きCookieを生成するためのヘルパーをインジェクションする。
+     * - | (2)
+       - | 署名付きクッキーの発行対象かどうかをコントローラに付与されたアノテーション属性からログイン権限と照らし合わせて判定する。
+     * - | (3)
+       - | ヘルパーを利用してレスポンスのSet-Cookieヘッダーに設定する為の情報を生成する。
+     * - | (4)
+       - | \ ``CloudFront-Policy`` \、\ ``CloudFront-Signature`` \、及び\ ``CloudFront-KeyPairId`` \をCookieに設定する。
+         | CloudFrontとアプリケーションではドメインが異なるため、Cookieをサブドメイン間で共有するにはドメインを明示的に指定する必要がある。また、対象のリソースにのみCookieが必要となるため、此処では明示的に指定している。
+
+
+|
+
+* CloudFrontの署名付きCookieを生成するためのヘルパークラスの作成
+
+ .. code-block:: java
+
+   @ConfigurationProperties(prefix = "cf.signature")
+   public class CloudFrontSignatureHelper {
+
+       /**
+        * プロトコル。
+        */
+       private com.amazonaws.Protocol protocol = com.amazonaws.Protocol.HTTPS;
+
+       /**
+        * セキュア。
+        */
+       private boolean secure = true;
+
+       /**
+        * ドメイン。
+        */
+       @NotEmpty
+       private String domain;
+
+       /**
+        * クッキーパス
+        */
+       @NotEmpty
+       private String cookiePath;
+
+       /**
+        * ディストリビューションドメイン。
+        */
+       @NotEmpty
+       private String distributionDomain;
+
+       /**
+        * プライベートキーファイルパス。
+        */
+       @NotEmpty
+       private String privateKeyFilePath;
+
+       /**
+        * リソースパス。
+        */
+       @NotEmpty
+       private String resourcePath;
+
+       /**
+        * キーペアID(アクセスキーID)。
+        */
+       @NotEmpty
+       private String keyPairId;
+
+       /**
+        * 有効期限開始までの時間（分）。
+        */
+       private Integer timeToActive;
+
+       /**
+        * 有効期限終了までの時間（分）。
+        */
+       @Min(1)
+       private int timeToExpire;
+
+       /**
+        * 許可するIPアドレスの範囲（CIDR）。
+        */
+       private String allowedIpRange;
+
+       /**
+        * カスタムポリシーによって作成されたクッキー情報を返却する。
+        * @return クッキー
+        */
+       public CookiesForCustomPolicy getSignedCookies() {
+
+           // プロトコルの設定
+           Protocol signerUtilsProtocol = Protocol.valueOf(protocol.toString());
+
+           // プライベートキーファイルの設定
+           File privateKeyFile = new File(privateKeyFilePath);
+
+           // 有効期限の設定
+           // 有効期間：開始
+           Date activeFrom = getPlusMinutesFromCurrentTime(timeToActive); // (1)
+
+           // 有効期間:終了
+           Date expiresOn = getPlusMinutesFromCurrentTime(timeToExpire);  // (2)
+
+           // Cookie情報作成
+           // (3)
+           CookiesForCustomPolicy cookies = null;
+           try {
+               cookies = CloudFrontCookieSigner.getCookiesForCustomPolicy(
+                       signerUtilsProtocol, distributionDomain, privateKeyFile,
+                       resourcePath, keyPairId, expiresOn, activeFrom,
+                       allowedIpRange);
+           } catch (IOException e) {
+               throw new SystemException("e.xx.fw.9001", "I/O error occured.", e);
+           } catch (InvalidKeySpecException e) {
+               throw new SystemException("e.xx.fw.9001", "invalid key specification.", e);
+           }
+           return cookies;
+       }
+
+       private Date getPlusMinutesFromCurrentTime(Integer minutes) {
+           if (minutes == null) {
+               return null;
+           }
+           DateTime currentTime = new DateTime(DateTimeZone.UTC);
+           return currentTime.plusMinutes(minutes).toDate();
+       }
+
+       // omitted
+
+
+   }
+
+
+
+ .. tabularcolumns:: |p{0.10linewidth}|p{0.90\linewidth}|
+ .. list-table::
+     :header-rows: 1
+     :widths: 10 90
+
+     * - 項番
+       - 説明
+     * - | (1)
+       - | 設定された有効期限：開始(分後)から有効期限開始日時を生成する。
+     * - | (2)
+       - | 設定された有効期限：終了(分後)から有効期限終了日時を生成する。
+     * - | (3)
+       - | レスポンスのSet-Cookieヘッダーに設定する為情報である\ ``CookiesForCustomPolicy`` \を生成する。
+
+
+
+|
+
+
+
+* ログアウト時にCloudFrontの署名付きCookieを削除する為のLogoutSuccessHandlerの作成
+
+ .. code-block:: java
+
+   public class PresignedCookieClearingLogoutSuccessHandler extends
+                                             SimpleUrlLogoutSuccessHandler {
+
+       @Inject
+       PresignedCookieCleaner presignedCookieCleaner;
+
+
+       @Override
+       public void onLogoutSuccess(HttpServletRequest request,
+               HttpServletResponse response,
+               Authentication authentication) throws IOException, ServletException {
+
+           presignedCookieCleaner.delete(response); // (1)
+           super.onLogoutSuccess(request, response, authentication);
+       }
+   }
+
+
+
+ .. tabularcolumns:: |p{0.10linewidth}|p{0.90\linewidth}|
+ .. list-table::
+     :header-rows: 1
+     :widths: 10 90
+
+     * - 項番
+       - 説明
+     * - | (1)
+       - | ログアウトが成功した場合に、Spring Securityの\ ``CookieClearingLogoutHandler`` \では消すことができないサブドメインに適用したCookieを削除する為の処理を実行する。
+
+
+
+|
+
+* ログアウトが実施されないでログインされた場合にも対応するためにAuthenticationSuccessHandlerを使用したCloudFrontの署名付きCookieの削除を作成
+
+ .. code-block:: java
+
+   public class PresingedCookieClearingAuthenticationSuccessHandler extends
+                                                                    SimpleUrlAuthenticationSuccessHandler {
+
+       @Inject
+       PresignedCookieCleaner presignedCookieCleaner;
+
+       @Override
+       public void onAuthenticationSuccess(HttpServletRequest request,
+               HttpServletResponse response,
+               Authentication authentication) throws IOException, ServletException {
+           presignedCookieCleaner.delete(response); // (1)
+           super.onAuthenticationSuccess(request, response, authentication);
+       }
+   }
+
+
+
+ .. tabularcolumns:: |p{0.10linewidth}|p{0.90\linewidth}|
+ .. list-table::
+     :header-rows: 1
+     :widths: 10 90
+
+     * - 項番
+       - 説明
+     * - | (1)
+       - | 認証が成功した場合に、Spring Securityの\ ``CookieClearingLogoutHandler`` \では消すことができないサブドメインに適用したCookieを削除する為の処理を実行する。
+
+
+
+|
+
+* Spring Securityでは削除することができないCloudFrontの署名付きCookieを削除する為のクラスを作成
+
+ .. code-block:: java
+
+   public class PresignedCookieCleaner {
+
+
+       @Inject
+       CloudFrontSignatureHelper signatureHelper;
+
+       private static final String[] DELETE_COOKIES = { "CloudFront-Policy",
+               "CloudFront-Signature", "CloudFront-Key-Pair-Id" };
+
+       // (1)
+       public void delete(HttpServletResponse response) {
+        for (String cookieName : DELETE_COOKIES) {
+            Cookie cookie = new Cookie(cookieName, null);
+            // https://github.com/spring-projects/spring-security/issues/2325
+            cookie.setPath(signatureHelper.getCookiePath() + "/");
+            cookie.setDomain(signatureHelper.getDomain());
+            cookie.setMaxAge(0);
+            response.addCookie(cookie);
+        }
+       }
+
+   }
+
+
+
+ .. tabularcolumns:: |p{0.10linewidth}|p{0.90\linewidth}|
+ .. list-table::
+     :header-rows: 1
+     :widths: 10 90
+
+     * - 項番
+       - 説明
+     * - | (1)
+       - | CloudFrontの署名付きCookieを生成時に指定してドメイン、及びパスを指定して削除する。
+
+.. note:: **Cookieの削除**
+
+   本ガイドラインでは説明を割愛するが、 \ ``<sec:logout>``\ タグには、ログアウト時に指定したCookieを削除するための\ ``delete-cookies``\ 属性が存在する。
+   ただし、この属性を使用しても正常にCookieが削除できないケースが報告されている。
+
+   詳細はSpring Securityの以下のJIRAを参照されたい。
+
+   * https://jira.spring.io/browse/SEC-2091
+
+   また、サブドメインに対して設定したCookieについても削除ができないため独自のCookieを削除する仕組みを実装する必要がある。
+
+|
+
+
+* CloudFrontの署名付きCookieを生成する為の設定を定義する
+
+  以下に、\ ``application.yml``\の定義例を示す。
+
+ .. code-block:: yaml
+
+   # CloudFront Signature
+     cf:
+       signature:
+         # (1)
+         protocol: https
+         # (2)
+         secure: true
+         # (3)
+         domain: XXX.XXX
+         # (4)
+         cookiePath: /prcd
+         # (5)
+         distributionDomain: www.tera-ci.net
+         # (6)
+         privateKeyFilePath: ${user.home}/private-key.der
+         # (7)
+         resourcePath: prcd/paid/*
+         # (8)
+         keyPairId: XXXXXXXXX
+         # (9)
+         timeToActive: 1
+         # (10)
+         timeToExpire: 30
+         # (11)
+         allowedIpRange: 0.0.0.0/0
+
+
+ .. tabularcolumns:: |p{0.10linewidth}|p{0.90\linewidth}|
+ .. list-table::
+     :header-rows: 1
+     :widths: 10 90
+
+     * - 項番
+       - 説明
+     * - | (1)
+       - | 使用するプロトコルを設定する。署名付きCookieは\ ``http``\ と\ ``https``\ がサポートされている。
+     * - | (2)
+       - | CookieをHTTPSやSSLなどのセキュアなプロトコルのみを使用して送信するべきかどうか設定する。
+     * - | (3)
+       - | Cookieが提示されるドメイン名を設定する。
+     * - | (4)
+       - | クライアントがCookieを返す必要のあるCookieのパスを設定する。
+     * - | (5)
+       - | CloudFrontのディストリビューションドメイン名を設定する。
+     * - | (6)
+       - | 作成したプライベートキーのパスを設定する。設定例は、ホームディレクトリのプライベートキーのパスを設定している。
+     * - | (7)
+       - | アクセスを許可するリソースパスの設定をする。設定例ではS3オブジェクト内の\ ``paid/``\ 配下すべてのオブジェクトに対してアクセスを許可している。
+     * - | (8)
+       - | キーペアID(アクセスキーID)を設定する。
+     * - | (9)
+       - | 発行する署名が有効になるまでの時間(分)を設定する。設定例では1分後に有効になる。
+     * - | (10)
+       - | 発行する署名が失効するまでの時間(分)を設定する。設定例ではセッションと同じタイミングで失効する様に、セッションタイムアウトと同じ30分を設定している。
+     * - | (11)
+       - | アクセスを許可するIPアドレスの範囲(CIDR)を設定する。設定例ではすべて許可している。
+
+|
+
+* CloudFrontの署名付きCookieを生成するためのヘルパークラスのBean定義
+
+  以下に、\ ``spring-mvc.xml``\の定義例を示す。
+
+ .. code-block:: xml
+
+   <!-- (1) -->
+   <bean class="com.example.xxx.app.signature.CloudFrontSignatureHelper"/>
+
+ .. tabularcolumns:: |p{0.10linewidth}|p{0.90\linewidth}|
+ .. list-table::
+     :header-rows: 1
+     :widths: 10 90
+
+     * - 項番
+       - 説明
+     * - | (1)
+       - | \ ``CloudFrontSignatureHelper`` \をBean定義する。
+
+
+
+|
+
+
+
+* Spring Securityの機能を利用したCloudFrontの署名付きCookieを削除する為の設定
+
+  以下に、\ ``spring-security.xml``\の定義例を示す。
+
+
+  .. code-block:: xml
+
+    <sec:http>
+        <!-- (1) -->
+        <sec:form-login login-page="/login"
+            authentication-failure-url="/login?error=true" authentication-success-handler-ref="presingedCookieClearingAuthenticationSuccessHandler"/>
+        <!-- (2) -->
+        <sec:logout success-handler-ref="presignedCookieClearingLogoutSuccessHandler"
+            delete-cookies="JSESSIONID" />
+        <!-- omitted -->
+    </sec:http>
+    <!-- omitted -->
+    <!-- (3) -->
+    <bean id="presignedCookieClearingLogoutSuccessHandler"
+        class="com.example.xxx.app.signature.PresignedCookieClearingLogoutSuccessHandler">
+    </bean>
+    <!-- (4) -->
+    <bean id="presingedCookieClearingAuthenticationSuccessHandler"
+        class="com.example.xxx.app.signature.PresingedCookieClearingAuthenticationSuccessHandler" >
+    </bean>
+    <!-- (5) -->
+    <bean id="presignedCookieCleaner"
+        class="com.example.xxx.app.signature.PresignedCookieCleaner">
+    </bean>
+
+
+
+  .. tabularcolumns:: |p{0.10linewidth}|p{0.90\linewidth}|
+  .. list-table::
+     :header-rows: 1
+     :widths: 10 90
+
+     * - 項番
+       - 説明
+     * - | (1)
+       - | \ ``sec:form-login``\ 要素の\ ``authentication-success-handler-ref``\ 属性にログアウトが実施されないでログインされた場合に署名付きCookieを削除する為の\ ``presingedCookieClearingAuthenticationSuccessHandler``\ を設定する。
+     * - | (2)
+       - | \ ``sec:logout``\ 要素の\ ``success-handler-ref``\ 属性にログアウト時にCloudFrontの署名付きCookieを削除する為の\ ``presignedCookieClearingLogoutSuccessHandler``\ を設定する。
+          これによりログアウト時に署名情報がCookieから削除される。
+     * - | (3)
+       - | ログアウト時にCloudFrontの署名付きCookieを削除する為の\ ``presignedCookieClearingLogoutSuccessHandler``\ をBean定義する。
+
+     * - | (4)
+       - | ログアウトが実施されないでログインされた場合に署名付きCookieを削除する為の\ ``presingedCookieClearingAuthenticationSuccessHandler``\ をBean定義する。
+
+     * - | (5)
+       - | CloudFrontの署名付きCookieを削除する為の\ ``PresignedCookieCleaner``\をBean定義する。
+
+|
+
+* 有料会員の権限保持者のみに署名付きCookieを発行するコントローラの実装例
+
+  .. code-block:: java
+
+   @Controller
+   public class HelloController {
+
+       @Inject
+       PresignedCookieCleaner presignedCookieCleaner;
+
+
+       @RequestMapping(value = "/", method = { RequestMethod.GET,
+            RequestMethod.POST })
+       @PresignedCookie({ "PAID" }) // (1)
+       public String home(Locale locale, Model model) {
+           // omitted
+           return "welcome/home";
+       }
+
+   }
+
+
+  .. tabularcolumns:: |p{0.10linewidth}|p{0.90\linewidth}|
+  .. list-table::
+     :header-rows: 1
+     :widths: 10 90
+
+     * - 項番
+       - 説明
+     * - | (1)
+       - | 署名付きCookieの発行をする為に\ ``@PresignedCookie`` \を付与して発行対象のロールを指定する。設定例では有料会員を示すPAIDを指定している。
+
+
+|
+
 
 .. _sc_fallback_with_route53:
 

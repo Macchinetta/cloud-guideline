@@ -451,12 +451,12 @@ Spring Profileに応じた環境リポジトリの実装を行う。
        public synchronized Locations getLocations(String application,
                String profile, String label) { // (3)
 
-           AmazonS3Client amazonS3Client = null;
+           AmazonS3 amazonS3 = AmazonS3ClientBuilder.defaultClient();
            TransferManager tm = null;
            try {
                String bucketName = new AmazonS3URI(getUri()).getBucket();
-               amazonS3Client = new AmazonS3Client();
-               tm = new TransferManager(amazonS3Client);
+               tm = TransferManagerBuilder.standard().withS3Client(amazonS3)
+                    .build();
                logger.info("local temp dir:" + getBasedir().getAbsolutePath());
                MultipleFileDownload download = tm.downloadDirectory(bucketName,
                        null, getBasedir());
@@ -468,9 +468,6 @@ Spring Profileに応じた環境リポジトリの実装を行う。
            } finally {
                if (tm != null) {
                    tm.shutdownNow();
-               }
-               if (amazonS3Client != null) {
-                   amazonS3Client.shutdown();
                }
 
            }
@@ -593,7 +590,7 @@ configプロジェクトの作成
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 configプロジェクトの構成について説明する。
-Spring Bootプロジェクトについては、\ `公式リファレンスの"Using Spring Boot" <http://docs.spring.io/spring-boot/docs/1.4.3.RELEASE/reference/htmlsingle/#using-boot>`_\ を参照されたい。
+Spring Bootプロジェクトについては、\ `公式リファレンスの"Using Spring Boot" <http://docs.spring.io/spring-boot/docs/1.5.7.RELEASE/reference/htmlsingle/#using-boot>`_\ を参照されたい。
 
 .. code-block:: console
 
@@ -661,6 +658,7 @@ Spring Bootプロジェクトについては、\ `公式リファレンスの"Us
            <dependency>
                <groupId>org.springframework.cloud</groupId>
                <artifactId>spring-cloud-config-server</artifactId>
+               <version>1.2.3.RELEASE</version>
            </dependency>
            <dependency>
                <groupId>org.springframework.boot</groupId>

@@ -55,10 +55,10 @@ How to use
 AWS環境での固有設定
 """"""""""""""""""""""""""""""""""""""""""""""""
 
-\ `Spring Session with Redis <http://docs.spring.io/spring-session/docs/1.2.2.RELEASE/reference/html5/#httpsession-redis>`_\
+\ `Spring Session with Redis <http://docs.spring.io/spring-session/docs/1.3.1.RELEASE/reference/html5/#httpsession-redis>`_\
 は、Redisのconfigコマンドを使用して初期化時に自動で設定を実施するが、ElastiCacheのようなマネージドサービスでは
 configコマンドが無効化されていてエラーになってしまうため、以下の設定が必要となる。
-詳細については、\ `SessionDeletedEvent and SessionExpiredEvent <http://docs.spring.io/spring-session/docs/1.2.2.RELEASE/reference/html5/#api-redisoperationssessionrepository-sessiondestroyedevent>`_\ を参照されたい。
+詳細については、\ `SessionDeletedEvent and SessionExpiredEvent <http://docs.spring.io/spring-session/docs/1.3.1.RELEASE/reference/html5/#api-redisoperationssessionrepository-sessiondestroyedevent>`_\ を参照されたい。
 
 
 - :file:`application-context.xml`
@@ -78,7 +78,7 @@ configコマンドが無効化されていてエラーになってしまうた�
    * - 項番
      - 説明
    * - | (1)
-     - | \ `Spring Session with Redis <http://docs.spring.io/spring-session/docs/1.2.2.RELEASE/reference/html5/#httpsession-redis>`_\の自動設定を無効化する設定を定義。
+     - | \ `Spring Session with Redis <http://docs.spring.io/spring-session/docs/1.3.1.RELEASE/reference/html5/#httpsession-redis>`_\の自動設定を無効化する設定を定義。
 
 
 

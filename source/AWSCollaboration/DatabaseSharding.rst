@@ -97,7 +97,7 @@ Spring Data module for DynamoDBの詳細については、 `Spring Data DynamoDB
     <properties>
       ・・・
       <!-- (2) -->
-      <org.springframework.data.dynamodb-dependencies.version>4.2.3</org.springframework.data.dynamodb-dependencies.version>
+      <org.springframework.data.dynamodb-dependencies.version>4.5.0</org.springframework.data.dynamodb-dependencies.version>
       ・・・
     </properties>
 
@@ -139,9 +139,9 @@ Spring Data module for DynamoDBの詳細については、 `Spring Data DynamoDB
 
 |
 
-以下に、DynamoDBエンドポイントとシャードキーリポジトリインタフェースの設定例を示す。
+以下に、DynamoDBのリージョンとシャードキーリポジトリインタフェースの設定例を示す。
 
-- \ ``xxx-web/src/java/resources/application-local.yml``\にDynamoDBエンドポイントを設定
+- \ ``xxx-web/src/java/resources/application-local.yml``\にDynamoDBのリージョンを設定
 
 .. code-block:: yaml
 
@@ -150,7 +150,7 @@ Spring Data module for DynamoDBの詳細については、 `Spring Data DynamoDB
       ・・・
       # (1)
       dynamodb:
-        endpoint: https://dynamodb.ap-northeast-1.amazonaws.com
+        region: ap-northeast-1
 
 .. tabularcolumns:: |p{0.10\linewidth}|p{0.90\linewidth}|
 .. list-table::
@@ -160,7 +160,7 @@ Spring Data module for DynamoDBの詳細については、 `Spring Data DynamoDB
   * - 項番
     - 説明
   * - | (1)
-    - DynamoDBエンドポイントを設定する。
+    - DynamoDBのリージョンを設定する。
 
 |
 
@@ -169,10 +169,11 @@ Spring Data module for DynamoDBの詳細については、 `Spring Data DynamoDB
 .. code-block:: xml
 
   <!-- (1) -->
-  <bean id="amazonDynamoDB" class="com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient">
-    <!-- (2) -->
-    <property name="endpoint" value="${cloud.aws.dynamodb.endpoint}" />
-  </bean>
+   <bean id="amazonDynamoDB"
+     class="com.example.xxx.domain.common.dynamodb.DynamoDBClientFactory" factory-method="create">
+     <!-- (2) -->
+     <constructor-arg index ="0" value="${cloud.aws.dynamodb.region}" />
+   </bean>
   <!-- (3) -->
   <dynamodb:repositories base-package="com.example.xxx.domain.common.shard.repository"
     amazon-dynamodb-ref="amazonDynamoDB" />
@@ -185,11 +186,36 @@ Spring Data module for DynamoDBの詳細については、 `Spring Data DynamoDB
   * - 項番
     - 説明
   * - | (1)
-    - DynamoDBクライアント\ ``AmazonDynamoDBClient``\を設定する。
+    - | DynamoDBへアクセスするための\ ``AmazonDynamoDB``\ を定義する。
+      | \ ``DynamoDBClientFactory``\ を使用してインスタンスを生成する。
   * - | (2)
-    - DynamoDBエンドポイントをプロパティ\ ``endpoint``\ に設定する。
+    - DynamoDBリージョンをコンストラクタ引数で設定する。
   * - | (3)
     - シャードキーリポジトリのパッケージをスキャン対象に設定する。
+
+|
+
+- \ ``DynamoDBClientFactory.java``\
+
+.. code-block:: java
+
+
+    public class DynamoDBClientFactory {
+         public static AmazonDynamoDB create(String region) {
+            // (1)
+            return AmazonDynamoDBClientBuilder.standard().withRegion(region).build();
+        }
+    }
+
+.. tabularcolumns:: |p{0.10\linewidth}|p{0.90\linewidth}|
+.. list-table::
+ :header-rows: 1
+ :widths: 10 90
+
+ * - 項番
+   - 説明
+ * - | (1)
+   - | \ ``AmazonDynamoDBClientBuilder``\ を使用してインスタンスを生成する。
 
 |
 
@@ -229,7 +255,7 @@ Spring Data module for DynamoDBの詳細については、 `Spring Data DynamoDB
 DynamoDBへアクセスする為には、テーブルデータに対応したエンティティクラスとシャードキーリポジトリクラスを作成する。
 以下に、DynamoDBのエンティティクラス\ ``ShardingAccount``\とシャードキーリポジトリクラス\ ``AccountShardKeyRepository``\の実装例を示す。
 
-Spring DataのRepositoryの詳細については、|base_framework_name| の `Spring Data JPA <http://macchinetta.github.io/server-guideline/1.4.0.RELEASE/ja/ArchitectureInDetail/DataAccessDetail/DataAccessJpa.html#repository>`_ を参照されたい。
+Spring DataのRepositoryの詳細については、`Spring Data JPA <http://terasolunaorg.github.io/guideline/5.4.0.RELEASE/ja/ArchitectureInDetail/DataAccessDetail/DataAccessJpa.html#repository>`_ を参照されたい。
 
 - エンティティクラス\ ``ShardingAccount``\
 

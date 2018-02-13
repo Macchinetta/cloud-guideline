@@ -12,6 +12,7 @@
 
 ## Issue Links
 * #XXX
+* [Parent](/macchinetta-cloud/issue-management/issues/XXX)
 
 ## ChangeLog
 (To be written later by project member)

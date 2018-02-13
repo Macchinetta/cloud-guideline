@@ -99,10 +99,7 @@ How to extend
    @ConfigurationProperties(prefix = "custom.metric")
    public class CloudWatchMetricSender implements InitializingBean {
 
-       @Inject
-       AWSCredentialsProvider awsCredentialsProvider;
-
-       @Value("${cloud.aws.cloudwatch.region}")
+       @Value("${cloud.aws.cloudwatch.region:}")
        String region;
 
        // (1)
@@ -112,19 +109,21 @@ How to extend
        @Inject
        CloudWatchMetricProperties cloudWatchMetricProperties;
 
-       AmazonCloudWatchClient amazonCloudWatchClient;
+       private AmazonCloudWatch amazonCloudWatch;
 
-       String instanceId;
+       private String instanceId;
 
        // (2)
        @Override
        public void afterPropertiesSet() throws Exception {
-           this.amazonCloudWatchClient = new AmazonCloudWatchClient(awsCredentialsProvider);
-
-           if (!StringUtils.isEmpty(region)) {
-               this.amazonCloudWatchClient.setRegion(Region.getRegion(Regions
-                       .fromName(region)));
+           if (StringUtils.isEmpty(region)) {
+               this.amazonCloudWatch = AmazonCloudWatchClientBuilder
+                       .defaultClient();
+           } else {
+               this.amazonCloudWatch = AmazonCloudWatchClientBuilder
+                       .standard().withRegion(region).build();
            }
+
 
            try {
                InstanceInfo instanceInfo = EC2MetadataUtils.getInstanceInfo();
@@ -184,7 +183,7 @@ How to extend
 
                    );
 
-           amazonCloudWatchClient.putMetricData(request); // (8)
+           AmazonCloudWatch.putMetricData(request); // (8)
        }
 
        private void resolveInstanceIdWithLocalHostAddress() {
@@ -217,7 +216,7 @@ How to extend
      - | \ `Auto Scaling グループメトリクスのディメンション <http://docs.aws.amazon.com/ja_jp/autoscaling/latest/userguide/as-instance-monitoring.html#as-group-metric-dimensions>`_\で使用するAutoScalingGroupName ディメンションの設定である
          \ ``custom.metric.auto-scaling-group-name``\が設定されていない場合に、\ ``spring.application.name``\をデフォルト値として\ ``autoScalingGroupName``\に設定する。
    * - | (2)
-     - | AmazonCloudWatchClientで指定されたリージョンが存在する場合は設定して生成する。アプリケーションがEC2インスタンス上で実行されている場合は、EC2インスタンスを識別する為の、InstanceIdを取得する。EC2インスタンス上でない場合は、localhost文字列を設定する。
+     - | AmazonCloudWatchで指定されたリージョンが存在する場合は設定して生成する。アプリケーションがEC2インスタンス上で実行されている場合は、EC2インスタンスを識別する為の、InstanceIdを取得する。EC2インスタンス上でない場合は、localhost文字列を設定する。
    * - | (3)
      - | CloudWatchメトリクスに送信するスケジュールを指定する。
    * - | (4)
@@ -229,7 +228,7 @@ How to extend
    * - | (7)
      - | CloudWatchメトリクスに送信する\ ``PutMetricDataRequest``\を生成して、メトリクス名に\ ``HeapMemory.Utilization``\、単位にパーセント表記する為の\ ``StandardUnit.Percent.toString()``\、値にメモリ使用率を計算指定して設定する。
    * - | (8)
-     - | \ ``AmazonCloudWatchClient#putMetricData``\を使用して、CloudWatchメトリクスに送信する。
+     - | \ ``AmazonCloudWatch#putMetricData``\を使用して、CloudWatchメトリクスに送信する。
 
 .. note::
   Spring Cloud AWSにはメトリクスを送信するための\ ``CloudWatchMetricSender``\ インタフェースとその実装である\ ``BufferingCloudWatchMetricSender``\ が用意されている。
@@ -245,9 +244,7 @@ How to extend
 
       <!-- (1) -->
       <bean id="cloudWatchMetricSender"
-        class="com.example.xxx.common.metrics.CloudWatchMetricSender">
-        <constructor-arg ref="environment" />
-      </bean>
+        class="com.example.xxx.common.metrics.CloudWatchMetricSender" />
 
  .. tabularcolumns:: |p{0.10\linewidth}|p{0.90\linewidth}|
  .. list-table::

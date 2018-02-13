@@ -579,7 +579,7 @@ How to use
 ルーティングデータソースクラス
 """""""""""""""""""""""""""""""""""""""""""""""""""""
 
-  \ ``RoutingDataSource``\は、Springが提供する、複数のデータソースを定義し動的に切り替えを行う仕組みである。簡単な使用方法は `こちら <http://macchinetta.github.io/server-guideline/1.4.0.RELEASE/ja/ArchitectureInDetail/DataAccessDetail/DataAccessCommon.html#data-access-common-todo-multiple-datasource-howtoextends>`_ を参照すること。
+  \ ``RoutingDataSource``\は、Springが提供する、複数のデータソースを定義し動的に切り替えを行う仕組みである。簡単な使用方法は `こちら <https://macchinetta.github.io/server-guideline/1.5.0.RELEASE/ja/ArchitectureInDetail/DataAccessDetail/DataAccessCommon.html#data-access-common-todo-multiple-datasource-howtoextends>`_ を参照すること。
 
   以下に、ルーティングデータソースクラス\ ``RoutingDataSource``\のBean定義例を示す。
 

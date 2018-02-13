@@ -15,7 +15,7 @@ Overview
 
     本ガイドラインでは、クラウド環境を利用する場合の留意点のみを説明し、ファイルアップロードを行う機能そのものの実装方法については説明しない。
     
-    ファイルアップロードを行う機能の実装方法については |base_framework_name| Development Guideline `ファイルアップロード <http://macchinetta.github.io/server-guideline/1.4.0.RELEASE/ja/ArchitectureInDetail/WebApplicationDetail/FileUpload.html>`_  を参照されたい。
+    ファイルアップロードを行う機能の実装方法については |base_framework_name| Development Guideline `ファイルアップロード <https://macchinetta.github.io/server-guideline/1.5.0.RELEASE/ja/ArchitectureInDetail/WebApplicationDetail/FileUpload.html>`_  を参照されたい。
 
 仮アップロードファイルの保存
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -55,7 +55,7 @@ Amazon Web Service
 
 クラウドベンダーとしてAWSを使用する場合、Spring Cloud for Amazon Web Services、AWS SDK for JavaおよびAmazon Simple Storage Serviceを使用してストレージサービスへのファイル保存を行う事ができる。
     
-実装方法については :doc:`../AWSCollaboration/UploadFileManagement` を参照。
+実装方法については :doc:`../../AWSCollaboration/FileManagement/UploadFileManagement` を参照。
 
 .. raw:: latex
 

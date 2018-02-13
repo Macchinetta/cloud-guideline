@@ -11,12 +11,12 @@ AWS連携
    CreateAWSApplicationProject
    AutoScale
    SessionManagement
-   UploadFileManagement
+   FileManagement/index
    StaticContents
-   DatabaseSharding
-   AsynchronousProcessing
+   Queuing/index
    MailSending
    LogManagement
+   DatabaseSharding
    DatabaseReadReplica
 
 .. raw:: latex

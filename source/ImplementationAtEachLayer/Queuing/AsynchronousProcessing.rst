@@ -1,4 +1,4 @@
-バースト処理の非同期実行
+非同期実行（共通編）
 ================================================================================
 
 .. only:: html
@@ -10,7 +10,7 @@
 Overview
 --------------------------------------------------------------------------------
 
-| 本ガイドラインでは、クラウド環境におけるバースト処理の非同期実行について、クラウドベンダーに依存しない共通的な事項を説明する。
+| 本ガイドラインでは、クラウド環境における非同期実行について、クラウドベンダーに依存しない共通的な事項を説明する。
 |
 | システムによっては、特定のタイミングで大量のトラフィックが発生し、リソースへの負荷が増大するような場合が存在する。
 | 航空チケット予約システムを例に挙げると、大型連休等の高需要な日程のチケットの予約開始日などは、一時的に大量の予約注文が発生する事が想定される。
@@ -58,6 +58,8 @@ Overview
    * - | (5)
      - | 通知サービスは、クライアントに処理完了通知を送信する。
 
+.. _asynchoronous-processing-front-label:
+
 フロントサーバの処理方式
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -72,7 +74,7 @@ Overview
 | 送信完了後、クライアントに処理を受け付けた旨のレスポンスを返却する。
 |
 | 本ガイドラインでは、メッセージ送信のインタフェースにSpring Frameworkが提供するインタフェースを使用する事を前提としている。実装には、クラウドベンダーが提供するライブラリを利用する。
-| なお、クラウドベンダーがJMS互換のメッセージングをサポートしている場合は、|base_framework_name| のメッセージング連携のノウハウを活用できる為、|base_framework_name| Development Guideline `メッセージを同期送信する場合 <http://macchinetta.github.io/server-guideline/1.4.0.RELEASE/ja/ArchitectureInDetail/MessagingDetail/JMS.html#jmsoverviewsyncsend>`_ を参照されたい。
+| なお、クラウドベンダーがJMS互換のメッセージングをサポートしている場合は、|base_framework_name| のメッセージング連携のノウハウを活用できる為、|base_framework_name| Development Guideline `メッセージを同期送信する場合 <https://macchinetta.github.io/server-guideline/1.5.0.RELEASE/ja/ArchitectureInDetail/MessagingDetail/JMS.html#jmsoverviewsyncsend>`_ を参照されたい。
 
 
 メッセージに持たせる情報
@@ -86,8 +88,14 @@ Overview
 
  * **メッセージの識別子**
 
-   メッセージを一意に特定できるメッセージID。処理のトレーサビリティを確保する為に付与する。
-   採用するメッセージングサービスにて、一意なIDが採番される場合は、そちらを利用できないか検討すると良い。
+   メッセージを一意に特定できるメッセージID。処理のトレーサビリティを確保する為に利用する。
+   採用するメッセージングサービスにて一意なIDが採番される場合(例:Amazon SQSのSQSMessageIDなど)は、そちらを利用すると良い。
+
+   .. note::
+
+      メッセージ送信の失敗時に、前回送信と同一のメッセージIDでリトライ送信を行いたいなど、
+      メッセージングサービスにて採番されたIDでは実現できない要件がある場合は、
+      アプリケーションにて独自に採番する方式を検討されたい。
 
 メッセージ送信に関連するエラー処理
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -102,8 +110,10 @@ Overview
 | 特に、メッセージ送信後に例外が発生した場合に、フロントサーバ側とバックサーバ側で処理の整合性が保たれるよう、例外処理を設計すること。
 
 .. note::
-   
+
    フロントサーバとバックサーバのデータ整合性を保つための対処法としては、戻し更新処理の実装や、運用対処によるデータ修正などが考えられる。
+
+.. _asynchoronous-processing-back-label:
 
 バックサーバの処理方式
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -123,14 +133,14 @@ Overview
   Amazon Web Serviceが提供するAmazon SQSの\ `標準キュー <http://docs.aws.amazon.com/ja_jp/AWSSimpleQueueService/latest/SQSDeveloperGuide/standard-queues.html>`_\のように、メッセージングサービスによっては順序性を担保していない。厳密な順序性が求められる場合は注意されたい。
 
 | 本ガイドラインでは、メッセージ非同期受信のインタフェースにSpring Frameworkが提供するインタフェースを使用する事を前提としている。実装には、クラウドベンダーが提供するライブラリを利用する。
-| なお、クラウドベンダーがJMS互換のメッセージングをサポートしている場合は、|base_framework_name| のメッセージング連携のノウハウを活用できる為、|base_framework_name| Development Guideline `メッセージを非同期受信する場合 <http://macchinetta.github.io/server-guideline/1.4.0.RELEASE/ja/ArchitectureInDetail/MessagingDetail/JMS.html#jmsoverviewasyncreceive>`_ を参照されたい。
+| なお、クラウドベンダーがJMS互換のメッセージングをサポートしている場合は、|base_framework_name| のメッセージング連携のノウハウを活用できる為、|base_framework_name| Development Guideline `メッセージを非同期受信する場合 <https://macchinetta.github.io/server-guideline/1.5.0.RELEASE/ja/ArchitectureInDetail/MessagingDetail/JMS.html#jmsoverviewasyncreceive>`_ を参照されたい。
 
 
 メッセージのトレース
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 メッセージのトレーサビリティ向上のために、各ログにリクエスト単位で一意なメッセージID等をTrackIDとして出力させることを推奨する。
-TrackIDは、logbackのMDCを利用してログ出力する事ができる。TrackIDの利用方については、|base_framework_name| Development Guideline `ログの出力内容 <http://macchinetta.github.io/server-guideline/1.4.0.RELEASE/ja/ArchitectureInDetail/GeneralFuncDetail/Logging.html#id3>`_ を参照されたい。
+TrackIDは、logbackのMDCを利用してログ出力する事ができる。TrackIDの利用方については、|base_framework_name| Development Guideline `ログの出力内容 <https://macchinetta.github.io/server-guideline/1.5.0.RELEASE/ja/ArchitectureInDetail/GeneralFuncDetail/Logging.html#id3>`_ を参照されたい。
 
 処理完了通知
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -172,7 +182,7 @@ Amazon Web Service
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 クラウドベンダーとしてAWSを使用する場合の非同期処理の実装例については、
-:doc:`../AWSCollaboration/AsynchronousProcessing`
+:doc:`../../AWSCollaboration/Queuing/AsynchronousProcessing`
 を参照されたい。
 
 .. raw:: latex

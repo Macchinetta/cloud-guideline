@@ -21,7 +21,7 @@ AWSの各機能を利用する際の機能毎の設定については、 :doc:`.
 開発プロジェクトの作成
 --------------------------------------------------------------------------------
 
-本ガイドラインでは、クラウド版開発プロジェクトに対してクラウドベンダーとしてAWSを利用する場合の設定を追加する。
+本ガイドラインでは、オンライン版クラウド拡張開発プロジェクトに対してクラウドベンダーとしてAWSを利用する場合の設定を追加する。
 
 ベースとなる開発プロジェクトの作成は
 :doc:`../ImplementationAtEachLayer/CreateWebApplicationProject`
@@ -92,6 +92,38 @@ Amazon Elastic Compute Cloud(以後、EC2)上でアプリケーションを起�
         stack:
           auto: false
 
+.. _create_aws_project_autoconfiguration:
+
+Auto-Configurationの無効化
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+EC2上でアプリケーションを起動するためには、\ ``ElastiCacheAutoConfiguration``\ をAuto-configurationから除外する必要がある。
+事象についての詳細は :ref:`create_aws_project_constrait_cannot_find_cache` を参照されたい。
+
+\ ``ElastiCacheAutoConfiguration``\ を無効にする設定例を以下に示す。
+
+* Bootstrap.java
+
+  .. code-block:: java
+
+    @EnableAutoConfiguration(exclude = { DataSourceAutoConfiguration.class,
+                                          JmxAutoConfiguration.class, WebMvcAutoConfiguration.class,
+                                          ElastiCacheAutoConfiguration.class }) //(1)
+    public class Bootstrap extends SpringBootServletInitializer {
+      // omitted
+    }
+
+  .. tabularcolumns:: |p{0.10\linewidth}|p{0.90\linewidth}|
+  .. list-table::
+    :header-rows: 1
+    :widths: 10 90
+
+    * - 項番
+      - 説明
+    * - | (1)
+      - \ ``@EnableAutoConfiguration``\アノテーションの属性\ ``exclude``\に、\ ``ElastiCacheAutoConfiguration.class``\
+        を指定することで、\ ``ElastiCache``\の自動設定を除外する。
+
+
 
 .. _create_aws_project_constrait:
 
@@ -125,8 +157,28 @@ AWSの公式ドキュメントでは、下記のどちらかにアクセスキ�
   * AWSインスタンスプロファイルの認証情報
 
   詳細はSpring Cloud AWSの公式リファレンス
-  `SDK credentials configuration <http://cloud.spring.io/spring-cloud-static/spring-cloud-aws/1.1.3.RELEASE/#_sdk_credentials_configuration>`_
+  `SDK credentials configuration <http://cloud.spring.io/spring-cloud-static/spring-cloud-aws/1.2.1.RELEASE/#_sdk_credentials_configuration>`_
   を参照されたい。
+
+.. warning::
+
+    Spring Boot使用時はデフォルトの設定の状態では環境変数に設定したAWS認証情報は利用できない。
+    これはAuto-configurationによって\ ``com.amazonaws.auth.DefaultAWSCredentialsProviderChain``\ が利用されなくなるためである。
+
+    環境変数からAWS認証情報を取得するためには下記設定を行う必要がある。
+
+    #. \ ``cloud.aws.credentials.instanceProfile=false``\
+    #. \ ``cloud.aws.credentials.profileName=``\ (空)
+
+    * application.ymlの設定例
+
+      .. code-block:: yaml
+
+        cloud:
+          aws:
+            credentials:
+              instanceProfile: false
+              profileName:
 
 .. tip::
 
@@ -159,7 +211,7 @@ S3バケットに対するアクセス許可を適切に付与する必要があ
 本ガイドラインでは下記の章でS3を使用する。これらの機能を使用する場合、アクセス許可の設定が必要なことに注意されたい。
 
 * :doc:`../ImplementationAtEachLayer/EnvironmentValuesExternalManagement`
-* :doc:`../AWSCollaboration/UploadFileManagement`
+* :doc:`../AWSCollaboration/FileManagement/UploadFileManagement`
 * :doc:`../AWSCollaboration/StaticContents`
 
 アクセス許可を付与する際には、
@@ -207,9 +259,9 @@ S3 Management ConsoleもしくはAWS CLIから設定することでアクセス�
 
 Amazon EC2上でAPを起動するとAmazonServiceExceptionが発生する
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-EC2でアプリケーションを起動しようとすると、
+EC2上でアプリケーションを起動しようとすると、
 \ ``Caused by: com.amazonaws.AmazonServiceException: Stack for i-xxxxx does not exist...``\ が発生する。
-Spring Cloud AWSのAutoConfigureである\ ``ContextStackAutoConfiguration``\ によって、
+Spring Cloud AWSのAuto-configurationである\ ``ContextStackAutoConfiguration``\ によって、
 アプリケーションのスタック名自動検出が有効になり、AWS CloudFormationのスタックが見つからない場合、
 \ ``AmazonServiceException``\ が発生しAPが起動しない。
 
@@ -217,32 +269,15 @@ Spring Cloud AWSのAutoConfigureである\ ``ContextStackAutoConfiguration``\ �
 
 設定例は :ref:`create_aws_project_stack` を参照されたい。
 
+.. _create_aws_project_constrait_cannot_find_cache:
+
 Amazon EC2上でElastiCache Redis使用時の注意
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-EC2でアプリケーションを起動しようとすると、\ ``Spring Boot: java.lang.IllegalArgumentException: Cannot find cache named 'xxx' for CacheableOperation``\が発生する。
-Spring Cloud AWSのAutoConfigureである\ ``ElastiCacheAutoConfiguration``\ によって、ElastiCacheの自動設定が有効になり、AWS ElastiCacheに\ ``cache named``\の設定がされていない場合、\ ``IllegalArgumentException``\ が発生しAPが起動しない。
-そのため、以下のように\ ``ElastiCacheAutoConfiguration``\の自動設定を除外する。
+EC2上でアプリケーションを起動しようとすると、\ ``Spring Boot: java.lang.IllegalArgumentException: Cannot find cache named 'xxx' for CacheableOperation``\が発生する。
+Spring Cloud AWSのAuto-configurationである\ ``ElastiCacheAutoConfiguration``\ によって、ElastiCacheの自動設定が有効になり、AWS ElastiCacheに\ ``cache named``\の設定がされていない場合、\ ``IllegalArgumentException``\ が発生しAPが起動しない。
+そのため、\ ``ElastiCacheAutoConfiguration``\の自動設定を除外する。
 
-  .. code-block:: java
-
-    @EnableAutoConfiguration(exclude = { DataSourceAutoConfiguration.class,
-      // (1)
-      ElastiCacheAutoConfiguration.class, JmxAutoConfiguration.class,
-      WebMvcAutoConfiguration.class })
-    public class Bootstrap extends SpringBootServletInitializer {
-      // ・・・
-    }
-
-  .. tabularcolumns:: |p{0.10\linewidth}|p{0.90\linewidth}|
-  .. list-table::
-    :header-rows: 1
-    :widths: 10 90
-
-    * - 項番
-      - 説明
-    * - | (1)
-      - \ ``@EnableAutoConfiguration``\アノテーションの属性\ ``exclude``\に、\ ``ElastiCacheAutoConfiguration.class``\
-        を指定することで、\ ``ElastiCache``\の自動設定を除外する。
+設定例は :ref:`create_aws_project_autoconfiguration` を参照されたい。
 
 
 .. raw:: latex

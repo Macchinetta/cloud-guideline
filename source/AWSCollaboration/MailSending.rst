@@ -60,13 +60,17 @@ Spring Frameworkのコンポーネントを使用したAmazon SESの利用
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 | Spring Frameworkはメール送信を行うためのコンポーネント（\ ``org.springframework.mail``\ パッケージ）を提供している。
 | このパッケージに含まれるコンポーネントはメール送信に係る詳細なロジックを隠蔽し、低レベルのAPIハンドリング(JavaMailのAPI呼び出し)を代行する。
-| 詳しくは、|base_framework_name| のガイドライン\ `Spring FrameworkのMail連携用コンポーネントについて <http://macchinetta.github.io/server-guideline/1.4.0.RELEASE/ja/ArchitectureInDetail/MessagingDetail/Email.html#spring-frameworkmail>`_\ に紹介されている為、参照されたい。
+| 詳しくは、|base_framework_name| のガイドライン\ `Spring FrameworkのMail連携用コンポーネントについて <https://macchinetta.github.io/server-guideline/1.5.0.RELEASE/ja/ArchitectureInDetail/MessagingDetail/Email.html#spring-frameworkmail>`_\ に紹介されている為、参照されたい。
 
 本ガイドラインで使用するコンポーネントを以下に示す。
 
 * \ ``JavaMailSender``\
     | JavaMail用のメール送信インターフェース。
     | JavaMailの\ `MimeMessage <http://docs.oracle.com/javaee/7/api/javax/mail/internet/MimeMessage.html>`_\ とSpringの\ ``SimpleMailMessage``\ の両方に対応している。
+
+* \ ``MimeMessageHelper``\
+    | JavaMailのMimeMessageの作成を容易にするためのヘルパークラス。
+    | MimeMessageHelperには、MimeMessageに値を設定するための便利なメソッドがいくつも用意されている。
 
 * \ ``SimpleMailMessage``\
     | 単純なメールメッセージを作成するためのクラス。
@@ -96,6 +100,15 @@ Amazon SESの設定
    送信上限は必要に応じて引き上げ申請が可能な為、 \ `Amazon SES の送信制限の管理 <https://docs.aws.amazon.com/ja_jp/ses/latest/DeveloperGuide/manage-sending-limits.html>`_\および
    \ `Amazon SES の送信制限の引き上げ <https://docs.aws.amazon.com/ja_jp/ses/latest/DeveloperGuide/increase-sending-limits.html>`_\ を参照されたい。
 
+.. note::
+
+   **メールボックスシミュレーターについて**
+
+   テスト工程などでは、実在する宛先にメールを送らずに、バウンスやサプレッションリストへの送信確認などを行いたい場合が存在する。
+
+   Amazon SESはメールボックスシミュレータを提供している為、特定のアドレスをToに設定して送信することで、いくつかのシミュレートを行う事ができる。
+   詳細については\ `Amazon SES Eメール送信のテスト <https://docs.aws.amazon.com/ja_jp/ses/latest/DeveloperGuide/mailbox-simulator.html>`_\を参照されたい。
+
 .. _SESHowToUseDependentLibrary:
 
 依存ライブラリの設定
@@ -116,6 +129,16 @@ Amazon SESの設定
               <groupId>org.springframework.cloud</groupId>
               <artifactId>spring-cloud-starter-aws</artifactId>
           </dependency>
+          <!-- (2) -->
+          <dependency>
+              <groupId>com.amazonaws</groupId>
+              <artifactId>aws-java-sdk-ses</artifactId>
+          </dependency>
+          <!-- (3) -->
+          <dependency>
+              <groupId>com.sun.mail</groupId>
+              <artifactId>javax.mail</artifactId>
+          </dependency>
 
       </dependencies>
 
@@ -128,7 +151,11 @@ Amazon SESの設定
         - 説明
       * - | (1)
         - | \ ``spring-cloud-starter-aws``\ をdependenciesに追加する。
-          | Amazon Web Serviceが提供する\ ``aws-java-sdk-ses``\、Spring Frameworkが提供する\ ``spring-context-support``\、JavaMailのAPIである\ ``javax.mail-api``\など、本ガイドラインで紹介するメール送信に必要なライブラリが推移的な依存関係に含まれる。
+      * - | (2)
+        - | \ ``aws-java-sdk-ses``\ をdependenciesに追加する。
+      * - | (3)
+        - | \ ``javax.mail``\ をdependenciesに追加する。
+
 
 Spring Cloud AWSの設定
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -227,16 +254,14 @@ SimpleMailMessageによるメール送信方法
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 英文のプレーンテキストメール（エンコードの指定や添付ファイル等が不要なメール）を送信する場合は、Springが提供している\ ``SimpleMailMessage``\クラスを使用する。
 
-実装例については、|base_framework_name| のガイドライン\ `SimpleMailMessageによるメール送信方法 <http://macchinetta.github.io/server-guideline/1.4.0.RELEASE/ja/ArchitectureInDetail/MessagingDetail/Email.html#simplemailmessage>`_\ にて紹介されているものを参照されたい。
+実装例については、|base_framework_name| のガイドライン\ `SimpleMailMessageによるメール送信方法 <https://macchinetta.github.io/server-guideline/1.5.0.RELEASE/ja/ArchitectureInDetail/MessagingDetail/Email.html#simplemailmessage>`_\ を参照されたい。
 
-.. note::
+MimeMessageによるメール送信方法
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+英文以外のメールやHTMLメール、添付ファイルの送信を行う場合、\ ``javax.mail.internet.MimeMessage``\ クラスを使用する。
+本ガイドラインでは\ ``MimeMessageHelper``\ クラスを使用してMimeMessageを作成する方法を推奨している。
 
-   **メールボックスシミュレーターについて**
-
-   テスト工程などでは、実在する宛先にメールを送らずに、バウンスやサプレッションリストへの送信確認などを行いたい場合が存在する。
-
-   Amazon SESはメールボックスシミュレータを提供している為、特定のアドレスをToに設定して送信することで、いくつかのシミュレートを行う事ができる。
-   詳細については\ `Amazon SES Eメール送信のテスト <https://docs.aws.amazon.com/ja_jp/ses/latest/DeveloperGuide/mailbox-simulator.html>`_\を参照されたい。
+実装例については、|base_framework_name| のガイドライン\ `MimeMessageによるメール送信方法 <https://macchinetta.github.io/server-guideline/1.5.0.RELEASE/ja/ArchitectureInDetail/MessagingDetail/Email.html#id8>`_\ を参照されたい。
 
 .. raw:: latex
 

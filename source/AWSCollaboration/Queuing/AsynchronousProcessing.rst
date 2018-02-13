@@ -1,4 +1,4 @@
-非同期処理の実装
+非同期処理の実装（共通編）
 ================================================================================
 
 .. only:: html
@@ -10,7 +10,7 @@
 Overview
 --------------------------------------------------------------------------------
 
-| 本節では、Amazon Simple Queue Service（以下、Amazon SQS）を使用した非同期処理の実装方法について、:doc:`../ImplementationAtEachLayer/AsynchronousProcessing` に則って説明する。
+| 本節では、Amazon Simple Queue Service（以下、Amazon SQS）を使用した非同期処理の実装方法について、:doc:`../../ImplementationAtEachLayer/Queuing/AsynchronousProcessing` に則って説明する。
 | 非同期処理実装の全体イメージを以下に示す。
 
 .. figure:: ./imagesAsynchronousProcessing/AsynchronousProcessingOverviewUsingAWS.png
@@ -21,7 +21,7 @@ Overview
 
    リクエストを受け付け、キューにメッセージを送信するフロントサーバと、キューからメッセージを受信し非同期に処理を行うバックサーバの2つのサーバが存在する前提で説明を進める。
 
-   必要に応じて、バックサーバのプロジェクトを作成すること。プロジェクトの作成については、:doc:`../ImplementationAtEachLayer/CreateWebApplicationProject` を参照されたい。
+   必要に応じて、バックサーバのプロジェクトを作成すること。プロジェクトの作成については、:doc:`../../ImplementationAtEachLayer/CreateWebApplicationProject` を参照されたい。
 
 .. _AboutSQS:
 
@@ -118,12 +118,12 @@ Spring JMSを使用したAmazon SQSの利用
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 | Spring Frameworkが提供するSpring JMSライブラリ経由でSQSを利用する方法について説明する。
-| Spring JMSについては、|base_framework_name| のガイドライン\ `Spring Frameworkのコンポーネントを使用したJMSの利用 <http://macchinetta.github.io/server-guideline/1.4.0.RELEASE/ja/ArchitectureInDetail/MessagingDetail/JMS.html#spring-frameworkjms>`_\に詳しい利用法が記されている為、参照されたい。
+| Spring JMSについては、|base_framework_name| のガイドライン\ `Spring Frameworkのコンポーネントを使用したJMSの利用 <https://macchinetta.github.io/server-guideline/1.5.0.RELEASE/ja/ArchitectureInDetail/MessagingDetail/JMS.html#spring-frameworkjms>`_\に詳しい利用法が記されている為、参照されたい。
 
 .. note::
 
  Spring Cloudが提供する Spring Cloud for Amazon Web Services(以下、Spring Cloud AWS)を用いても、JavaアプリケーションからAmazon SQSを利用することができる。
- ただし、本ガイドライン執筆時点のバージョン(1.1.3.RELEASE)では、メッセージ受信を行う\ ``SimpleMessageListenerContainer``\ の仕様により、メッセージ受信後の処理がパラレルに実行できないという制約がある。
+ ただし、本ガイドライン執筆時点のバージョン(1.2.1.RELEASE)では、メッセージ受信を行う\ ``SimpleMessageListenerContainer``\ の仕様により、メッセージ受信後の処理がパラレルに実行できないという制約がある。
  詳細については、Spring Cloud AWSの\ `issues#166 <https://github.com/spring-cloud/spring-cloud-aws/issues/166>`_\を参照されたい。
 
  以上の理由から、本ガイドラインではSpring Cloud AWSを使用せず、Spring JMSを用いて説明する。
@@ -297,11 +297,11 @@ Amazon Web Serviceのコンソール、またはクエリAPIから、アプリ�
 ConnectionFactoryの設定
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-フロントサーバ、バックサーバそれぞれのenvプロジェクトのenv.xmlに\ ``ConnectionFactory``\ の定義を追加する。
+フロントサーバ、バックサーバそれぞれのdomainプロジェクトのinfra.xmlに\ ``ConnectionFactory``\ の定義を追加する。
 
 記述例を以下に示す。
 
-- xxx-env.xml
+- xxx-infra.xml
 
  .. code-block:: xml
 
@@ -334,11 +334,11 @@ ConnectionFactoryの設定
 
          ここではリージョンを固定文字列として記述しているが、実際の開発では外部管理とすることが望ましい。
 
-         環境依存値の外部管理については、:doc:`../ImplementationAtEachLayer/EnvironmentValuesExternalManagement` を参照されたい。
+         環境依存値の外部管理については、:doc:`../../ImplementationAtEachLayer/EnvironmentValuesExternalManagement` を参照されたい。
 
  .. note:: **ConnectionFactoryの定義方法について**
 
-  |base_framework_name| のガイドライン\ `ConnectionFactoryの設定 <http://macchinetta.github.io/server-guideline/1.4.0.RELEASE/ja/ArchitectureInDetail/MessagingDetail/JMS.html#connectionfactory>`_\ では、
+  |base_framework_name| のガイドライン\ `ConnectionFactoryの設定 <https://macchinetta.github.io/server-guideline/1.5.0.RELEASE/ja/ArchitectureInDetail/MessagingDetail/JMS.html#connectionfactory>`_\ では、
   Bean定義ファイルがアプリケーションサーバ提供のJMSプロバイダ依存となることを防ぐため、\ ``ConnectionFactory``\ をアプリケーションサーバ側にて定義することを推奨しているが、
   本ガイドラインで紹介しているケースにおいては、JMSプロバイダはクラウドベンダー提供のライブラリを使用する為、アプリケーションサーバ側に定義する必要性は低い。
 
@@ -366,7 +366,7 @@ Spring JMSは、JMSプロバイダによる解決を行う \ ``DynamicDestinatio
 
 | クライアントからAmazon SQSキューへメッセージを同期送信する方法を説明する。
 
-本ガイドラインでは、|base_framework_name| のガイドライン \ `メッセージを同期送信する方法 <http://macchinetta.github.io/server-guideline/1.4.0.RELEASE/ja/ArchitectureInDetail/MessagingDetail/JMS.html#jmshowtousesyncsendmessage>`_\ との差分について重点的に紹介している為、
+本ガイドラインでは、|base_framework_name| のガイドライン \ `メッセージを同期送信する方法 <https://macchinetta.github.io/server-guideline/1.5.0.RELEASE/ja/ArchitectureInDetail/MessagingDetail/JMS.html#jmshowtousesyncsendmessage>`_\ との差分について重点的に紹介している為、
 本ガイドラインと併せて、|base_framework_name| のガイドラインも参照されたい。
 
 .. _SQSHowToUseSettingForSyncSend:
@@ -377,25 +377,53 @@ Spring JMSは、JMSプロバイダによる解決を行う \ ``DynamicDestinatio
 | \ ``JmsMessagingTemplate``\ を利用して、Amazon SQSへの同期送信処理を実現する。
 | ここでは、\ ``Reservation``\ クラスのオブジェクトをメッセージ同期送信する場合の実装例を紹介する。
 
+- 同期送信に必要となるBean定義
+
+  | メッセージの送信側アプリケーションに必要となるBean定義例を以下に示す。
+
+  - xxx-infra.xml
+
+    .. code-block:: xml
+
+      <bean id="cachingConnectionFactory"
+         class="org.springframework.jms.connection.CachingConnectionFactory" primary="true"> <!-- (1) -->
+         <property name="targetConnectionFactory" ref="connectionFactory" /> <!-- (2) -->
+         <property name="sessionCacheSize" value="10" />  <!-- (3) -->
+      </bean>
+
+    .. tabularcolumns:: |p{0.10\linewidth}|p{0.90\linewidth}|
+    .. list-table::
+       :header-rows: 1
+       :widths: 10 90
+
+       * - 項番
+         - 説明
+       * - | (1)
+         - | \ ``Session``\ 、\ ``MessageProducer``\ のキャッシュを行う\ ``org.springframework.jms.connection.CachingConnectionFactory``\ をBean定義する。
+           | \ ``SQSConnectionFactory``\ をそのまま使うのではなく、
+             \ ``CachingConnectionFactory``\ にラップして使用することで、キャッシュ機能を使用することができる。
+           | DIコンテナに\ ``ConnectionFactory``\ 実装クラスが複数登録されることになる為、\ ``primary``\属性に\ ``true``\ を指定する。
+       * - | (2)
+         - | Bean定義された\ ``SQSConnectionFactory``\ を指定する。
+       * - | (3)
+         - | \ ``Session``\ のキャッシュ数を設定する。（デフォルト値は1）
+           | この例では10を指定しているが、性能要件に応じて適宜キャッシュ数を変更すること。
+           | このキャッシュ数を超えてセッションが必要になるとキャッシュを使用せず、新しいセッションの作成と破棄を繰り返すことになる。
+           | すると処理効率が下がり、性能劣化の原因になるので注意すること。
+
 .. note::
 
   本ガイドラインでは、Spring BootのAuto-configurationの使用を前提としており、
   メッセージ送信に使用する\ ``JmsTemplate``\、\ ``JmsMessagingTemplate``\ は \ ``JmsAutoConfiguration``\ にてBean定義される為、
   デフォルト設定のまま使用する場合は、Bean定義は不要である。
 
-.. todo::
 
-   |base_framework_name| のガイドライン\ `基本的な同期送信 <http://macchinetta.github.io/server-guideline/1.4.0.RELEASE/ja/ArchitectureInDetail/MessagingDetail/JMS.html#jmshowtousesettingforsyncsend>`_\ で紹介されている、
-   \ ``CachingConnectionFactory``\を使用して\ ``SQSConnectionFactory``\ をキャッシュする事で性能向上が見込める。
-
-   \ ``CachingConnectionFactory``\を使用する際の設定方法についての説明を追記する。
-
-なお、\ ``JmsTemplate``\ の設定については、|base_framework_name| のガイドライン\ `メッセージを同期送信する方法 <http://macchinetta.github.io/server-guideline/1.4.0.RELEASE/ja/ArchitectureInDetail/MessagingDetail/JMS.html#jmshowtousesyncsendmessage>`_\に詳しく紹介されている為、必要に応じて参照されたい。
+なお、\ ``JmsTemplate``\ の設定については、|base_framework_name| のガイドライン\ `メッセージを同期送信する方法 <https://macchinetta.github.io/server-guideline/1.5.0.RELEASE/ja/ArchitectureInDetail/MessagingDetail/JMS.html#jmshowtousesyncsendmessage>`_\に詳しく紹介されている為、必要に応じて参照されたい。
 
 - 送信対象のJavaBeanの実装
 
   | フロントサーバ、バックサーバの両アプリケーションで共用するオブジェクトの為、modelプロジェクトに作成する。
-  | modelの共有についての詳細は、|base_framework_name| のガイドライン \ `プロジェクト構成について <http://macchinetta.github.io/server-guideline/1.4.0.RELEASE/ja/ArchitectureInDetail/MessagingDetail/JMS.html#jmsoverviewaboutprojectconfiguration>`_\を参照されたい。
+  | modelの共有についての詳細は、|base_framework_name| のガイドライン \ `プロジェクト構成について <https://macchinetta.github.io/server-guideline/1.5.0.RELEASE/ja/ArchitectureInDetail/MessagingDetail/JMS.html#jmsoverviewaboutprojectconfiguration>`_\を参照されたい。
 
   実装例を以下に示す。
 
@@ -411,19 +439,9 @@ Spring JMSは、JMSプロバイダによる解決を行う \ ``DynamicDestinatio
 
          private static final long serialVersionUID = -1L;
 
-         private String messageId; // (2)
-
          private String reserveNo;
 
          // omitted
-
-         public String getMessageId() {
-             return messageId;
-         }
-
-         public void setMessageId(String messageId) {
-             this.messageId = messageId;
-         }
 
          public String getReserveNo() {
              return reserveNo;
@@ -447,13 +465,6 @@ Spring JMSは、JMSプロバイダによる解決を行う \ ``DynamicDestinatio
          - 説明
        * - | (1)
          - | シリアライズして送信するため、\ ``java.io.Serializable``\ インタフェース を実装する必要がある。
-       * - | (2)
-         - | 後述する2重受信チェックに使用する、一意なメッセージID格納用のメンバ変数を用意する。
-
-           .. note::
-
-              ここでは説明の簡略化の為、\ ``Reservation``\ クラスに持たせているが、
-              冗長な設計となるため、実際の開発では抽象クラスに切り出す等して共通化することを推奨する。
 
 
 - 同期送信を行うサービスクラスの実装
@@ -468,7 +479,6 @@ Spring JMSは、JMSプロバイダによる解決を行う \ ``DynamicDestinatio
 
       package com.example.domain.service.reservation;
 
-      import java.util.UUID;
       import javax.inject.Inject;
       import org.springframework.jms.core.JmsMessagingTemplate;
       import org.springframework.stereotype.Service;
@@ -485,9 +495,7 @@ Spring JMSは、JMSプロバイダによる解決を行う \ ``DynamicDestinatio
 
              // omitted
 
-             reservation.setMessageId(UUID.randomUUID().toString());  // (2)
-
-             jmsMessagingTemplate.convertAndSend("reservation-queue", reservation);  // (3)
+             jmsMessagingTemplate.convertAndSend("reservation-queue", reservation);  // (2)
 
           }
       }
@@ -503,9 +511,6 @@ Spring JMSは、JMSプロバイダによる解決を行う \ ``DynamicDestinatio
       * - | (1)
         - | \ ``JmsMessagingTemplate``\ をインジェクションする。
       * - | (2)
-        - | \ ``UUID``\ を使用して、メッセージIDを生成する。
-          | なお、\ ``UUID``\によるID生成は厳密には一意ではない為、実際の開発ではデータベースのシーケンスにて採番する方法などを検討されたい。
-      * - | (3)
         - | \ ``JmsMessagingTemplate``\ の\ ``convertAndSend``\ メソッドを使用して、引数のJavaBeanを\ ``org.springframework.messaging.Message``\ インタフェースの実装クラスに変換し、指定したDestinationに対しメッセージを同期送信する。
           | 本実装例では、Amazon SQSキューに送信する為、\ ``com.amazon.sqs.javamessaging.message.SQSObjectMessage``\ に変換され、送信される。
 
@@ -515,12 +520,12 @@ Spring JMSは、JMSプロバイダによる解決を行う \ ``DynamicDestinatio
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 | Amazon SQSキューからメッセージを非同期受信する方法を説明する。
 
-本ガイドラインでは、|base_framework_name| のガイドライン \ `メッセージを非同期受信する方法 <http://macchinetta.github.io/server-guideline/1.4.0.RELEASE/ja/ArchitectureInDetail/MessagingDetail/JMS.html#jmshowtouseasyncreceivemessage>`_\ との差分について重点的に紹介している為、
+本ガイドラインでは、|base_framework_name| のガイドライン \ `メッセージを非同期受信する方法 <https://macchinetta.github.io/server-guideline/1.5.0.RELEASE/ja/ArchitectureInDetail/MessagingDetail/JMS.html#jmshowtouseasyncreceivemessage>`_\ との差分について重点的に紹介している為、
 本ガイドラインと併せて、|base_framework_name| のガイドラインも参照されたい。
 
 .. warning::
 
-   Amazon SQSはトランザクションをサポートしていない為、|base_framework_name| のガイドライン \ `トランザクション管理 <http://macchinetta.github.io/server-guideline/1.4.0.RELEASE/ja/ArchitectureInDetail/MessagingDetail/JMS.html#jmshowtousetransactionmanagementforasyncreceive>`_\ で紹介されているような、
+   Amazon SQSはトランザクションをサポートしていない為、|base_framework_name| のガイドライン \ `トランザクション管理 <https://macchinetta.github.io/server-guideline/1.5.0.RELEASE/ja/ArchitectureInDetail/MessagingDetail/JMS.html#jmshowtousetransactionmanagementforasyncreceive>`_\ で紹介されているような、
    メッセージングとDBのトランザクションを組み合わせる設計は行えない為、注意が必要である。
 
 .. _SQSHowToUseSettingForAsyncReceive:
@@ -585,6 +590,11 @@ Spring JMSは、JMSプロバイダによる解決を行う \ ``DynamicDestinatio
           | この例では、\ :ref:`SQSHowToUseConnectionFactory`\ で示した\ ``ConnectionFactory``\ のBean(Bean名は\ ``connectionFactory``\ )を利用するため、\ ``connection-factory``\ 属性を省略している。
           | \ ``<jms:listener-container/>``\ には、ここで紹介した以外の属性も存在する。
           | 詳細については、\ `Attributes of the JMS <listener-container> element <http://docs.spring.io/spring/docs/4.3.5.RELEASE/spring-framework-reference/html/jms.html#jms-namespace-listener-container-tbl>`_\ を参照されたい。
+
+          .. warning::
+
+             非同期受信の場合、\ ``DefaultMessageListenerContainer``\ の内部に独自のキャッシュ機能が備わっているため、\ ``CachingConnectionFactory``\ は使用してはいけない。
+             詳細については、\ `DefaultMessageListenerContainerのJavadoc <http://docs.spring.io/autorepo/docs/spring-framework/4.3.5.RELEASE/javadoc-api/org/springframework/jms/listener/DefaultMessageListenerContainer.html>`_\ を参照されたい。
       * -
         - \ ``factory-id``\
         - | Bean定義を行う\ ``DefaultJmsListenerContainerFactory``\ の名前を設定する。
@@ -618,26 +628,28 @@ Spring JMSは、JMSプロバイダによる解決を行う \ ``DynamicDestinatio
      package com.example.listener.reservation;
 
      import javax.inject.Inject;
-     import org.springframework.transaction.annotation.Transactional;
      import org.springframework.jms.annotation.JmsListener;
+     import org.springframework.jms.support.JmsHeaders;
      import org.springframework.stereotype.Component;
+     import com.example.domain.common.exception.DuplicateReceivingException;
      import com.example.domain.model.Reservation;
-     import com.example.domain.messaging.DuplicateMessageChecker;
+     import com.example.domain.service.reservation.ReservationInspectionService;
 
      @Component
      public class ReservationMessageListener {
 
         @Inject
-        DuplicateMessageChecker duplicateMessageChecker;  // (1)
+        ReservationInspectionService reservationInspectionService;
 
-        @JmsListener(destination = "reservation-queue", concurrency = "5-10")   // (2)
-        @Transactional  // (3)
-        public void receive(Reservation reservation) {
+        @JmsListener(destination = "reservation-queue", concurrency = "5-10")   // (1)
+        public void receive(Reservation reservation,
+                @Header(JmsHeaders.MESSAGE_ID) String messageId) { // (2)
 
-            if (duplicateMessageChecker.isDuplicated(reservation.getMessageId)) {  // (4)
+            try{
+                reservationInspectionService.inspectAndNotify(reservation, messageId); // (3)
+            }catch(DuplicateReceivingException e){ // (4)
                 return;
             }
-
            // omitted
         }
 
@@ -651,23 +663,22 @@ Spring JMSは、JMSプロバイダによる解決を行う \ ``DynamicDestinatio
      * - 項番
        - 説明
      * - | (1)
-       - | 2重受信チェックユーティリティ \ ``DuplicateMessageChecker``\ をインジェクションする。
-         | \ ``DuplicateMessageChecker``\については、\ :ref:`SQSHowToCheckDuplicateReceiving`\ にて後述する。
-     * - | (2)
        - | 非同期受信用のメソッドに対し\ ``@JmsListener``\ アノテーションを設定する。
          | \ ``destination``\ 属性には、受信先のキュー名を指定する。
          | \ ``concurrency``\ 属性には、リスナーメソッドの並列数の上限を指定する。記述例のように、下限と上限を設定することも可能である。
 
          .. note::
 
-            \ ``concurrency``\ 属性は、\ ``<jms:listener-container/>``\にて設定することも可能だが、
+            \ ``concurrency``\ 属性は、\ ``<jms:listener-container/>``\ にて設定することも可能だが、
             記述例ではリスナーメソッドごとに並列数を設定する設計を想定している為、\ ``@JmsListener``\ アノテーションに設定している。
 
+     * - | (2)
+       - | 後述する2重受信チェックに使用するJMSMessageIDを、\ ``Header``\ アノテーションを使用してメソッド引数として受け取る。
      * - | (3)
-       - | \ ``DuplicateMessageChecker``\が、リスナーメソッドの正常終了をもってDBアクセスをコミットする為、\ ``@Transactional``\ アノテーションを設定する。
+       - | メッセージ受信後に実行するサービスクラスのメソッドを呼び出す。
+         | サービスクラス内にて2重受信チェックを行うため、受信メッセージのJMSMessageIDを引数として渡す。
      * - | (4)
-       - | \ ``DuplicateMessageChecker``\にて、2重受信チェックを行う。
-         | チェックの結果、受信したメッセージが処理済であった場合は、\ ``return``\してリスナーメソッドを正常終了させる。
+       - | 2重受信チェックの結果、受信したメッセージが処理済であった場合は、\ ``return``\ してリスナーメソッドを正常終了させる。
 
 .. _SQSHowToCheckDuplicateReceiving:
 
@@ -692,28 +703,20 @@ Spring JMSは、JMSプロバイダによる解決を行う \ ``DynamicDestinatio
     * - 項番
       - 説明
     * - | (1)
-      - | フロントサーバのアプリケーションは、一意となるメッセージID(AAAAAAAAAAAZ)を生成し、SQSメッセージに付加して送信する。
-
-        .. note::
-
-           一意なメッセージIDの生成については、RDBのシーケンスを利用する方法や、\ ``UUID``\にシステム時刻を組み合わせる方法などがある。
-           必要に応じて適切な方法を検討すること。
-
-    * - | (2)
       - | バックサーバのアプリケーションは、SQSメッセージ(ID:AAAAAAAAAAAZ)を受信する。
-    * - | (3)
+    * - | (2)
       - | バックサーバのアプリケーションは、2重受信チェック部品を使用してメッセージID:AAAAAAAAAAAZをRDBのメッセージID管理テーブルに登録した後、業務処理を実行する。
         | メッセージID管理テーブルは、メッセージIDカラムがユニークキーに設定されている前提。
 
         .. note::
 
-           リスナーメソッドに\ ``@Transactional``\ が付与されている為、メッセージID挿入はリスナーメソッドが正常終了した時点でコミットされる。
+           2重受信チェック部品は、\ ``@Transactional``\ が付与されたサービスクラスのメソッド内にて呼び出され、サービスクラスのトランザクションに参加する。その為、メッセージID挿入は、サービスクラスのメソッドが正常終了した時点でコミットされる。
 
-    * - | (4)
+    * - | (3)
       - | バックサーバのアプリケーションは、何らかの原因により、(2)で受信したSQSメッセージ(ID:AAAAAAAAAAAZ)を再度受信する。
-    * - | (5)
+    * - | (4)
       - | 2重受信チェック部品は、メッセージID:AAAAAAAAAAAZをRDBのメッセージID管理テーブルに登録しようとするが、既に同じIDが登録されている為に挿入できず、2重受信と判断する。
-    * - | (6)
+    * - | (5)
       - | バックサーバのアプリケーションは、以降の業務処理を行わずにリスナーメソッドを正常終了させる。
 
         .. note::
@@ -733,14 +736,15 @@ Spring JMSは、JMSプロバイダによる解決を行う \ ``DynamicDestinatio
     import org.springframework.dao.DuplicateKeyException;
     import org.springframework.transaction.annotation.Transactional;
     import com.example.domain.repository.messaging.MessageIdRepository;
+    import com.example.domain.common.exception.DuplicateReceivingException;
 
     public class DuplicateMessageChecker {
 
         @Inject
         MessageIdRepository repository; // (1)
 
-        @Transactional // (2)
-        public boolean isDuplicated(String messageId) {
+        @Transactional  // (2)
+        public void checkDuplicateMessage(String messageId) {
 
             try {
 
@@ -748,12 +752,9 @@ Spring JMSは、JMSプロバイダによる解決を行う \ ``DynamicDestinatio
 
             } catch (DuplicateKeyException e) { // (4)
 
-                return true;
+                throw new DuplicateReceivingException(messageId);
             }
-
-            return false; // (5)
         }
-
     }
 
 
@@ -779,10 +780,50 @@ Spring JMSは、JMSプロバイダによる解決を行う \ ``DynamicDestinatio
       - | \ ``MessageIdRepository``\の\ ``register``\メソッドを実行し、メッセージIDをメッセージID管理テーブルにINSERTする。
     * - | (4)
       - | 一意性制約違反によって発生する\ ``DuplicateKeyException``\ をcatchする。
-        | メソッドの処理結果として、2重受信を示す\ ``true``\を返却する。
-    * - | (5)
-      - | メソッドの処理結果として、2重受信でない旨を示す\ ``false``\を返却する。
+        | 2重受信発生を示す例外をthrowする。
 
+- ReservationInspectionServiceImpl.java
+
+ .. code-block:: java
+
+    package com.example.domain.service.reservation;
+
+    import javax.inject.Inject;
+    import org.springframework.stereotype.Service;
+    import org.springframework.transaction.annotation.Transactional;
+    import com.example.domain.common.messaging.DuplicateMessageChecker;
+    import com.example.domain.model.Reservation;
+
+    @Service
+    public class ReservationInspectionServiceImpl implements
+                                                 ReservationInspectionService {
+
+        @Inject
+        DuplicateMessageChecker duplicateMessageChecker; // (1)
+
+        @Transactional
+        public void inspectAndNotify(Reservation reservation, String messageId) {
+
+            duplicateMessageChecker.checkDuplicateMessage(messageId); // (2)
+
+            // omitted
+
+        }
+    }
+
+
+ .. tabularcolumns:: |p{0.10\linewidth}|p{0.90\linewidth}|
+ .. list-table::
+    :header-rows: 1
+    :widths: 10 90
+
+    * - 項番
+      - 説明
+    * - | (1)
+      - | 2重受信チェックユーティリティ\ ``DuplicateMessageChecker``\ をインジェクションする。
+    * - | (2)
+      - | \ ``DuplicateMessageChecker``\ を使用して、2重受信チェックを行う。
+        | 2重受信が発生していた場合には例外がthrowされる。
 
 .. _SQSHowToLoggingTraceID:
 
@@ -804,7 +845,7 @@ Spring JMSは、JMSプロバイダによる解決を行う \ ``DynamicDestinatio
 | メッセージIDを出力させることで、不規則に出力された場合でも、ログを結びつけることができる。
 | 上記の例だと、3行目と6行目は4,5行目を跨いでいるが、同じリクエストに関するログであることがわかる。
 |
-| このような横断的なログ出力は、MDCを利用することで可能となる。MDCについては、|base_framework_name| のガイドライン\ `MDCの使用 <http://macchinetta.github.io/server-guideline/1.4.0.RELEASE/ja/ArchitectureInDetail/GeneralFuncDetail/Logging.html#mdc>`_\に詳しい利用法が記されている為、参照されたい。
+| このような横断的なログ出力は、MDCを利用することで可能となる。MDCについては、|base_framework_name| のガイドライン\ `MDCの使用 <https://macchinetta.github.io/server-guideline/1.5.0.RELEASE/ja/ArchitectureInDetail/GeneralFuncDetail/Logging.html#mdc>`_\に詳しい利用法が記されている為、参照されたい。
 
 MDCを用いてメッセージIDをログに埋め込む例を以下に示す。
 
@@ -824,24 +865,26 @@ MDCを用いてメッセージIDをログに埋め込む例を以下に示す。
          @Override
          public Object invoke(MethodInvocation invocation) throws Throwable {
 
-             Object[] arguments = invocation.getArguments();
-
              String key = "messageId";
 
-             if (arguments != null && arguments.length != 0
-                     && arguments[0] instanceof Reservation) {
-                 Reservation reservation = (Reservation) arguments[0];
+             Object[] arguments = invocation.getArguments();
+             Parameter[] parameters = invocation.getMethod().getParameters();
 
-                 String messageId = reservation.getMessageId();  // (2)
+             for (int i = 0; i < parameters.length; i++) {
+                 Header header = parameters[i].getAnnotation(Header.class);
 
-                 MDC.put(key, messageId);  // (3)
+                 if (header != null && JmsHeaders.MESSAGE_ID.equals(header.value()) // (2)
+                         && arguments[i] instanceof String) {
+                     MDC.put(key, ((String) arguments[i])); // (3)
+                     break;
+                 }
              }
 
-             try {
-                 return invocation.proceed();
-             } finally {
-                 MDC.remove(key);  // (4)
-             }
+             Object ret = invocation.proceed();
+
+             MDC.remove(key); // (4)
+
+             return ret;
          }
 
     }
@@ -856,19 +899,18 @@ MDCを用いてメッセージIDをログに埋め込む例を以下に示す。
     * - | (1)
       - | Spring AOPにてメッセージ埋め込み処理を差し込む為、\ ``MethodInterceptor``\ インタフェースを実装する。
     * - | (2)
-      - | \ ``MethodInvocation``\ の\ ``getArguments``\メソッドを呼び出し、リスナーメソッドの引数\ ``Reservation``\ クラスを取得する。
-        | \ ``Reservation``\ クラスから、メッセージIDを取得する。
+      - | \ ``MethodInvocation``\ の\ ``getArguments``\ メソッドを呼び出し、リスナーメソッドの引数リストを取得する。
+        | リスナーメソッドの引数のうち、\ ``Header``\ アノテーションにJMSMessageIDが指定されているものを取得する。
     * - | (3)
       - | \ ``MDC``\ の\ ``put``\ メソッドを使用して、メッセージIDを\ ``messageId``\というキーで登録する。
     * - | (4)
       - | \ ``MDC``\ の\ ``remove``\ メソッドを使用して、登録したメッセージIDを削除する。
 
- .. note::
+ .. note:: **removeメソッドをfinally句で呼び出さない理由について**
 
-    上記の例では、\ :ref:`SQSHowToUseSettingForSyncSend`\ 、\ :ref:`SQSHowToUseSettingForAsyncReceive`\ の説明に合わせて、
-    第一引数で\ ``Reservation``\クラスを受けるリスナーメソッドのみをサポートする実装になっている。
-    
-    実際の開発では、メッセージの抽象クラスを受ける実装とするなど、複数のリスナーメソッドに対応した作りとすることが望ましい。
+    finally句でMDCのremoveメソッドを呼び出す作りにすると、例外発生時にMDCからメッセージIDがremoveされてしまい、
+    Spring提供の例外ハンドラErrorHandler内でのログにメッセージIDが出力されなくなる。例外の起因となったメッセージが特定し辛くなる為、
+    例外時にMDCの情報を削除する処理は、ErrorHandlerにて行うのが望ましい。
 
 | 作成した\ ``MessageIdLoggingInterceptor``\ クラスを、Bean定義ファイルに設定する。
 

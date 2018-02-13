@@ -87,17 +87,17 @@ qthelp:
 	@echo
 	@echo "Build finished; now you can run "qcollectiongenerator" with the" \
 	      ".qhcp project file in $(BUILDDIR)/qthelp, like this:"
-	@echo "# qcollectiongenerator $(BUILDDIR)/qthelp/TERASOLUNAGlobalFrameworkDevelopmentGuideline.qhcp"
+	@echo "# qcollectiongenerator $(BUILDDIR)/qthelp/MacchinettaServerFrameworkDevelopmentGuideline.qhcp"
 	@echo "To view the help file:"
-	@echo "# assistant -collectionFile $(BUILDDIR)/qthelp/TERASOLUNAGlobalFrameworkDevelopmentGuideline.qhc"
+	@echo "# assistant -collectionFile $(BUILDDIR)/qthelp/MacchinettaServerFrameworkDevelopmentGuideline.qhc"
 
 devhelp:
 	$(SPHINXBUILD) -b devhelp $(ALLSPHINXOPTS) $(BUILDDIR)/devhelp
 	@echo
 	@echo "Build finished."
 	@echo "To view the help file:"
-	@echo "# mkdir -p $$HOME/.local/share/devhelp/TERASOLUNAGlobalFrameworkDevelopmentGuideline"
-	@echo "# ln -s $(BUILDDIR)/devhelp $$HOME/.local/share/devhelp/TERASOLUNAGlobalFrameworkDevelopmentGuideline"
+	@echo "# mkdir -p $$HOME/.local/share/devhelp/MacchinettaServerFrameworkDevelopmentGuideline"
+	@echo "# ln -s $(BUILDDIR)/devhelp $$HOME/.local/share/devhelp/MacchinettaServerFrameworkDevelopmentGuideline"
 	@echo "# devhelp"
 
 epub:
@@ -124,10 +124,10 @@ latexpdfja:
 	@echo "add uplatex to documentclass for Unicode proc"
 	@echo "building pdf index needs twice uplatex command"
 	cd ${BUILDDIR}/latex; \
-	sed -i -e 's/\\documentclass\[/\\documentclass\[uplatex,/g' TERASOLUNAServerFrameworkForJavaDevelopmentGuidelineForCloud.tex; \
-	uplatex TERASOLUNAServerFrameworkForJavaDevelopmentGuidelineForCloud.tex; \
-	uplatex TERASOLUNAServerFrameworkForJavaDevelopmentGuidelineForCloud.tex; \
-	dvipdfmx TERASOLUNAServerFrameworkForJavaDevelopmentGuidelineForCloud.dvi;
+	sed -i -e 's/\\documentclass\[/\\documentclass\[uplatex,/g' MacchinettaServerFrameworkDevelopmentGuideline.tex; \
+	uplatex MacchinettaServerFrameworkDevelopmentGuideline.tex; \
+	uplatex MacchinettaServerFrameworkDevelopmentGuideline.tex; \
+	dvipdfmx MacchinettaServerFrameworkDevelopmentGuideline.dvi;
 	@echo "pdflatex finished; the PDF files are in $(BUILDDIR)/latex."
 
 latexpdfen:
@@ -137,10 +137,10 @@ latexpdfen:
 	@echo "building pdf index needs twice uplatex command"
 	sh $(REPLACE_SHELL) $(BUILDDIR)/latex/*.tex
 	cd ${BUILDDIR}/latex; \
-	sed -i -e 's/\\documentclass\[/\\documentclass\[uplatex,/g' TERASOLUNAServerFrameworkForJavaDevelopmentGuidelineForCloud.tex; \
-	uplatex TERASOLUNAServerFrameworkForJavaDevelopmentGuidelineForCloud.tex; \
-	uplatex TERASOLUNAServerFrameworkForJavaDevelopmentGuidelineForCloud.tex; \
-	dvipdfmx TERASOLUNAServerFrameworkForJavaDevelopmentGuidelineForCloud.dvi;
+	sed -i -e 's/\\documentclass\[/\\documentclass\[uplatex,/g' MacchinettaServerFrameworkDevelopmentGuideline.tex; \
+	uplatex MacchinettaServerFrameworkDevelopmentGuideline.tex; \
+	uplatex MacchinettaServerFrameworkDevelopmentGuideline.tex; \
+	dvipdfmx MacchinettaServerFrameworkDevelopmentGuideline.dvi;
 	@echo "pdflatex finished; the PDF files are in $(BUILDDIR)/latex."
 
 text:
