@@ -22,7 +22,7 @@
 --------------------------------------------------------------------------------
 
 開発プロジェクトの作成方法は、
-|base_framework_name| Development Guideline `開発プロジェクトの作成 <https://macchinetta.github.io/server-guideline/1.5.0.RELEASE/ja/ImplementationAtEachLayer/CreateWebApplicationProject.html#createwebapplicationproject>`_
+|base_framework_name| Development Guideline `開発プロジェクトの作成 <https://macchinetta.github.io/server-guideline/1.5.1.RELEASE/ja/ImplementationAtEachLayer/CreateWebApplicationProject.html#createwebapplicationproject>`_
 を参照されたい。
 
 .. _create_project_customize:
@@ -297,7 +297,7 @@ Spring BootではLogbackの拡張を行っており追加の設定を行うこ�
 を参照されたい。
 
 また、Logbackの設定例は |base_framework_name| Development Guideline
-`Logbackの設定 <https://macchinetta.github.io/server-guideline/1.5.0.RELEASE/ja/ArchitectureInDetail/GeneralFuncDetail/Logging.html#id5>`_
+`Logbackの設定 <https://macchinetta.github.io/server-guideline/1.5.1.RELEASE/ja/ArchitectureInDetail/GeneralFuncDetail/Logging.html#id5>`_
 を参照されたい。
 
 .. warning::
@@ -356,7 +356,7 @@ Spring Bootではエントリポイントで、\ ``ContextLoaderListener``\ を�
 トランザクショントークンチェックを使用するための設定方法が異なる
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-|base_framework_name| Development Guideline `トランザクショントークンチェックを使用するための設定 <https://macchinetta.github.io/server-guideline/1.5.0.RELEASE/ja/ArchitectureInDetail/WebApplicationDetail/DoubleSubmitProtection.html#setting>`_
+|base_framework_name| Development Guideline `トランザクショントークンチェックを使用するための設定 <https://macchinetta.github.io/server-guideline/1.5.1.RELEASE/ja/ArchitectureInDetail/WebApplicationDetail/DoubleSubmitProtection.html#setting>`_
 に記載されている設定方法を使用してもトランザクショントークンチェックが正常に動作しない。
 これは、組み込みTomcatを使用しない場合にSpring BootによるrequestDataValueProcessorの
 上書きが行われることにより、JSPにトランザクショントークンが埋め込まれないためである。
@@ -533,7 +533,7 @@ Spring BootのAuto-configurationにより設定される\ ``WebMvcAutoConfigurat
 ViewResolverが上書きされViewの解決ができない
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-|base_framework_name| Development Guideline `HTMLを応答する <https://macchinetta.github.io/server-guideline/1.5.0.RELEASE/ja/ImplementationAtEachLayer/ApplicationLayer.html#html>`_
+|base_framework_name| Development Guideline `HTMLを応答する <https://macchinetta.github.io/server-guideline/1.5.1.RELEASE/ja/ImplementationAtEachLayer/ApplicationLayer.html#html>`_
 に従って\ ``<mvc:view-resolvers>``\ を使用していると、Viewの解決ができなくなる不具合が発生する。
 
 これは、Spring Bootを非組み込みTomcatで使用する場合に、``<mvc:view-resolvers>``\ で定義した

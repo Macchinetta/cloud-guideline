@@ -16,7 +16,7 @@ Overview
 
     本ガイドラインでは、アップロードファイルをS3のストレージに保存する方法および留意点のみを説明する。
 
-    AWS環境におけるファイルアップロードの実装方法は |base_framework_name| Development Guideline `ファイルアップロード <https://macchinetta.github.io/server-guideline/1.5.0.RELEASE/ja/ArchitectureInDetail/WebApplicationDetail/FileUpload.html>`_  に記載の内容と基本的に同様であり、アップロードファイルの保存先をAWSが提供するストレージサービスであるS3に保存する点のみが異なる。
+    AWS環境におけるファイルアップロードの実装方法は |base_framework_name| Development Guideline `ファイルアップロード <https://macchinetta.github.io/server-guideline/1.5.1.RELEASE/ja/ArchitectureInDetail/WebApplicationDetail/FileUpload.html>`_  に記載の内容と基本的に同様であり、アップロードファイルの保存先をAWSが提供するストレージサービスであるS3に保存する点のみが異なる。
 
 .. note::
 
@@ -67,7 +67,7 @@ S3へのアクセスはSpring Cloud AWSまたはAmazon SDK for Javaを使用す�
 
 Spring Cloud AWSによる実装では、Spring Frameworkが提供する\ ``Resource``\ インターフェースによるリソースアクセスの抽象化が利用可能である。
 そのため、実装の標準化の観点からSpring Cloud AWSを使用して実装可能な機能については同ライブラリを使用して実装することが望ましい。
-\ ``Resource``\ インターフェースの詳細については、Spring Framework Reference Documentation `Resources <http://docs.spring.io/spring/docs/4.3.5.RELEASE/spring-framework-reference/htmlsingle/#resources>`_ を参照されたい。
+\ ``Resource``\ インターフェースの詳細については、Spring Framework Reference Documentation `Resources <http://docs.spring.io/spring/docs/4.3.14.RELEASE/spring-framework-reference/htmlsingle/#resources>`_ を参照されたい。
 
 ただし、Spring Cloud AWSでは以下のオブジェクト操作のみ実装可能である。
 
@@ -322,7 +322,7 @@ S3のマルチパートアップロードについては Amazon Simple Storage S
 
  .. note::
 
-    S3から取得したファイルをユーザにダウンロードさせる方法については、 |base_framework_name| Development Guideline `ファイルダウンロード <https://macchinetta.github.io/server-guideline/1.5.0.RELEASE/ja/ArchitectureInDetail/WebApplicationDetail/FileDownload.html>`_  を参照されたい。
+    S3から取得したファイルをユーザにダウンロードさせる方法については、 |base_framework_name| Development Guideline `ファイルダウンロード <https://macchinetta.github.io/server-guideline/1.5.1.RELEASE/ja/ArchitectureInDetail/WebApplicationDetail/FileDownload.html>`_  を参照されたい。
 
 - S3上の単一ファイル削除【Amazon SDK for Javaを使用】
 
@@ -451,7 +451,7 @@ S3では、バケット内のオブジェクトに対してライフサイクル
 
 .. note::
 
-    ライフサイクル管理でHousekeepingの要件を満たせない場合は、オブジェクトの削除機能を実装する必要がある。実装方法については |base_framework_name| Development Guideline `仮アップロード時の不要ファイルのHousekeeping <https://macchinetta.github.io/server-guideline/1.5.0.RELEASE/ja/ArchitectureInDetail/WebApplicationDetail/FileUpload.html#housekeeping>`_  を参照されたい。
+    ライフサイクル管理でHousekeepingの要件を満たせない場合は、オブジェクトの削除機能を実装する必要がある。実装方法については |base_framework_name| Development Guideline `仮アップロード時の不要ファイルのHousekeeping <https://macchinetta.github.io/server-guideline/1.5.1.RELEASE/ja/ArchitectureInDetail/WebApplicationDetail/FileUpload.html#housekeeping>`_  を参照されたい。
 
 Appendix
 --------------------------------------------------------------------------------

@@ -15,7 +15,7 @@ Overview
 
 セッションを外部管理化するためにキャッシュを利用する方法については、 :doc:`../../AWSCollaboration/SessionManagement` を参照されたい。
 
-Springのガイドについては、 `Spring Cache Abstraction <http://docs.spring.io/spring/docs/4.3.5.RELEASE/spring-framework-reference/html/cache.html>`_ を参照されたい。
+Springのガイドについては、 `Spring Cache Abstraction <http://docs.spring.io/spring/docs/4.3.14.RELEASE/spring-framework-reference/html/cache.html>`_ を参照されたい。
 
 .. _cache-local-heap:
 
@@ -151,7 +151,7 @@ Spring Cache Abstractionの設定
 
   .. note::
       ローカルヒープ領域における「入れ物」の実装は、\ ``ConcurrentMapCacheFactoryBean``\以外のものもSpringに用意されている。
-      詳細は `Springのリファレンス Configuring the cache storage <https://docs.spring.io/spring/docs/4.3.5.RELEASE/spring-framework-reference/htmlsingle/#cache-store-configuration>`_ を参照されたい。
+      詳細は `Springのリファレンス Configuring the cache storage <https://docs.spring.io/spring/docs/4.3.14.RELEASE/spring-framework-reference/htmlsingle/#cache-store-configuration>`_ を参照されたい。
 
 .. _cache-redis-setting:
 
@@ -258,7 +258,7 @@ Spring Cache Abstractionでは、メソッドにアノテーションを定義�
         * - | (1)
           - \ ``Cacheable``\アノテーションの属性\ ``key``\で設定している、\ ``#a0``\がメソッド\ ``findOne``\の引数0番目(id)を指定している。
 
-            詳細は `Springのリファレンス Available caching SpEL evaluation context <https://docs.spring.io/spring/docs/4.3.5.RELEASE/spring-framework-reference/html/cache.html#cache-spel-context>`_ を参照されたい。
+            詳細は `Springのリファレンス Available caching SpEL evaluation context <https://docs.spring.io/spring/docs/4.3.14.RELEASE/spring-framework-reference/html/cache.html#cache-spel-context>`_ を参照されたい。
 
 キャッシュしたデータの削除
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -488,7 +488,7 @@ Spring Bootデフォルトのプロパティキーについては、Spring Boot 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Spring Cache Abstractionでは、複数のキャッシュマネージャを別のBean名で定義しておき、\ `@Cacheable`\アノテーションの\ `cacheManager`\属性に指定することで、キャッシュ対象データ毎に使用するキャッシュマネージャを指定することが可能である。
-詳細は、`Custom cache resolution <https://docs.spring.io/spring/docs/4.3.5.RELEASE/spring-framework-reference/html/cache.html#cache-annotations-cacheable-cache-resolver>`_ を参照されたい。
+詳細は、`Custom cache resolution <https://docs.spring.io/spring/docs/4.3.14.RELEASE/spring-framework-reference/html/cache.html#cache-annotations-cacheable-cache-resolver>`_ を参照されたい。
 
 .. raw:: latex
 

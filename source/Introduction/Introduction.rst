@@ -87,8 +87,8 @@
     * - AWS
       - Red Hat Enterprise Linux (64bit) 7.3
       - Apache Tomcat 8.5
-      - RDS(PostgreSQL 9.5)
-      - 2017/1-12
+      - RDS(PostgreSQL 9.6)
+      - 2018/2
 
 商標について
 ================================================================================

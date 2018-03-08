@@ -96,7 +96,7 @@ Redisへ永続化を行うタイミングで各リクエストで行ったセッ
 制約事項
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
- * セッションの外部管理を行った場合は、「\ `同一セッション内のリクエストの同期化 <https://macchinetta.github.io/server-guideline/1.5.0.RELEASE/ja/ArchitectureInDetail/WebApplicationDetail/SessionManagement.html#id25>`_\ 」のような方法でリクエストを同期化することができないため、セッション情報の完全な同期が必要なケースは、セッションで情報を管理しないこと。
+ * セッションの外部管理を行った場合は、「\ `同一セッション内のリクエストの同期化 <https://macchinetta.github.io/server-guideline/1.5.1.RELEASE/ja/ArchitectureInDetail/WebApplicationDetail/SessionManagement.html#id25>`_\ 」のような方法でリクエストを同期化することができないため、セッション情報の完全な同期が必要なケースは、セッションで情報を管理しないこと。
 
     .. note::
      二重送信防止で、セッションを利用したトランザクショントークンチェックは、トランザクショントークンの変更が即座に同期されないため、リクエストのタイミングに因っては、意図した動作をしないケースが存在する。
@@ -474,7 +474,7 @@ SessionEnforcerFilter の作成および設定方法を以下に示す。
     .. _session-management-session-enforcerfilter-label:
 
     .. warning::
-     \ ``SessionEnforcerFilter``\を使用する場合は、セッションIDが不正の場合や、セッションがタイムアウトしている可能性があるため、Spring Securityなどで別途セッションタイムアウト検知、CSRF対策を行うことが必要である。Spring Securityでセッションタイムアウト検知を行う設定方法は、 `無効なセッションを使ったリクエストの検知 <https://macchinetta.github.io/server-guideline/1.5.0.RELEASE/ja/Security/SessionManagement.html#springsecuritysessiondetectinvalidsession>`_ 、CSRF対策を行う設定方法は、`CSRF対策 <https://macchinetta.github.io/server-guideline/1.5.0.RELEASE/ja/Security/CSRF.html>`_ を参照されたい。
+     \ ``SessionEnforcerFilter``\を使用する場合は、セッションIDが不正の場合や、セッションがタイムアウトしている可能性があるため、Spring Securityなどで別途セッションタイムアウト検知、CSRF対策を行うことが必要である。Spring Securityでセッションタイムアウト検知を行う設定方法は、 `無効なセッションを使ったリクエストの検知 <https://macchinetta.github.io/server-guideline/1.5.1.RELEASE/ja/Security/SessionManagement.html#springsecuritysessiondetectinvalidsession>`_ 、CSRF対策を行う設定方法は、`CSRF対策 <https://macchinetta.github.io/server-guideline/1.5.1.RELEASE/ja/Security/CSRF.html>`_ を参照されたい。
 
 .. _spring-data-redis-setting-label:
 
@@ -490,7 +490,7 @@ Spring Data Redisの設定
 エンドポイントの設定
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 エンドポイント設定は、Spring Data Redisの設定にて定義する。
-詳細は、\ `Redis Cluster <http://docs.spring.io/spring-data/redis/docs/1.7.6.RELEASE/reference/html/#cluster>`_\を参照されたい。
+詳細は、\ `Redis Cluster <http://docs.spring.io/spring-data/redis/docs/1.8.7.RELEASE/reference/html/#cluster>`_\を参照されたい。
 
 
 - :file:`application.yml`
@@ -517,7 +517,7 @@ Spring Data Redisの設定
      - 説明
    * - | (1)
      - | \ ``spring.redis.cluster.nodes``\にすべてのノードを追加する。
-         詳細は、\ `Enabling Redis Cluster <http://docs.spring.io/spring-data/redis/docs/1.7.6.RELEASE/reference/html/#_enabling_redis_cluster>`_\を参照されたい。
+         詳細は、\ `Enabling Redis Cluster <http://docs.spring.io/spring-data/redis/docs/1.8.7.RELEASE/reference/html/#_enabling_redis_cluster>`_\を参照されたい。
 
 
 |
@@ -610,7 +610,7 @@ HttpSessionListenerを使用する場合の設定方法を以下に示す。詳�
 
 TransactionTokenの拡張方法
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-|base_framework_name| Development Guideline `4.5. 二重送信防止 <https://macchinetta.github.io/server-guideline/1.5.0.RELEASE/ja/ArchitectureInDetail/WebApplicationDetail/DoubleSubmitProtection.html#id1>`_ にて説明しているトランザクショントークンチェックについて、共通ライブラリから提供しているトランザクショントークンチェック機能はトークン情報の格納先をセッションとしている。
+|base_framework_name| Development Guideline `4.5. 二重送信防止 <https://macchinetta.github.io/server-guideline/1.5.1.RELEASE/ja/ArchitectureInDetail/WebApplicationDetail/DoubleSubmitProtection.html#id1>`_ にて説明しているトランザクショントークンチェックについて、共通ライブラリから提供しているトランザクショントークンチェック機能はトークン情報の格納先をセッションとしている。
 そのため、Spring Sessionによるセッションの外部管理を行う場合、セッションの同期化を行うことができないことにより二重送信を防止できないケースがある。
 本ガイドラインでは、MyBatis3を使用してトークン情報の格納先をデータベースへ変更する拡張方法について説明する。
 
@@ -811,7 +811,7 @@ TransactionTokenStoreの実装
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 トークン情報の格納を行う\ ``TransactionTokenStore``\インターフェースの実装クラスを作成する。
-実装する各メソッドの役割については、\ `TransactionTokenStore <https://github.com/terasolunaorg/terasoluna-gfw/blob/release/5.4.0.RELEASE/terasoluna-gfw-common-libraries/terasoluna-gfw-web/src/main/java/org/terasoluna/gfw/web/token/transaction/TransactionTokenStore.java>`_\インターフェースを参照のこと。
+実装する各メソッドの役割については、\ `TransactionTokenStore <https://github.com/terasolunaorg/terasoluna-gfw/blob/release/5.4.1.RELEASE/terasoluna-gfw-common-libraries/terasoluna-gfw-web/src/main/java/org/terasoluna/gfw/web/token/transaction/TransactionTokenStore.java>`_\インターフェースを参照のこと。
 
 - :file:`MyBatisTransactionTokenStore.java`
 
@@ -967,11 +967,11 @@ HttpSessionListenerの実装
 
 アプリケーションでの利用方法
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-本ガイドラインで紹介する拡張方法を使用した場合においても、ControllerやJSPからの利用方法は同一である。詳細は、`トランザクショントークンチェックのControllerでの利用方法 <https://macchinetta.github.io/server-guideline/1.5.0.RELEASE/ja/ArchitectureInDetail/WebApplicationDetail/DoubleSubmitProtection.html#controller>`_ および `トランザクショントークンチェックのView(JSP)での利用方法 <https://macchinetta.github.io/server-guideline/1.5.0.RELEASE/ja/ArchitectureInDetail/WebApplicationDetail/DoubleSubmitProtection.html#view-jsp>`_ を参照されたい。
+本ガイドラインで紹介する拡張方法を使用した場合においても、ControllerやJSPからの利用方法は同一である。詳細は、`トランザクショントークンチェックのControllerでの利用方法 <https://macchinetta.github.io/server-guideline/1.5.1.RELEASE/ja/ArchitectureInDetail/WebApplicationDetail/DoubleSubmitProtection.html#controller>`_ および `トランザクショントークンチェックのView(JSP)での利用方法 <https://macchinetta.github.io/server-guideline/1.5.1.RELEASE/ja/ArchitectureInDetail/WebApplicationDetail/DoubleSubmitProtection.html#view-jsp>`_ を参照されたい。
 
 本ガイドラインでは、アプリケーションから利用するためのBean定義方法について説明する。
 
-|base_framework_name| Development Guideline `4.5.2.3.5. トランザクショントークンチェックを使用するための設定 <https://macchinetta.github.io/server-guideline/1.5.0.RELEASE/ja/ArchitectureInDetail/WebApplicationDetail/DoubleSubmitProtection.html#setting>`_ にて説明している、\ ``HandlerInterceptor``\の設定について、\ ``TransactionTokenInterceptor``\で使用される\ ``TransactionTokenStore``\の実装クラスが作成した\ ``MyBatisTransactionTokenStore``\となるようBean定義を行う。
+|base_framework_name| Development Guideline `4.5.2.3.5. トランザクショントークンチェックを使用するための設定 <https://macchinetta.github.io/server-guideline/1.5.1.RELEASE/ja/ArchitectureInDetail/WebApplicationDetail/DoubleSubmitProtection.html#setting>`_ にて説明している、\ ``HandlerInterceptor``\の設定について、\ ``TransactionTokenInterceptor``\で使用される\ ``TransactionTokenStore``\の実装クラスが作成した\ ``MyBatisTransactionTokenStore``\となるようBean定義を行う。
 
 - :file:`spring-mvc.xml`
 

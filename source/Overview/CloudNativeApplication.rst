@@ -339,7 +339,7 @@ Springを開発、提供しているPivotal社が提示している
 
 共通ライブラリ
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-|base_framework_name| が提供する\ `共通ライブラリ <https://macchinetta.github.io/server-guideline/1.5.0.RELEASE/ja/Overview/FrameworkStack.html#frameworkstack-common-library>`_\ の対応状況は以下の通り。
+|base_framework_name| が提供する\ `共通ライブラリ <https://macchinetta.github.io/server-guideline/1.5.1.RELEASE/ja/Overview/FrameworkStack.html#frameworkstack-common-library>`_\ の対応状況は以下の通り。
 
 .. tabularcolumns:: |p{0.15\linewidth}|p{0.25\linewidth}|p{0.40\linewidth}|p{0.25\linewidth}|
 .. list-table::
@@ -475,7 +475,7 @@ Springを開発、提供しているPivotal社が提示している
 
 提供機能
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-|base_framework_name| \ `Development Guideline <https://macchinetta.github.io/server-guideline/1.5.0.RELEASE/ja/index.html>`_\ が提供する機能の対応状況は以下の通り。
+|base_framework_name| \ `Development Guideline <https://macchinetta.github.io/server-guideline/1.5.1.RELEASE/ja/index.html>`_\ が提供する機能の対応状況は以下の通り。
 
 .. tabularcolumns:: |p{0.33\linewidth}|p{0.33\linewidth}|p{0.33\linewidth}|
 .. list-table::

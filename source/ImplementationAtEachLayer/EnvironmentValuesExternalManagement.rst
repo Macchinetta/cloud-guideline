@@ -81,7 +81,7 @@ How to use
 Config Serverの構築
 """"""""""""""""""""""""""""""""
 Spring Frameworkから提供されている「Spring Cloud Config Server」機能を使用した、環境依存値の一元管理方法について説明する。
-「Spring Cloud Config Server」の構築の詳細については、\ `公式リファレンスの"Spring Cloud Config Server" <https://cloud.spring.io/spring-cloud-config/spring-cloud-config.html#_spring_cloud_config_server>`_\ を参照されたい。
+「Spring Cloud Config Server」の構築の詳細については、\ `公式リファレンスの"Spring Cloud Config Server" <http://cloud.spring.io/spring-cloud-static/spring-cloud-config/1.3.3.RELEASE/single/spring-cloud-config.html>`_\ を参照されたい。
 
 pom.xmlで必要なjarを設定する。
 

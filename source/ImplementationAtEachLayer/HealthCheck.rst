@@ -19,12 +19,12 @@ Overview
 ロードバランサの負荷分散と縮退運転
 """"""""""""""""""""""""""""""""""
 
-「ロードバランサの負荷分散と縮退運転」の詳細については、 |base_framework_name| Development Guidelineの\ `ロードバランサの負荷分散と縮退運転 <https://macchinetta.github.io/server-guideline/1.5.0.RELEASE/ja/ArchitectureInDetail/WebApplicationDetail/HealthCheck.html#healthcheckoverview-loadbalancer>`_\ を参照されたい。
+「ロードバランサの負荷分散と縮退運転」の詳細については、 |base_framework_name| Development Guidelineの\ `ロードバランサの負荷分散と縮退運転 <https://macchinetta.github.io/server-guideline/1.5.1.RELEASE/ja/ArchitectureInDetail/WebApplicationDetail/HealthCheck.html#healthcheckoverview-loadbalancer>`_\ を参照されたい。
 
 ヘルスチェックの種類
 """"""""""""""""""""
 
-「ヘルスチェックの種類」の詳細については、 |base_framework_name| Development Guidelineの\ `ヘルスチェックの種類 <https://macchinetta.github.io/server-guideline/1.5.0.RELEASE/ja/ArchitectureInDetail/WebApplicationDetail/HealthCheck.html#id4>`_\ を参照されたい。
+「ヘルスチェックの種類」の詳細については、 |base_framework_name| Development Guidelineの\ `ヘルスチェックの種類 <https://macchinetta.github.io/server-guideline/1.5.1.RELEASE/ja/ArchitectureInDetail/WebApplicationDetail/HealthCheck.html#id4>`_\ を参照されたい。
 
 本ガイドラインで示すヘルスチェックの構成
 """"""""""""""""""""""""""""""""""""""""

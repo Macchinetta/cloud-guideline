@@ -55,7 +55,7 @@ Overview
 - レプリカDBにアクセスする場合は、Springの\ ``@Transactional``\アノテーションの属性\ ``readOnly``\を\ ``true``\に設定する
 
 RDSのリードレプリカの詳細は `AWS 公式サイト <https://aws.amazon.com/jp/rds/details/read-replicas/>`_ 、
-Spring Cloud AWSの詳細は `Spring 公式サイト <http://cloud.spring.io/spring-cloud-aws/spring-cloud-aws.html#_read_replica_configuration>`_ を参照されたい。
+Spring Cloud AWSの詳細は `Spring 公式サイト <http://cloud.spring.io/spring-cloud-static/spring-cloud-aws/1.2.1.RELEASE/#_read_replica_configuration>`_ を参照されたい。
 
 .. warning::
 
@@ -159,12 +159,12 @@ Bean定義の詳細については、 Spring Cloud AWS `Data Access with JDBC <h
       - | リードレプリカを使用するかどうかを設定する。\ ``true``\ を指定した場合、読み取り専用トランザクションはレプリカDBにルーティングされ、書き込み操作時にはマスタDBにルーティングされる。
     * - | (3)
       - | \ ``jdbc:pool-attributes``\
-      - | データソースのコネクションプールのプロパティを設定することができる。詳細はSpring公式サイト\ `Data source pool configuration <http://cloud.spring.io/spring-cloud-static/spring-cloud-aws/1.1.4.RELEASE/#_data_source_pool_configuration>`_\ を参照されたい。
+      - | データソースのコネクションプールのプロパティを設定することができる。詳細はSpring公式サイト\ `Data source pool configuration <http://cloud.spring.io/spring-cloud-static/spring-cloud-aws/1.2.1.RELEASE/#_data_source_pool_configuration>`_\ を参照されたい。
 
   .. note::
       \ ``jdbc:data-source``\ 内の設定値はプロパティファイルに書き出して読み込ませることができない。
       環境によって設定値を変更する場合Springのプロファイルの仕組みを使って実現することができる。
-      詳細はSpring公式サイト\ `XML bean definition profiles <https://docs.spring.io/spring/docs/4.3.5.RELEASE/spring-framework-reference/html/beans.html#beans-definition-profiles-xml>`_\ を参照されたい。
+      詳細はSpring公式サイト\ `XML bean definition profiles <https://docs.spring.io/spring/docs/4.3.14.RELEASE/spring-framework-reference/html/beans.html#beans-definition-profiles-xml>`_\ を参照されたい。
 
 .. _rdd_settings_for_using_datasource:
 

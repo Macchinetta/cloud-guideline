@@ -12,7 +12,7 @@
 
 本ガイドラインで使用するSoftware Frameworkは、|base_framework_name| で使用するものに加えて、クラウドベンダーが提供するサービスと連携するためのOSSを組み合わせたものである。
 
-|base_framework_name| で使用するSoftware Frameworkについては、 |base_framework_name| `Development Guideline <https://macchinetta.github.io/server-guideline/1.5.0.RELEASE/ja/Overview/FrameworkStack.html>`_  を参照されたい。
+|base_framework_name| で使用するSoftware Frameworkについては、 |base_framework_name| `Development Guideline <https://macchinetta.github.io/server-guideline/1.5.1.RELEASE/ja/Overview/FrameworkStack.html>`_  を参照されたい。
 
 Software Frameworkの主な構成要素
 --------------------------------------------------------------------------------
@@ -79,7 +79,7 @@ Amazon Web Serviceとの連携を行うフレームワークとして以下を�
 --------------------------------------------------------------------------------
 
 |framework_name| |framework_version| で利用するOSSの一覧を以下に示す。
-|base_framework_name| Development Guideline `利用するOSSのバージョン <https://macchinetta.github.io/server-guideline/1.5.0.RELEASE/ja/Overview/FrameworkStack.html#oss>`_ において説明済みのOSSについては記載しない。
+|base_framework_name| Development Guideline `利用するOSSのバージョン <https://macchinetta.github.io/server-guideline/1.5.1.RELEASE/ja/Overview/FrameworkStack.html#oss>`_ において説明済みのOSSについては記載しない。
 
 |framework_name| と |base_framework_name| のバージョンの対応関係は、:ref:`cloud_native_application_framework_relation` を参照されたい。
 
