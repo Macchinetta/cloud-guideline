@@ -1,0 +1,1142 @@
+<!DOCTYPE html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>5.10. データベースリードレプリカ &#8212; Macchinetta Server Framework Cloud Extension Development Guideline 1.0.1.RELEASE documentation</title>
+    
+    <link rel="stylesheet" href="../_static/solar.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.0.1.RELEASE',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="5.9. データベースシャーディング" href="DatabaseSharding.html" /><script src="../_static/jquery.treeview.js" type="text/javascript"></script>
+<!-- <link href='http://fonts.googleapis.com/css?family=Source+Code+Pro|Open+Sans:300italic,400italic,700italic,400,300,700' rel='stylesheet' type='text/css'> -->
+<link href="../_static/solarized-dark.css" rel="stylesheet">
+<link href="../_static/jquery.treeview.css" rel="stylesheet">
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="DatabaseSharding.html" title="5.9. データベースシャーディング"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Macchinetta Server Framework Cloud Extension Development Guideline 1.0.1.RELEASE documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">5. AWS連携</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><label><input id="scroll" type="checkbox"> scroll sidebar</label>
+
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">5.10. データベースリードレプリカ</a><ul>
+<li><a class="reference internal" href="#overview">5.10.1. Overview</a><ul>
+<li><a class="reference internal" href="#drr-implementation-policy">5.10.1.1. 実装方針</a></li>
+<li><a class="reference internal" href="#drr-restrictions">5.10.1.2. リードレプリカ使用時の注意点</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#how-to-use">5.10.2. How to use</a><ul>
+<li><a class="reference internal" href="#drr-add-dependencies">5.10.2.1. 依存ライブラリの設定</a></li>
+<li><a class="reference internal" href="#rdd-settings-for-datasource">5.10.2.2. データソースの設定</a></li>
+<li><a class="reference internal" href="#rdd-settings-for-using-datasource">5.10.2.3. データソース利用箇所の設定</a></li>
+<li><a class="reference internal" href="#rdd-implements-for-read-replica">5.10.2.4. リードレプリカへのアクセスを行うサービスクラスの実装</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#how-to-extend">5.10.3. How to extend</a><ul>
+<li><a class="reference internal" href="#drr-implements-with-sharding">5.10.3.1. データベースシャーディングと併用する場合の実装</a><ul>
+<li><a class="reference internal" href="#drr-datasource-factory">5.10.3.1.1. リードレプリカに対応したデータソースファクトリの実装</a></li>
+<li><a class="reference internal" href="#drr-settings-with-sharding">5.10.3.1.2. 設定ファイルの記述</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="DatabaseSharding.html"
+                        title="previous chapter">5.9. データベースシャーディング</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/AWSCollaboration/DatabaseReadReplica.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="id1">
+<h1>5.10. データベースリードレプリカ<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h1>
+<div class="contents local topic" id="id2">
+<p class="topic-title first">目次</p>
+<ul class="simple">
+<li><a class="reference internal" href="#overview" id="id13">Overview</a><ul>
+<li><a class="reference internal" href="#drr-implementation-policy" id="id14">実装方針</a></li>
+<li><a class="reference internal" href="#drr-restrictions" id="id15">リードレプリカ使用時の注意点</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#how-to-use" id="id16">How to use</a><ul>
+<li><a class="reference internal" href="#drr-add-dependencies" id="id17">依存ライブラリの設定</a></li>
+<li><a class="reference internal" href="#rdd-settings-for-datasource" id="id18">データソースの設定</a></li>
+<li><a class="reference internal" href="#rdd-settings-for-using-datasource" id="id19">データソース利用箇所の設定</a></li>
+<li><a class="reference internal" href="#rdd-implements-for-read-replica" id="id20">リードレプリカへのアクセスを行うサービスクラスの実装</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#how-to-extend" id="id21">How to extend</a><ul>
+<li><a class="reference internal" href="#drr-implements-with-sharding" id="id22">データベースシャーディングと併用する場合の実装</a><ul>
+<li><a class="reference internal" href="#drr-datasource-factory" id="id23">リードレプリカに対応したデータソースファクトリの実装</a></li>
+<li><a class="reference internal" href="#drr-settings-with-sharding" id="id24">設定ファイルの記述</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="overview">
+<span id="drr-overview"></span><h2><a class="toc-backref" href="#id13">5.10.1. Overview</a><a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>本ガイドラインでは、AWSのAmazon RDS（以後、RDS）と<code class="docutils literal"><span class="pre">spring-cloud-aws-jdbc</span></code>を使用してリードレプリカを行う場合について説明する。</p>
+<p>リードレプリカの概要は、<a class="reference internal" href="../ImplementationAtEachLayer/PersistenceLayerScalability.html#read-replica-method-image-label"><span class="std std-ref">リードレプリカ方式</span></a>、 AWS READ REPLICAの詳細は <a class="reference external" href="https://aws.amazon.com/jp/rds/details/read-replicas/">AWS 公式サイト</a> を参照されたい。</p>
+<blockquote>
+<div><div class="figure align-center">
+<a class="reference internal image-reference" href="../_images/DatabaseReadReplicaOverview.png"><img alt="../_images/DatabaseReadReplicaOverview.png" src="../_images/DatabaseReadReplicaOverview.png" style="width: 90%;" /></a>
+</div>
+<table border="1" class="docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td>Controllerが<code class="docutils literal"><span class="pre">&#64;Transactional</span></code>アノテーション付のServiceメソッドを呼び出す。</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(2)</div>
+</div>
+</td>
+<td><code class="docutils literal"><span class="pre">TransactionInterceptor</span></code>は、<code class="docutils literal"><span class="pre">DataSourceTransactionManager</span></code>のメソッドを呼び出してトランザクションの開始を依頼する。</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(3)</div>
+</div>
+</td>
+<td><code class="docutils literal"><span class="pre">DataSourceTransactionManager</span></code>は<code class="docutils literal"><span class="pre">LazyConnectionDataSourceProxy</span></code>から<code class="docutils literal"><span class="pre">Connection</span></code>を取得する。
+このとき<code class="docutils literal"><span class="pre">ReadOnlyRoutingDataSource</span></code>はトランザクションが読み取り専用の場合レプリカDBの<code class="docutils literal"><span class="pre">DataSource</span></code>を返し、読み取り専用でない場合マスタDBの<code class="docutils literal"><span class="pre">DataSource</span></code>を返却する。</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(4)</div>
+</div>
+</td>
+<td>(3)で取得した<code class="docutils literal"><span class="pre">Connection</span></code>でトランザクションを開始し<code class="docutils literal"><span class="pre">Connection</span> <span class="pre">Holder</span></code>へ<code class="docutils literal"><span class="pre">Connection</span></code>を格納する。</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(5)</div>
+</div>
+</td>
+<td>ServiceはMyBatis Springを経由してDBへクエリを発行する。</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(6)</div>
+</div>
+</td>
+<td>MyBatis Springは、(4)で格納した<code class="docutils literal"><span class="pre">Connection</span></code>を<code class="docutils literal"><span class="pre">Connection</span> <span class="pre">Holder</span></code>から取得する。</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(7)</div>
+</div>
+</td>
+<td>MyBatis Springは、更新系の場合はマスタDBに、参照系の場合はレプリカDBにアクセスする。</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<div class="section" id="drr-implementation-policy">
+<span id="id3"></span><h3><a class="toc-backref" href="#id14">5.10.1.1. 実装方針</a><a class="headerlink" href="#drr-implementation-policy" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>レプリカDBへのデータのレプリケーションはRDSのリードレプリカを使用する</li>
+<li><code class="docutils literal"><span class="pre">spring-cloud-aws-jdbc</span></code>の仕組みを使用し、トランザクション単位でマスタDBとレプリカDBのデータソースを切り替える</li>
+<li>レプリカDBにアクセスする場合は、Springの<code class="docutils literal"><span class="pre">&#64;Transactional</span></code>アノテーションの属性<code class="docutils literal"><span class="pre">readOnly</span></code>を<code class="docutils literal"><span class="pre">true</span></code>に設定する</li>
+</ul>
+<p>RDSのリードレプリカの詳細は <a class="reference external" href="https://aws.amazon.com/jp/rds/details/read-replicas/">AWS 公式サイト</a> 、
+Spring Cloud AWSの詳細は <a class="reference external" href="http://cloud.spring.io/spring-cloud-static/spring-cloud-aws/1.2.1.RELEASE/#_read_replica_configuration">Spring 公式サイト</a> を参照されたい。</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">本ガイドの実装例は障害発生したレプリカDBのデータソースを選択する可能性を回避できない実装になっている。
+そのため、レプリカDBに障害が発生した場合に障害を回避することができない。
+本ガイドの実装例を利用する場合、レプリカDBの障害に対して運用面での対処（リードレプリカ復旧手順）を検討する必要がある。</p>
+</div>
+</div>
+<div class="section" id="drr-restrictions">
+<span id="id5"></span><h3><a class="toc-backref" href="#id15">5.10.1.2. リードレプリカ使用時の注意点</a><a class="headerlink" href="#drr-restrictions" title="Permalink to this headline">¶</a></h3>
+<p>本ガイドラインで紹介するPostgreSQLのリードレプリカでは、マスタDBからのレプリケーションに遅延が生じるなど注意すべき点が存在する。</p>
+<p>詳細は、AWS公式ドキュメント <a class="reference external" href="http://docs.aws.amazon.com/ja_jp/AmazonRDS/latest/UserGuide/USER_ReadRepl.html#USER_ReadRepl.PostgreSQL">PostgreSQL リードレプリカ</a> を参照されたい。</p>
+</div>
+</div>
+<div class="section" id="how-to-use">
+<span id="drr-how-to-use"></span><h2><a class="toc-backref" href="#id16">5.10.2. How to use</a><a class="headerlink" href="#how-to-use" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="drr-add-dependencies">
+<span id="id6"></span><h3><a class="toc-backref" href="#id17">5.10.2.1. 依存ライブラリの設定</a><a class="headerlink" href="#drr-add-dependencies" title="Permalink to this headline">¶</a></h3>
+<p>Spring Cloud AWSを利用してRDSへのアクセスを行うための依存ライブラリの追加を行う。</p>
+<ul>
+<li><p class="first">xxx-domain/pom.xml</p>
+<div class="highlight-xml"><div class="highlight"><pre><span></span><span class="c">&lt;!-- (1) --&gt;</span>
+<span class="nt">&lt;dependency&gt;</span>
+    <span class="nt">&lt;groupId&gt;</span>org.springframework.cloud<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>spring-cloud-aws-jdbc<span class="nt">&lt;/artifactId&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span>
+</pre></div>
+</div>
+</li>
+</ul>
+<blockquote>
+<div><table border="1" class="docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">spring-cloud-aws-jdbc</span></code>の依存関係を追加する。</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+</div>
+<div class="section" id="rdd-settings-for-datasource">
+<span id="id7"></span><h3><a class="toc-backref" href="#id18">5.10.2.2. データソースの設定</a><a class="headerlink" href="#rdd-settings-for-datasource" title="Permalink to this headline">¶</a></h3>
+<p>Spring Cloud AWS JDBCを利用してRDSへのアクセスを行うためのBean定義を行う。
+Bean定義の詳細については、 Spring Cloud AWS <a class="reference external" href="http://cloud.spring.io/spring-cloud-static/spring-cloud-aws/1.2.1.RELEASE/#_data_access_with_jdbc">Data Access with JDBC</a> を参照されたい。</p>
+<ul>
+<li><p class="first">xxx-domain.xml</p>
+<div class="highlight-xml"><div class="highlight"><pre><span></span><span class="c">&lt;!-- (1) --&gt;</span>
+<span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
+<span class="nt">&lt;beans</span> <span class="na">xmlns=</span><span class="s">&quot;http://www.springframework.org/schema/beans&quot;</span>
+    <span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
+    <span class="na">xmlns:jdbc=</span><span class="s">&quot;http://www.springframework.org/schema/cloud/aws/jdbc&quot;</span>
+    <span class="na">xsi:schemaLocation=</span><span class="s">&quot;http://www.springframework.org/schema/cloud/aws/jdbc</span>
+<span class="s">    http://www.springframework.org/schema/cloud/aws/jdbc/spring-cloud-aws-jdbc.xsd&quot;</span><span class="nt">&gt;</span>
+<span class="c">&lt;!-- (2) --&gt;</span>
+<span class="nt">&lt;jdbc:data-source</span> <span class="na">db-instance-identifier=</span><span class="s">&quot;myRdsDatabase&quot;</span> <span class="na">password=</span><span class="s">&quot;password&quot;</span> <span class="na">read-replica-support=</span><span class="s">&quot;true&quot;</span><span class="nt">&gt;</span>
+  <span class="c">&lt;!-- (3) --&gt;</span>
+  <span class="nt">&lt;jdbc:pool-attributes</span> <span class="na">initialSize=</span><span class="s">&quot;1&quot;</span> <span class="na">maxActive=</span><span class="s">&quot;200&quot;</span> <span class="na">minIdle=</span><span class="s">&quot;10&quot;</span> <span class="na">testOnBorrow=</span><span class="s">&quot;true&quot;</span> <span class="na">validationQuery=</span><span class="s">&quot;SELECT 1&quot;</span> <span class="nt">/&gt;</span>
+<span class="nt">&lt;/jdbc:data-source&gt;</span>
+</pre></div>
+</div>
+<table border="1" class="docutils">
+<colgroup>
+<col width="10%" />
+<col width="30%" />
+<col width="60%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">属性名</th>
+<th class="head">内容</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">xmlns:jdbc</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">Spring Cloud AWS JDBCの Namespaceを定義する。</div>
+<div class="line">値として<code class="docutils literal"><span class="pre">http://www.springframework.org/schema/cloud/aws/jdbc</span></code>を指定する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">xsi:schemaLocation</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">スキーマのURLを指定する。</div>
+<div class="line">値に<code class="docutils literal"><span class="pre">http://www.springframework.org/schema/cloud/aws/jdbc</span></code>と<code class="docutils literal"><span class="pre">http://www.springframework.org/schema/cloud/aws/jdbc/spring-cloud-aws-jdbc.xsd</span></code>を追加する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(2)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">db-instance-identifier</span></code></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">RDSのマスタDBのインスタンス識別子を設定する。設定例では<code class="docutils literal"><span class="pre">myRdsDatabase</span></code>というDBインスタンス識別子を指定している。</div>
+<div class="line">データソースは設定したDBインスタンス識別子名で登録される。設定例の場合<code class="docutils literal"><span class="pre">myRdsDatabase</span></code>で参照できる。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">password</span></code></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">DBのパスワードを設定する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">read-replica-support</span></code></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">リードレプリカを使用するかどうかを設定する。<code class="docutils literal"><span class="pre">true</span></code>を指定した場合、読み取り専用トランザクションはレプリカDBにルーティングされ、書き込み操作時にはマスタDBにルーティングされる。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(3)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">jdbc:pool-attributes</span></code></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">データソースのコネクションプールのプロパティを設定することができる。詳細はSpring公式サイト<a class="reference external" href="http://cloud.spring.io/spring-cloud-static/spring-cloud-aws/1.2.1.RELEASE/#_data_source_pool_configuration">Data source pool configuration</a>を参照されたい。</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last"><code class="docutils literal"><span class="pre">jdbc:data-source</span></code>内の設定値はプロパティファイルに書き出して読み込ませることができない。
+環境によって設定値を変更する場合Springのプロファイルの仕組みを使って実現することができる。
+詳細はSpring公式サイト<a class="reference external" href="https://docs.spring.io/spring/docs/4.3.14.RELEASE/spring-framework-reference/html/beans.html#beans-definition-profiles-xml">XML bean definition profiles</a>を参照されたい。</p>
+</div>
+</li>
+</ul>
+</div>
+<div class="section" id="rdd-settings-for-using-datasource">
+<span id="id8"></span><h3><a class="toc-backref" href="#id19">5.10.2.3. データソース利用箇所の設定</a><a class="headerlink" href="#rdd-settings-for-using-datasource" title="Permalink to this headline">¶</a></h3>
+<p>データソースのBean名は<code class="docutils literal"><span class="pre">db-instance-identifier</span></code>の設定値で登録されるため、データソースのBeanを参照する際は設定したマスタDBのインスタンス識別子に変更する必要がある。</p>
+<ul>
+<li><p class="first">application-local.yml</p>
+<div class="highlight-yaml"><div class="highlight"><pre><span></span><span class="c1"># (1)</span>
+<span class="l l-Scalar l-Scalar-Plain">rds</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">dbInstanceIdentifier</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">myRdsDatabase</span>
+</pre></div>
+</div>
+<table border="1" class="docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><a class="reference internal" href="#rdd-settings-for-datasource"><span class="std std-ref">データソースの設定</span></a>で<code class="docutils literal"><span class="pre">jdbc:data-source</span></code>要素の<code class="docutils literal"><span class="pre">db-instance-identifier</span></code>属性に設定したRDSのマスタDBのインスタンス識別子を<code class="docutils literal"><span class="pre">rds.dbInstanceIdentifier</span></code>に設定する。</td>
+</tr>
+</tbody>
+</table>
+</li>
+<li><p class="first">xxx-codelist.xml</p>
+<div class="highlight-xml"><div class="highlight"><pre><span></span><span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;jdbcTemplateForCodeList&quot;</span> <span class="na">class=</span><span class="s">&quot;org.springframework.jdbc.core.JdbcTemplate&quot;</span><span class="nt">&gt;</span>
+    <span class="c">&lt;!-- (1) --&gt;</span>
+    <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;dataSource&quot;</span> <span class="na">ref=</span><span class="s">&quot;${rds.dbInstanceIdentifier}&quot;</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;fetchSize&quot;</span> <span class="na">value=</span><span class="s">&quot;${codelist.jdbc.fetchSize:1000}&quot;</span> <span class="nt">/&gt;</span>
+<span class="nt">&lt;/bean&gt;</span>
+</pre></div>
+</div>
+<table border="1" class="docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">jdbcTemplateForCodeList</span></code>の<code class="docutils literal"><span class="pre">dataSource</span></code>のref属性にDBインスタンス識別子を設定する。</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</li>
+</ul>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<ul>
+<li><p class="first">xxx-env.xml 変更前</p>
+<div class="highlight-xml"><div class="highlight"><pre><span></span><span class="c">&lt;!-- (1) --&gt;</span>
+<span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;realDataSource&quot;</span> <span class="na">class=</span><span class="s">&quot;org.apache.commons.dbcp2.BasicDataSource&quot;</span>
+    <span class="na">destroy-method=</span><span class="s">&quot;close&quot;</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;driverClassName&quot;</span> <span class="na">value=</span><span class="s">&quot;${database.driverClassName}&quot;</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;url&quot;</span> <span class="na">value=</span><span class="s">&quot;${database.url}&quot;</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;username&quot;</span> <span class="na">value=</span><span class="s">&quot;${database.username}&quot;</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;password&quot;</span> <span class="na">value=</span><span class="s">&quot;${database.password}&quot;</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;defaultAutoCommit&quot;</span> <span class="na">value=</span><span class="s">&quot;false&quot;</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;maxTotal&quot;</span> <span class="na">value=</span><span class="s">&quot;${cp.maxActive}&quot;</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;maxIdle&quot;</span> <span class="na">value=</span><span class="s">&quot;${cp.maxIdle}&quot;</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;minIdle&quot;</span> <span class="na">value=</span><span class="s">&quot;${cp.minIdle}&quot;</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;maxWaitMillis&quot;</span> <span class="na">value=</span><span class="s">&quot;${cp.maxWait}&quot;</span> <span class="nt">/&gt;</span>
+<span class="nt">&lt;/bean&gt;</span>
+
+<span class="c">&lt;!-- (2) --&gt;</span>
+<span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;dataSource&quot;</span> <span class="na">class=</span><span class="s">&quot;net.sf.log4jdbc.Log4jdbcProxyDataSource&quot;</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;constructor-arg</span> <span class="na">index=</span><span class="s">&quot;0&quot;</span> <span class="na">ref=</span><span class="s">&quot;realDataSource&quot;</span> <span class="nt">/&gt;</span>
+<span class="nt">&lt;/bean&gt;</span>
+
+<span class="c">&lt;!-- (3) --&gt;</span>
+<span class="nt">&lt;jdbc:initialize-database</span> <span class="na">data-source=</span><span class="s">&quot;dataSource&quot;</span> <span class="na">ignore-failures=</span><span class="s">&quot;ALL&quot;</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;jdbc:script</span> <span class="na">location=</span><span class="s">&quot;classpath:/database/${database}-schema.sql&quot;</span> <span class="na">encoding=</span><span class="s">&quot;UTF-8&quot;</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;jdbc:script</span> <span class="na">location=</span><span class="s">&quot;classpath:/database/${database}-dataload.sql&quot;</span> <span class="na">encoding=</span><span class="s">&quot;UTF-8&quot;</span> <span class="nt">/&gt;</span>
+<span class="nt">&lt;/jdbc:initialize-database&gt;</span>
+
+<span class="c">&lt;!-- (4) --&gt;</span>
+<span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;transactionManager&quot;</span>
+    <span class="na">class=</span><span class="s">&quot;org.springframework.jdbc.datasource.DataSourceTransactionManager&quot;</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;dataSource&quot;</span> <span class="na">ref=</span><span class="s">&quot;dataSource&quot;</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;rollbackOnCommitFailure&quot;</span> <span class="na">value=</span><span class="s">&quot;true&quot;</span> <span class="nt">/&gt;</span>
+<span class="nt">&lt;/bean&gt;</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">xxx-env.xml 変更後</p>
+<div class="highlight-xml"><div class="highlight"><pre><span></span><span class="c">&lt;!-- (1) --&gt;</span>
+<span class="c">&lt;!-- 削除 --&gt;</span>
+
+<span class="c">&lt;!-- (2) --&gt;</span>
+<span class="c">&lt;!-- 削除 --&gt;</span>
+
+<span class="c">&lt;!-- (3) --&gt;</span>
+<span class="nt">&lt;jdbc:initialize-database</span> <span class="na">data-source=</span><span class="s">&quot;${rds.dbInstanceIdentifier}&quot;</span> <span class="na">ignore-failures=</span><span class="s">&quot;ALL&quot;</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;jdbc:script</span> <span class="na">location=</span><span class="s">&quot;classpath:/database/${database}-schema.sql&quot;</span> <span class="na">encoding=</span><span class="s">&quot;UTF-8&quot;</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;jdbc:script</span> <span class="na">location=</span><span class="s">&quot;classpath:/database/${database}-dataload.sql&quot;</span> <span class="na">encoding=</span><span class="s">&quot;UTF-8&quot;</span> <span class="nt">/&gt;</span>
+<span class="nt">&lt;/jdbc:initialize-database&gt;</span>
+
+<span class="c">&lt;!-- (4) --&gt;</span>
+<span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;transactionManager&quot;</span>
+    <span class="na">class=</span><span class="s">&quot;org.springframework.jdbc.datasource.DataSourceTransactionManager&quot;</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;dataSource&quot;</span> <span class="na">ref=</span><span class="s">&quot;${rds.dbInstanceIdentifier}&quot;</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;rollbackOnCommitFailure&quot;</span> <span class="na">value=</span><span class="s">&quot;true&quot;</span> <span class="nt">/&gt;</span>
+<span class="nt">&lt;/bean&gt;</span>
+</pre></div>
+</div>
+<table border="1" class="docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">旧DataSource設定は不要のため削除する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(2)</div>
+</div>
+</td>
+<td><div class="first line-block">
+<div class="line">データソースをラップしていると、データソースの情報が正しく認識できずレプリカノードを正しく参照できなくなるため削除する。</div>
+</div>
+<div class="last admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">spring-cloud-aws-jdbcを用いてリードレプリカ方式を実現する場合はデータソースをラップしないことを推奨する。
+例えば、ログ出力の為に<code class="docutils literal"><span class="pre">net.sf.log4jdbc.Log4jdbcProxyDataSource</span></code>等でデータソースをラップしていると、データソースの情報が正しく認識できずレプリカノードを正しく参照できなくなる。</p>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(3)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">jdbc:initialize-database</span></code>の<code class="docutils literal"><span class="pre">data-source</span></code>属性にDBインスタンス識別子を設定する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(4)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">transactionManager</span></code>の<code class="docutils literal"><span class="pre">dataSource</span></code>のref属性にDBインスタンス識別子を設定する。</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</li>
+</ul>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<ul>
+<li><p class="first">xxx-infra.xml</p>
+<div class="highlight-xml"><div class="highlight"><pre><span></span><span class="c">&lt;!-- define the SqlSessionFactory --&gt;</span>
+<span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;sqlSessionFactory&quot;</span> <span class="na">class=</span><span class="s">&quot;org.mybatis.spring.SqlSessionFactoryBean&quot;</span><span class="nt">&gt;</span>
+    <span class="c">&lt;!-- (1) --&gt;</span>
+    <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;dataSource&quot;</span> <span class="na">ref=</span><span class="s">&quot;${rds.dbInstanceIdentifier}&quot;</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;configLocation&quot;</span> <span class="na">value=</span><span class="s">&quot;classpath:/META-INF/mybatis/mybatis-config.xml&quot;</span> <span class="nt">/&gt;</span>
+<span class="nt">&lt;/bean&gt;</span>
+</pre></div>
+</div>
+<table border="1" class="docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">sqlSessionFactory</span></code>の<code class="docutils literal"><span class="pre">dataSource</span></code>のref属性にDBインスタンス識別子を設定する。</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</li>
+</ul>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+</div>
+<div class="section" id="rdd-implements-for-read-replica">
+<span id="id9"></span><h3><a class="toc-backref" href="#id20">5.10.2.4. リードレプリカへのアクセスを行うサービスクラスの実装</a><a class="headerlink" href="#rdd-implements-for-read-replica" title="Permalink to this headline">¶</a></h3>
+<p>リードレプリカへのアクセスを行うサービスクラスの実装例を以下に示す。</p>
+<ul>
+<li><p class="first">MemberUpdateServiceImpl.Java</p>
+<div class="highlight-java"><div class="highlight"><pre><span></span><span class="kd">public</span> <span class="kd">class</span> <span class="nc">MemberUpdateServiceImpl</span> <span class="kd">implements</span> <span class="n">MemberUpdateService</span> <span class="o">{</span>
+
+  <span class="nd">@Transactional</span><span class="o">(</span><span class="n">readOnly</span> <span class="o">=</span> <span class="kc">true</span><span class="o">)</span> <span class="c1">//(1)</span>
+  <span class="kd">public</span> <span class="n">Member</span> <span class="nf">findMember</span><span class="o">(</span><span class="n">String</span> <span class="n">customerNo</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span> <span class="o">{</span>
+    <span class="c1">// omitted</span>
+  <span class="o">}</span>
+
+  <span class="nd">@Transactional</span>  <span class="c1">// (2)</span>
+  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">updateMember</span><span class="o">(</span><span class="n">Member</span> <span class="n">member</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span> <span class="o">{</span>
+    <span class="c1">// omitted</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+<table border="1" class="docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">読み取り処理は<code class="docutils literal"><span class="pre">&#64;Transactional(readOnly</span> <span class="pre">=</span> <span class="pre">true)</span></code>を指定することで、リードレプリカインスタンスを参照する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(2)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">readOnly=true</span></code>でない場合、マスタDBにルーティングされ書き込み処理が行われる。</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="how-to-extend">
+<span id="drr-how-to-extend"></span><h2><a class="toc-backref" href="#id21">5.10.3. How to extend</a><a class="headerlink" href="#how-to-extend" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="drr-implements-with-sharding">
+<span id="id10"></span><h3><a class="toc-backref" href="#id22">5.10.3.1. データベースシャーディングと併用する場合の実装</a><a class="headerlink" href="#drr-implements-with-sharding" title="Permalink to this headline">¶</a></h3>
+<p>本ガイドラインで紹介している<a class="reference internal" href="../ArchitectureInDetail/DataAccessDetail/DataAccessMyBatis3.html"><span class="doc">データベースシャーディング</span></a>では各シャードに対してデータソースを定義する独自の実装を行っている。
+このため、シャーティングと併用する場合<a class="reference internal" href="#drr-how-to-use"><span class="std std-ref">How to use</span></a>で紹介した方法ではリードレプリカを使用することはできない。</p>
+<p>この項では<a class="reference internal" href="../ArchitectureInDetail/DataAccessDetail/DataAccessMyBatis3.html"><span class="doc">データベースシャーディング</span></a>で紹介しているデータソースファクトリクラスを拡張することによって、
+シャーディングとリードレプリカの併用を実現する方法を紹介する。</p>
+<div class="section" id="drr-datasource-factory">
+<span id="id11"></span><h4><a class="toc-backref" href="#id23">5.10.3.1.1. リードレプリカに対応したデータソースファクトリの実装</a><a class="headerlink" href="#drr-datasource-factory" title="Permalink to this headline">¶</a></h4>
+<p><a class="reference internal" href="../ArchitectureInDetail/DataAccessDetail/DataAccessMyBatis3.html#datasource-mapping-object-label"><span class="std std-ref">マッピングされたデータベースのプロパティクラスを元にデータソースを生成</span></a>で紹介しているデータソースファクトリクラスである<code class="docutils literal"><span class="pre">TomcatDataSourceFactory</span></code>を拡張し、
+リードレプリカに対応したデータソース( <code class="docutils literal"><span class="pre">ReadOnlyRoutingDataSource</span></code>)を作成する<code class="docutils literal"><span class="pre">AmazonRdsReadReplicaTomcatDataSourceFactory</span></code>を実装する。</p>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<ul>
+<li><p class="first">データソースファクトリクラスのBean定義</p>
+<p>以下に、データソースファクトリクラス<code class="docutils literal"><span class="pre">AmazonRdsReadReplicaTomcatDataSourceFactory</span></code>のBean定義例を示す。</p>
+<div class="highlight-xml"><div class="highlight"><pre><span></span><span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;dataSourceFactory&quot;</span>
+  <span class="na">class=</span><span class="s">&quot;com.example.xxx.domain.common.shard.datasource.pool.AmazonRdsReadReplicaTomcatDataSourceFactory&quot;</span> <span class="nt">/&gt;</span>
+</pre></div>
+</div>
+</li>
+</ul>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<ul>
+<li><p class="first"><code class="docutils literal"><span class="pre">TomcatDataSourceFactory</span></code>の修正</p>
+<p><a class="reference internal" href="../ArchitectureInDetail/DataAccessDetail/DataAccessMyBatis3.html#datasource-mapping-object-label"><span class="std std-ref">マッピングされたデータベースのプロパティクラスを元にデータソースを生成</span></a>で実装したデータソースファクトリクラスを下記のように変更する。</p>
+<div class="highlight-java"><div class="highlight"><pre><span></span><span class="kd">public</span> <span class="kd">class</span> <span class="nc">TomcatDataSourceFactory</span> <span class="kd">implements</span> <span class="n">DataSourceFactory</span> <span class="o">{</span>
+
+    <span class="kd">protected</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">dbInstanceIdentifierKey</span> <span class="o">=</span> <span class="s">&quot;dbInstanceIdentifier&quot;</span><span class="o">;</span>
+
+    <span class="kd">protected</span> <span class="n">org</span><span class="o">.</span><span class="na">apache</span><span class="o">.</span><span class="na">tomcat</span><span class="o">.</span><span class="na">jdbc</span><span class="o">.</span><span class="na">pool</span><span class="o">.</span><span class="na">DataSourceFactory</span> <span class="n">factory</span> <span class="o">=</span> <span class="k">new</span> <span class="n">org</span><span class="o">.</span><span class="na">apache</span><span class="o">.</span><span class="na">tomcat</span><span class="o">.</span><span class="na">jdbc</span><span class="o">.</span><span class="na">pool</span><span class="o">.</span><span class="na">DataSourceFactory</span><span class="o">();</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="n">DataSource</span> <span class="nf">create</span><span class="o">(</span><span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">String</span><span class="o">&gt;</span> <span class="n">dataSourceProperties</span><span class="o">,</span>
+            <span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">String</span><span class="o">&gt;</span> <span class="n">commonDataSourceProperties</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">DataSource</span> <span class="n">ret</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+        <span class="n">Properties</span> <span class="n">properties</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Properties</span><span class="o">();</span>
+        <span class="k">if</span> <span class="o">(!</span><span class="n">commonDataSourceProperties</span><span class="o">.</span><span class="na">isEmpty</span><span class="o">())</span> <span class="o">{</span>
+            <span class="n">properties</span><span class="o">.</span><span class="na">putAll</span><span class="o">(</span><span class="n">commonDataSourceProperties</span><span class="o">);</span>
+        <span class="o">}</span>
+        <span class="n">properties</span><span class="o">.</span><span class="na">putAll</span><span class="o">(</span><span class="n">dataSourceProperties</span><span class="o">);</span>
+        <span class="k">try</span> <span class="o">{</span>
+            <span class="c1">// (1)</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">properties</span><span class="o">.</span><span class="na">containsKey</span><span class="o">(</span><span class="n">dbInstanceIdentifierKey</span><span class="o">))</span> <span class="o">{</span>
+                <span class="n">ret</span> <span class="o">=</span> <span class="n">createReadReplicaDataSource</span><span class="o">(</span><span class="n">properties</span><span class="o">);</span>
+            <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+                <span class="n">ret</span> <span class="o">=</span> <span class="n">factory</span><span class="o">.</span><span class="na">createDataSource</span><span class="o">(</span><span class="n">properties</span><span class="o">);</span>
+            <span class="o">}</span>
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">Exception</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="n">SystemException</span><span class="o">(</span><span class="n">LogMessages</span><span class="o">.</span><span class="na">E_AR_A0_L9008</span><span class="o">.</span><span class="na">getCode</span><span class="o">(),</span> <span class="n">LogMessages</span><span class="o">.</span><span class="na">E_AR_A0_L9008</span>
+                    <span class="o">.</span><span class="na">getMessage</span><span class="o">(),</span> <span class="n">e</span><span class="o">);</span>
+        <span class="o">}</span>
+        <span class="k">return</span> <span class="n">ret</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="c1">// (2)</span>
+    <span class="kd">protected</span> <span class="n">DataSource</span> <span class="nf">createReadReplicaDataSource</span><span class="o">(</span><span class="n">Properties</span> <span class="n">properties</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
+        <span class="k">throw</span> <span class="k">new</span> <span class="n">SystemException</span><span class="o">(</span><span class="n">LogMessages</span><span class="o">.</span><span class="na">E_AR_A0_L9010</span><span class="o">.</span><span class="na">getCode</span><span class="o">(),</span> <span class="n">LogMessages</span><span class="o">.</span><span class="na">E_AR_A0_L9010</span>
+                <span class="o">.</span><span class="na">getMessage</span><span class="o">(</span><span class="n">dbInstanceIdentifierKey</span><span class="o">));</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+<table border="1" class="docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">dbInstanceIdentifier</span></code>というキー名がプロパティに設定されている場合、<code class="docutils literal"><span class="pre">createReadReplicaDataSource</span></code> メソッドを実行する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(2)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">リードレプリカに対応したデータソースを作成する<code class="docutils literal"><span class="pre">createReadReplicaDataSource</span></code>メソッドを定義する。
+リードレプリカ対応データソースファクトリクラスによってオーバーライドされる想定のため、
+<code class="docutils literal"><span class="pre">TomcatDataSourceFactory</span></code>を使用したまま<code class="docutils literal"><span class="pre">dbInstanceIdentifierKey</span></code>を定義している場合、システム例外が発生するように設定している。</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</li>
+</ul>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<ul>
+<li><p class="first">リードレプリカに対応したデータソースファクトリクラスの実装</p>
+<p>上記で修正した<code class="docutils literal"><span class="pre">TomcatDataSourceFactory</span></code>を拡張して実装する。</p>
+<p>以下に、リードレプリカに対応したデータソースファクトリクラスの実装例を示す。</p>
+<div class="highlight-java"><div class="highlight"><pre><span></span><span class="c1">// (1)</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">AmazonRdsReadReplicaTomcatDataSourceFactory</span> <span class="kd">extends</span> <span class="n">TomcatDataSourceFactory</span> <span class="o">{</span>
+
+    <span class="nd">@Value</span><span class="o">(</span><span class="s">&quot;${database.rdsRegion}&quot;</span><span class="o">)</span>
+    <span class="kd">private</span> <span class="n">String</span> <span class="n">defaultRegion</span><span class="o">;</span>
+
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">driverUrlOptionKey</span> <span class="o">=</span> <span class="s">&quot;driverUrlOption&quot;</span><span class="o">;</span>
+
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">replicaRegionKey</span> <span class="o">=</span> <span class="s">&quot;replicaRegion&quot;</span><span class="o">;</span>
+
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">driverClassNameKey</span> <span class="o">=</span> <span class="s">&quot;driverClassName&quot;</span><span class="o">;</span>
+
+    <span class="kd">private</span> <span class="n">StaticDatabasePlatformSupport</span> <span class="n">databasePlatformSupport</span> <span class="o">=</span> <span class="k">new</span> <span class="n">StaticDatabasePlatformSupport</span><span class="o">();</span>
+
+    <span class="nd">@Override</span>
+    <span class="c1">// (2)</span>
+    <span class="kd">protected</span> <span class="n">DataSource</span> <span class="nf">createReadReplicaDataSource</span><span class="o">(</span><span class="n">Properties</span> <span class="n">properties</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
+        <span class="c1">// (3)</span>
+        <span class="n">String</span> <span class="n">region</span> <span class="o">=</span> <span class="n">defaultRegion</span><span class="o">;</span>
+        <span class="k">if</span> <span class="o">(!</span><span class="n">StringUtils</span><span class="o">.</span><span class="na">isEmpty</span><span class="o">(</span><span class="n">properties</span><span class="o">.</span><span class="na">getProperty</span><span class="o">(</span><span class="n">replicaRegionKey</span><span class="o">)))</span> <span class="o">{</span>
+            <span class="n">region</span> <span class="o">=</span> <span class="n">properties</span><span class="o">.</span><span class="na">getProperty</span><span class="o">(</span><span class="n">replicaRegionKey</span><span class="o">);</span>
+        <span class="o">}</span>
+        <span class="n">AmazonRDS</span> <span class="n">amazonRds</span> <span class="o">=</span> <span class="n">AmazonRDSClientBuilder</span><span class="o">.</span><span class="na">standard</span><span class="o">().</span><span class="na">withRegion</span><span class="o">(</span><span class="n">region</span><span class="o">).</span><span class="na">build</span><span class="o">();</span>
+        <span class="c1">// (4)</span>
+        <span class="n">String</span> <span class="n">dbInstanceIdentifier</span> <span class="o">=</span> <span class="o">(</span><span class="n">String</span><span class="o">)</span> <span class="n">properties</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">dbInstanceIdentifierKey</span><span class="o">);</span>
+        <span class="n">DBInstance</span> <span class="n">dbInstance</span> <span class="o">=</span> <span class="n">getDbInstance</span><span class="o">(</span><span class="n">amazonRds</span><span class="o">,</span> <span class="n">dbInstanceIdentifier</span><span class="o">);</span>
+        <span class="c1">// (5)</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">dbInstance</span><span class="o">.</span><span class="na">getReadReplicaDBInstanceIdentifiers</span><span class="o">().</span><span class="na">isEmpty</span><span class="o">())</span> <span class="o">{</span>
+            <span class="k">return</span> <span class="n">createDataSourceInstance</span><span class="o">(</span><span class="n">dbInstance</span><span class="o">,</span> <span class="n">properties</span><span class="o">);</span>
+        <span class="o">}</span>
+        <span class="c1">// (6)</span>
+        <span class="n">Map</span><span class="o">&lt;</span><span class="n">Object</span><span class="o">,</span> <span class="n">Object</span><span class="o">&gt;</span> <span class="n">replicaMap</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HashMap</span><span class="o">&lt;&gt;(</span>
+                <span class="n">dbInstance</span><span class="o">.</span><span class="na">getReadReplicaDBInstanceIdentifiers</span><span class="o">().</span><span class="na">size</span><span class="o">());</span>
+
+        <span class="k">for</span> <span class="o">(</span><span class="n">String</span> <span class="n">replicaName</span> <span class="o">:</span> <span class="n">dbInstance</span><span class="o">.</span><span class="na">getReadReplicaDBInstanceIdentifiers</span><span class="o">())</span> <span class="o">{</span>
+            <span class="n">replicaMap</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="n">replicaName</span><span class="o">,</span> <span class="n">createDataSourceInstance</span><span class="o">(</span><span class="n">amazonRds</span><span class="o">,</span>
+                    <span class="n">replicaName</span><span class="o">,</span> <span class="n">properties</span><span class="o">));</span>
+        <span class="o">}</span>
+
+        <span class="c1">// (7)</span>
+        <span class="n">ReadOnlyRoutingDataSource</span> <span class="n">dataSource</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ReadOnlyRoutingDataSource</span><span class="o">();</span>
+        <span class="n">dataSource</span><span class="o">.</span><span class="na">setTargetDataSources</span><span class="o">(</span><span class="n">replicaMap</span><span class="o">);</span>
+        <span class="n">dataSource</span><span class="o">.</span><span class="na">setDefaultTargetDataSource</span><span class="o">(</span><span class="n">createDataSourceInstance</span><span class="o">(</span><span class="n">dbInstance</span><span class="o">,</span> <span class="n">properties</span><span class="o">));</span>
+
+        <span class="c1">// (8)</span>
+        <span class="n">dataSource</span><span class="o">.</span><span class="na">afterPropertiesSet</span><span class="o">();</span>
+        <span class="c1">// (9)</span>
+        <span class="k">return</span> <span class="k">new</span> <span class="n">LazyConnectionDataSourceProxy</span><span class="o">(</span><span class="n">dataSource</span><span class="o">);</span>
+    <span class="o">}</span>
+    <span class="c1">// (10)</span>
+    <span class="kd">private</span> <span class="n">DBInstance</span> <span class="nf">getDbInstance</span><span class="o">(</span><span class="n">AmazonRDS</span> <span class="n">amazonRds</span><span class="o">,</span>
+            <span class="n">String</span> <span class="n">identifier</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IllegalStateException</span> <span class="o">{</span>
+        <span class="n">DBInstance</span> <span class="n">instance</span><span class="o">;</span>
+        <span class="k">try</span> <span class="o">{</span>
+            <span class="n">DescribeDBInstancesResult</span> <span class="n">describeDBInstancesResult</span> <span class="o">=</span> <span class="n">amazonRds</span>
+                    <span class="o">.</span><span class="na">describeDBInstances</span><span class="o">(</span><span class="k">new</span> <span class="n">DescribeDBInstancesRequest</span><span class="o">()</span>
+                            <span class="o">.</span><span class="na">withDBInstanceIdentifier</span><span class="o">(</span><span class="n">identifier</span><span class="o">));</span>
+            <span class="n">instance</span> <span class="o">=</span> <span class="n">describeDBInstancesResult</span><span class="o">.</span><span class="na">getDBInstances</span><span class="o">().</span><span class="na">get</span><span class="o">(</span><span class="mi">0</span><span class="o">);</span>
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">DBInstanceNotFoundException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="n">SystemException</span><span class="o">(</span><span class="n">LogMessages</span><span class="o">.</span><span class="na">E_AR_A0_L9009</span><span class="o">.</span><span class="na">getCode</span><span class="o">(),</span> <span class="n">LogMessages</span><span class="o">.</span><span class="na">E_AR_A0_L9009</span>
+                    <span class="o">.</span><span class="na">getMessage</span><span class="o">(</span><span class="n">identifier</span><span class="o">),</span> <span class="n">e</span><span class="o">);</span>
+        <span class="o">}</span>
+        <span class="k">return</span> <span class="n">instance</span><span class="o">;</span>
+    <span class="o">}</span>
+    <span class="c1">// (11)</span>
+    <span class="kd">private</span> <span class="n">DataSource</span> <span class="nf">createDataSourceInstance</span><span class="o">(</span><span class="n">AmazonRDS</span> <span class="n">amazonRds</span><span class="o">,</span>
+            <span class="n">String</span> <span class="n">identifier</span><span class="o">,</span> <span class="n">Properties</span> <span class="n">properties</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
+        <span class="n">DBInstance</span> <span class="n">instance</span> <span class="o">=</span> <span class="n">getDbInstance</span><span class="o">(</span><span class="n">amazonRds</span><span class="o">,</span> <span class="n">identifier</span><span class="o">);</span>
+        <span class="k">return</span> <span class="n">createDataSourceInstance</span><span class="o">(</span><span class="n">instance</span><span class="o">,</span> <span class="n">properties</span><span class="o">);</span>
+    <span class="o">}</span>
+    <span class="c1">// (12)</span>
+    <span class="kd">private</span> <span class="n">DataSource</span> <span class="nf">createDataSourceInstance</span><span class="o">(</span><span class="n">DBInstance</span> <span class="n">instance</span><span class="o">,</span> <span class="n">Properties</span> <span class="n">properties</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
+        <span class="n">properties</span><span class="o">.</span><span class="na">setProperty</span><span class="o">(</span><span class="s">&quot;url&quot;</span><span class="o">,</span> <span class="n">createUrl</span><span class="o">(</span><span class="n">instance</span><span class="o">,</span> <span class="n">properties</span><span class="o">));</span>
+        <span class="k">if</span> <span class="o">(!</span><span class="n">properties</span><span class="o">.</span><span class="na">containsKey</span><span class="o">(</span><span class="n">driverClassNameKey</span><span class="o">))</span> <span class="o">{</span>
+            <span class="n">properties</span><span class="o">.</span><span class="na">setProperty</span><span class="o">(</span><span class="n">driverClassNameKey</span><span class="o">,</span> <span class="n">getDriverClassName</span><span class="o">(</span><span class="n">instance</span><span class="o">));</span>
+        <span class="o">}</span>
+        <span class="k">return</span> <span class="n">factory</span><span class="o">.</span><span class="na">createDataSource</span><span class="o">(</span><span class="n">properties</span><span class="o">);</span>
+    <span class="o">}</span>
+    <span class="c1">// (13)</span>
+    <span class="kd">private</span> <span class="n">String</span> <span class="nf">createUrl</span><span class="o">(</span><span class="n">DBInstance</span> <span class="n">instance</span><span class="o">,</span> <span class="n">Properties</span> <span class="n">properties</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">StringBuilder</span> <span class="n">sb</span> <span class="o">=</span> <span class="k">new</span> <span class="n">StringBuilder</span><span class="o">();</span>
+        <span class="n">String</span> <span class="n">url</span> <span class="o">=</span>
+                <span class="n">databasePlatformSupport</span><span class="o">.</span><span class="na">getDatabaseUrlForDatabase</span><span class="o">(</span>
+                <span class="n">DatabaseType</span><span class="o">.</span><span class="na">fromEngine</span><span class="o">(</span><span class="n">instance</span><span class="o">.</span><span class="na">getEngine</span><span class="o">()),</span>
+                <span class="n">instance</span><span class="o">.</span><span class="na">getEndpoint</span><span class="o">().</span><span class="na">getAddress</span><span class="o">(),</span>
+                <span class="n">instance</span><span class="o">.</span><span class="na">getEndpoint</span><span class="o">().</span><span class="na">getPort</span><span class="o">(),</span>
+                <span class="n">instance</span><span class="o">.</span><span class="na">getDBName</span><span class="o">());</span>
+        <span class="n">sb</span><span class="o">.</span><span class="na">append</span><span class="o">(</span><span class="n">url</span><span class="o">);</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">properties</span><span class="o">.</span><span class="na">containsKey</span><span class="o">(</span><span class="n">driverUrlOptionKey</span><span class="o">))</span> <span class="o">{</span>
+            <span class="n">sb</span><span class="o">.</span><span class="na">append</span><span class="o">(</span><span class="s">&quot;?&quot;</span><span class="o">).</span><span class="na">append</span><span class="o">(</span><span class="n">properties</span><span class="o">.</span><span class="na">getProperty</span><span class="o">(</span><span class="n">driverUrlOptionKey</span><span class="o">));</span>
+        <span class="o">}</span>
+        <span class="k">return</span> <span class="n">sb</span><span class="o">.</span><span class="na">toString</span><span class="o">();</span>
+    <span class="o">}</span>
+    <span class="c1">//(14)</span>
+    <span class="kd">private</span> <span class="n">String</span> <span class="nf">getDriverClassName</span><span class="o">(</span><span class="n">DBInstance</span> <span class="n">instance</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">databasePlatformSupport</span><span class="o">.</span><span class="na">getDriverClassNameForDatabase</span><span class="o">(</span>
+                <span class="n">DatabaseType</span><span class="o">.</span><span class="na">fromEngine</span><span class="o">(</span><span class="n">instance</span><span class="o">.</span><span class="na">getEngine</span><span class="o">()));</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+<table border="1" class="docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td>リードレプリカに対応したデータソースファクトリクラスを<code class="docutils literal"><span class="pre">TomcatDataSourceFactory</span></code>クラスを拡張して作成する。</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(2)</div>
+</div>
+</td>
+<td>リードレプリカに対応したデータソース作成メソッドを実装する。</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(3)</div>
+</div>
+</td>
+<td>リージョンを指定して<code class="docutils literal"><span class="pre">AmazonRDS</span></code>を作成する。</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(4)</div>
+</div>
+</td>
+<td>DBインスタンス識別子を使用して<code class="docutils literal"><span class="pre">DBInstance</span></code>を取得する。</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(5)</div>
+</div>
+</td>
+<td>(4)で取得した<code class="docutils literal"><span class="pre">DBInstance</span></code>の<code class="docutils literal"><span class="pre">ReadReplicaDBInstanceIdentifiers</span></code>が空の場合、リードレプリカ非対応のデータソースを作成する。</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(6)</div>
+</div>
+</td>
+<td><code class="docutils literal"><span class="pre">ReadReplicaDBInstanceIdentifiers</span></code>を使用して、レプリカごとにインスタンスを作成する。
+作成したインスタンスは、インスタンス識別子をキーにして<code class="docutils literal"><span class="pre">Map</span></code>に格納する。</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(7)</div>
+</div>
+</td>
+<td><code class="docutils literal"><span class="pre">ReadOnlyRoutingDataSource</span></code>を使用してリードレプリカに対応したデータソースを作成する。</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(8)</div>
+</div>
+</td>
+<td><code class="docutils literal"><span class="pre">afterPropertiesSet()</span></code>メソッドを呼び出し初期化を行う。</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(9)</div>
+</div>
+</td>
+<td><code class="docutils literal"><span class="pre">LazyConnectionDataSourceProxy</span></code>を使用して(7)作成したデータソースをラップして返却する。</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(10)</div>
+</div>
+</td>
+<td>DBインスタンス識別子から<code class="docutils literal"><span class="pre">DBInstance</span></code>を作成して返却するメソッドを実装する。</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(11)</div>
+</div>
+</td>
+<td>DBインスタンス識別子を使用して<code class="docutils literal"><span class="pre">DataSource</span></code>を作成するメソッドを実装する。</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(12)</div>
+</div>
+</td>
+<td><code class="docutils literal"><span class="pre">DBInstance</span></code>を使用して<code class="docutils literal"><span class="pre">DataSource</span></code>を作成するメソッドを実装する。</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(13)</div>
+</div>
+</td>
+<td><code class="docutils literal"><span class="pre">DBInstance</span></code>とプロパティを使用してDBのURLを作成するメソッドを実装する。</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(14)</div>
+</div>
+</td>
+<td><code class="docutils literal"><span class="pre">DBInstance</span></code>を使用してドライバークラス名を取得する。</td>
+</tr>
+</tbody>
+</table>
+</li>
+</ul>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+</div>
+<div class="section" id="drr-settings-with-sharding">
+<span id="id12"></span><h4><a class="toc-backref" href="#id24">5.10.3.1.2. 設定ファイルの記述</a><a class="headerlink" href="#drr-settings-with-sharding" title="Permalink to this headline">¶</a></h4>
+<p>データソースについての設定例を以下に示す。<a class="reference internal" href="../ArchitectureInDetail/DataAccessDetail/DataAccessMyBatis3.html#datasource-definition-label"><span class="std std-ref">設定ファイルに各シャードのデータソース情報を定義</span></a>で説明済みの内容は省略するので必要に応じて参照されたい。</p>
+<ul>
+<li><p class="first">application-local.yml</p>
+<div class="highlight-yaml"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">database</span><span class="p p-Indicator">:</span>
+  <span class="c1"># (1)</span>
+  <span class="l l-Scalar l-Scalar-Plain">rdsRegion</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">ap-northeast-1</span>
+  <span class="l l-Scalar l-Scalar-Plain">common</span><span class="p p-Indicator">:</span>
+    <span class="l l-Scalar l-Scalar-Plain">data-source</span><span class="p p-Indicator">:</span>
+      <span class="l l-Scalar l-Scalar-Plain">driverClassName</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">org.postgresql.Driver</span>
+      <span class="l l-Scalar l-Scalar-Plain">maxActive</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">96</span>
+      <span class="l l-Scalar l-Scalar-Plain">maxIdle</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">16</span>
+      <span class="l l-Scalar l-Scalar-Plain">minIdle</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">0</span>
+      <span class="l l-Scalar l-Scalar-Plain">maxWait</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">90000</span>
+      <span class="l l-Scalar l-Scalar-Plain">password</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">password</span>
+      <span class="l l-Scalar l-Scalar-Plain">username</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">username</span>
+  <span class="l l-Scalar l-Scalar-Plain">default</span><span class="p p-Indicator">:</span>
+    <span class="l l-Scalar l-Scalar-Plain">schema</span><span class="p p-Indicator">:</span>
+      <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">default</span>
+  <span class="l l-Scalar l-Scalar-Plain">data-sources</span><span class="p p-Indicator">:</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">schema</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">default</span>
+      <span class="c1"># (2)</span>
+      <span class="l l-Scalar l-Scalar-Plain">dbInstanceIdentifier</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">myRdsDatabase</span>
+      <span class="c1"># (3)</span>
+      <span class="l l-Scalar l-Scalar-Plain">driverUrlOption</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">socketTimeout=120&amp;connectTimeout=120</span>
+      <span class="c1"># (4)</span>
+      <span class="l l-Scalar l-Scalar-Plain">replicaRegion</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">us-east-1</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">schema</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">example1</span>
+      <span class="l l-Scalar l-Scalar-Plain">dbInstanceIdentifier</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">anotherRdsDatabase</span>
+      <span class="c1"># (5)</span>
+      <span class="l l-Scalar l-Scalar-Plain">password</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">another</span>
+      <span class="l l-Scalar l-Scalar-Plain">username</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">another</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">schema</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">example2</span>
+      <span class="c1"># (6)</span>
+      <span class="l l-Scalar l-Scalar-Plain">url</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">jdbc:postgresql://localhost:5432/example2?socketTimeout=120&amp;connectTimeout=120</span>
+</pre></div>
+</div>
+<table border="1" class="docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td>RDSのリージョンを設定する。</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(2)</div>
+</div>
+</td>
+<td>RDSのDBインスタンス識別子を設定する。ここでは<code class="docutils literal"><span class="pre">myRdsDatabase</span></code>を設定している。</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(3)</div>
+</div>
+</td>
+<td>ドライバーのURLオプションを設定する。</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(4)</div>
+</div>
+</td>
+<td><code class="docutils literal"><span class="pre">replicaRegion</span></code>は<code class="docutils literal"><span class="pre">rdsRegion</span></code>に設定したリージョンと違う設定値を使用したい場合に設定する。</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(5)</div>
+</div>
+</td>
+<td>データソース個別設定を行う。ここでは<code class="docutils literal"><span class="pre">password</span></code>と<code class="docutils literal"><span class="pre">username</span></code>を個別に設定している。</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(6)</div>
+</div>
+</td>
+<td>DBインスタンス識別子ではなく、URLにRDSインスタンスのエンドポイントを指定する方法も併用できる。</td>
+</tr>
+</tbody>
+</table>
+</li>
+</ul>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="DatabaseSharding.html" title="5.9. データベースシャーディング"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Macchinetta Server Framework Cloud Extension Development Guideline 1.0.1.RELEASE documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >5. AWS連携</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2018 NTT Corporation.
+    Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.5.3.Theme by <a href="http://github.com/vkvn">vkvn</a>
+    </div>
+    
+    <script>
+     
+     $(function() {
+    	   var $sidebar	= $('.sphinxsidebar'),
+    		     $window		= $(window),
+    		     offset		= $sidebar.offset(),
+    		     topPadding	= 3,
+    		     $scroll		= $('#scroll');
+    	   
+    	   $window.scroll(function() {
+    		     if ($scroll.is(':checked')) {
+				         if ($window.scrollTop() > offset.top) {
+					           $sidebar.stop().animate({
+						             marginTop:$window.scrollTop() - offset.top + topPadding
+					           });
+				         } else {
+					           $sidebar.stop().animate({
+						             marginTop:0
+					           });
+				         }
+			       }
+		     });
+    	   
+    	   var $navList = $('ul:first', $sidebar);
+    	   $('li:first', $navList).addClass('open');
+    	   
+    	   $navList.treeview({
+    		     persist: "location",
+    		     collapsed: true,
+    		     unique: false
+    	   });
+    	   
+	   });
+    </script>
+    
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-113850349-4"></script>
+    <script>
+     window.dataLayer = window.dataLayer || [];
+     function gtag(){dataLayer.push(arguments);}
+     gtag('js', new Date());
+
+     gtag('config', 'UA-113850349-4');
+    </script>
+  </body>
+</html>

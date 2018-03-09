@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>5.1. AWS向け開発プロジェクトの作成 &#8212; Macchinetta Server Framework Cloud Extension Development Guideline 1.0.1.RELEASE documentation</title>
+    
+    <link rel="stylesheet" href="../_static/solar.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.0.1.RELEASE',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="5.2. オートスケーリングの利用" href="AutoScale.html" />
+    <link rel="prev" title="5. AWS連携" href="index.html" /><script src="../_static/jquery.treeview.js" type="text/javascript"></script>
+<!-- <link href='http://fonts.googleapis.com/css?family=Source+Code+Pro|Open+Sans:300italic,400italic,700italic,400,300,700' rel='stylesheet' type='text/css'> -->
+<link href="../_static/solarized-dark.css" rel="stylesheet">
+<link href="../_static/jquery.treeview.css" rel="stylesheet">
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="AutoScale.html" title="5.2. オートスケーリングの利用"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="5. AWS連携"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Macchinetta Server Framework Cloud Extension Development Guideline 1.0.1.RELEASE documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">5. AWS連携</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><label><input id="scroll" type="checkbox"> scroll sidebar</label>
+
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">5.1. AWS向け開発プロジェクトの作成</a><ul>
+<li><a class="reference internal" href="#create-aws-project-blankpj">5.1.1. 開発プロジェクトの作成</a></li>
+<li><a class="reference internal" href="#create-aws-project-customize">5.1.2. 開発プロジェクトのカスタマイズ</a><ul>
+<li><a class="reference internal" href="#create-aws-project-adding-dependencies">5.1.2.1. 依存ライブラリの追加</a></li>
+<li><a class="reference internal" href="#create-aws-project-stack">5.1.2.2. スタックの自動検出の無効化</a></li>
+<li><a class="reference internal" href="#auto-configuration">5.1.2.3. Auto-Configurationの無効化</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#create-aws-project-constrait">5.1.3. AWS向けプロジェクトで考慮すべき点・制約事項</a><ul>
+<li><a class="reference internal" href="#aws-credentials">5.1.3.1. AWS認証情報（Credentials)の管理</a></li>
+<li><a class="reference internal" href="#amazon-s3">5.1.3.2. Amazon S3のアクセス許可設定</a></li>
+<li><a class="reference internal" href="#amazon-ec2apamazonserviceexception">5.1.3.3. Amazon EC2上でAPを起動するとAmazonServiceExceptionが発生する</a></li>
+<li><a class="reference internal" href="#amazon-ec2elasticache-redis">5.1.3.4. Amazon EC2上でElastiCache Redis使用時の注意</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">5. AWS連携</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="AutoScale.html"
+                        title="next chapter">5.2. オートスケーリングの利用</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/AWSCollaboration/CreateAWSApplicationProject.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="aws">
+<h1>5.1. AWS向け開発プロジェクトの作成<a class="headerlink" href="#aws" title="Permalink to this headline">¶</a></h1>
+<div class="contents local topic" id="id1">
+<p class="topic-title first">目次</p>
+<ul class="simple">
+<li><a class="reference internal" href="#create-aws-project-blankpj" id="id8">開発プロジェクトの作成</a></li>
+<li><a class="reference internal" href="#create-aws-project-customize" id="id9">開発プロジェクトのカスタマイズ</a><ul>
+<li><a class="reference internal" href="#create-aws-project-adding-dependencies" id="id10">依存ライブラリの追加</a></li>
+<li><a class="reference internal" href="#create-aws-project-stack" id="id11">スタックの自動検出の無効化</a></li>
+<li><a class="reference internal" href="#auto-configuration" id="id12">Auto-Configurationの無効化</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#create-aws-project-constrait" id="id13">AWS向けプロジェクトで考慮すべき点・制約事項</a><ul>
+<li><a class="reference internal" href="#aws-credentials" id="id14">AWS認証情報（Credentials)の管理</a></li>
+<li><a class="reference internal" href="#amazon-s3" id="id15">Amazon S3のアクセス許可設定</a></li>
+<li><a class="reference internal" href="#amazon-ec2apamazonserviceexception" id="id16">Amazon EC2上でAPを起動するとAmazonServiceExceptionが発生する</a></li>
+<li><a class="reference internal" href="#amazon-ec2elasticache-redis" id="id17">Amazon EC2上でElastiCache Redis使用時の注意</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p>本ガイドラインでは、AWS向け開発プロジェクトを作成する方法について説明する。
+ここでは、AWSの各機能を利用する上での共通的な設定のみ説明し、AWSの各機能毎の独自の設定については記述しない。</p>
+<p>AWSの各機能を利用する際の機能毎の設定については、 <a class="reference internal" href="index.html"><span class="doc">AWS連携</span></a> を参照されたい。</p>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<div class="section" id="create-aws-project-blankpj">
+<span id="id2"></span><h2><a class="toc-backref" href="#id8">5.1.1. 開発プロジェクトの作成</a><a class="headerlink" href="#create-aws-project-blankpj" title="Permalink to this headline">¶</a></h2>
+<p>本ガイドラインでは、オンライン版クラウド拡張開発プロジェクトに対してクラウドベンダーとしてAWSを利用する場合の設定を追加する。</p>
+<p>ベースとなる開発プロジェクトの作成は
+<a class="reference internal" href="../ImplementationAtEachLayer/CreateWebApplicationProject.html"><span class="doc">オンライン版クラウド拡張開発プロジェクトの作成</span></a>
+を参照されたい。</p>
+</div>
+<div class="section" id="create-aws-project-customize">
+<span id="id3"></span><h2><a class="toc-backref" href="#id9">5.1.2. 開発プロジェクトのカスタマイズ</a><a class="headerlink" href="#create-aws-project-customize" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference internal" href="#create-aws-project-blankpj"><span class="std std-ref">開発プロジェクトの作成</span></a> で作成したプロジェクトをAWS向けにカスタマイズする。
+AWS利用する場合、AWSの機能毎にカスタマイズが必要な箇所がいくつか存在するが、ここではAWSを利用する際の共通的な設定のみ説明する。</p>
+<p>カスタマイズが必要な箇所を以下に示す。</p>
+<ul class="simple">
+<li><a class="reference internal" href="#create-aws-project-adding-dependencies"><span class="std std-ref">依存ライブラリの追加</span></a></li>
+<li><a class="reference internal" href="#create-aws-project-stack"><span class="std std-ref">スタックの自動検出の無効化</span></a></li>
+</ul>
+<div class="section" id="create-aws-project-adding-dependencies">
+<span id="id4"></span><h3><a class="toc-backref" href="#id10">5.1.2.1. 依存ライブラリの追加</a><a class="headerlink" href="#create-aws-project-adding-dependencies" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>project/xxx-domain/pom.xml</li>
+</ul>
+<div class="highlight-xml"><div class="highlight"><pre><span></span><span class="nt">&lt;dependencies&gt;</span>
+    <span class="c">&lt;!--(1)--&gt;</span>
+    <span class="nt">&lt;dependency&gt;</span>
+        <span class="nt">&lt;groupId&gt;</span>org.springframework.cloud<span class="nt">&lt;/groupId&gt;</span>
+        <span class="nt">&lt;artifactId&gt;</span>spring-cloud-starter-aws<span class="nt">&lt;/artifactId&gt;</span>
+    <span class="nt">&lt;/dependency&gt;</span>
+<span class="nt">&lt;dependencies&gt;</span>
+</pre></div>
+</div>
+<table border="1" class="docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">spring-cloud-starter-aws</span></code>の依存関係を追加する。
+これにより、Spring Cloud for Amazon Web Servicesに関連する依存関係が解決される。</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition tip">
+<p class="first admonition-title">Tip</p>
+<p class="last"><code class="docutils literal"><span class="pre">spring-cloud-starter-aws</span></code>を追加すると、ページアクセスの統計情報をメトリクスのデータとして、Spring Cloud AWSがCloudWatchに自動で送信する。
+この情報が不要な場合、<code class="docutils literal"><span class="pre">spring.metrics.export.enabled=false</span></code>のプロパティを設定することで送信を止めることができる。</p>
+</div>
+</div>
+<div class="section" id="create-aws-project-stack">
+<span id="id5"></span><h3><a class="toc-backref" href="#id11">5.1.2.2. スタックの自動検出の無効化</a><a class="headerlink" href="#create-aws-project-stack" title="Permalink to this headline">¶</a></h3>
+<p>Amazon Elastic Compute Cloud(以後、EC2)上でアプリケーションを起動するためには、スタックの自動検出を無効化する必要がある。
+事象についての詳細は <a class="reference internal" href="#create-aws-project-constrait-amazon-service-exception"><span class="std std-ref">Amazon EC2上でAPを起動するとAmazonServiceExceptionが発生する</span></a> を参照されたい。</p>
+<p>スタックの自動検出を無効にする設定例を以下に示す。</p>
+<ul>
+<li><p class="first">application.yml</p>
+<div class="highlight-yaml"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">cloud</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">aws</span><span class="p p-Indicator">:</span>
+    <span class="l l-Scalar l-Scalar-Plain">stack</span><span class="p p-Indicator">:</span>
+      <span class="l l-Scalar l-Scalar-Plain">auto</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">false</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</div>
+<div class="section" id="auto-configuration">
+<span id="create-aws-project-autoconfiguration"></span><h3><a class="toc-backref" href="#id12">5.1.2.3. Auto-Configurationの無効化</a><a class="headerlink" href="#auto-configuration" title="Permalink to this headline">¶</a></h3>
+<p>EC2上でアプリケーションを起動するためには、<code class="docutils literal"><span class="pre">ElastiCacheAutoConfiguration</span></code>をAuto-configurationから除外する必要がある。
+事象についての詳細は <a class="reference internal" href="#create-aws-project-constrait-cannot-find-cache"><span class="std std-ref">Amazon EC2上でElastiCache Redis使用時の注意</span></a> を参照されたい。</p>
+<p><code class="docutils literal"><span class="pre">ElastiCacheAutoConfiguration</span></code>を無効にする設定例を以下に示す。</p>
+<ul>
+<li><p class="first">Bootstrap.java</p>
+<div class="highlight-java"><div class="highlight"><pre><span></span><span class="nd">@EnableAutoConfiguration</span><span class="o">(</span><span class="n">exclude</span> <span class="o">=</span> <span class="o">{</span> <span class="n">DataSourceAutoConfiguration</span><span class="o">.</span><span class="na">class</span><span class="o">,</span>
+                                      <span class="n">JmxAutoConfiguration</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="n">WebMvcAutoConfiguration</span><span class="o">.</span><span class="na">class</span><span class="o">,</span>
+                                      <span class="n">ElastiCacheAutoConfiguration</span><span class="o">.</span><span class="na">class</span> <span class="o">})</span> <span class="c1">//(1)</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">Bootstrap</span> <span class="kd">extends</span> <span class="n">SpringBootServletInitializer</span> <span class="o">{</span>
+  <span class="c1">// omitted</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+<table border="1" class="docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><code class="docutils literal"><span class="pre">&#64;EnableAutoConfiguration</span></code>アノテーションの属性<code class="docutils literal"><span class="pre">exclude</span></code>に、<code class="docutils literal"><span class="pre">ElastiCacheAutoConfiguration.class</span></code>を指定することで、<code class="docutils literal"><span class="pre">ElastiCache</span></code>の自動設定を除外する。</td>
+</tr>
+</tbody>
+</table>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="create-aws-project-constrait">
+<span id="id6"></span><h2><a class="toc-backref" href="#id13">5.1.3. AWS向けプロジェクトで考慮すべき点・制約事項</a><a class="headerlink" href="#create-aws-project-constrait" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="aws-credentials">
+<span id="create-aws-project-constrait-credential"></span><h3><a class="toc-backref" href="#id14">5.1.3.1. AWS認証情報（Credentials)の管理</a><a class="headerlink" href="#aws-credentials" title="Permalink to this headline">¶</a></h3>
+<p>AWS リソースへのアクセスを必要とする場合、AWS認証情報（Credentials)がアプリケーションに設定されている必要がある。
+セキュリティの観点から、アクセスキーを直接コードに埋め込むことは推奨されていない。
+AWSの公式ドキュメントでは、下記のどちらかにアクセスキーを配置することが推奨されている。</p>
+<ul class="simple">
+<li>AWS 認証情報ファイル</li>
+<li>環境変数</li>
+</ul>
+<p>詳細は
+<a class="reference external" href="http://docs.aws.amazon.com/ja_jp/general/latest/gr/aws-access-keys-best-practices.html#iam-user-access-keys">IAM ユーザーのアクセスキーを適切に管理する</a>
+を参照されたい。</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>Spring Cloud AWSでは<code class="docutils literal"><span class="pre">com.amazonaws.auth.DefaultAWSCredentialsProviderChain</span></code>を利用して
+AWS認証情報をアプリケーションに設定する。特定のクライアントが指定されていない場合、下記のAWS認証情報が利用される。</p>
+<ul class="simple">
+<li>環境変数<code class="docutils literal"><span class="pre">AWS_ACCESS_KEY_ID</span></code>と<code class="docutils literal"><span class="pre">AWS_SECRET_ACCESS_KEY</span></code></li>
+<li>システムプロパティ<code class="docutils literal"><span class="pre">aws.accessKeyId</span></code>と<code class="docutils literal"><span class="pre">aws.secretKey</span></code></li>
+<li>ユーザのAWS 認証情報ファイル</li>
+<li>AWSインスタンスプロファイルの認証情報</li>
+</ul>
+<p class="last">詳細はSpring Cloud AWSの公式リファレンス
+<a class="reference external" href="http://cloud.spring.io/spring-cloud-static/spring-cloud-aws/1.2.1.RELEASE/#_sdk_credentials_configuration">SDK credentials configuration</a>
+を参照されたい。</p>
+</div>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p>Spring Boot使用時はデフォルトの設定の状態では環境変数に設定したAWS認証情報は利用できない。
+これはAuto-configurationによって<code class="docutils literal"><span class="pre">com.amazonaws.auth.DefaultAWSCredentialsProviderChain</span></code>が利用されなくなるためである。</p>
+<p>環境変数からAWS認証情報を取得するためには下記設定を行う必要がある。</p>
+<ol class="arabic simple">
+<li><code class="docutils literal"><span class="pre">cloud.aws.credentials.instanceProfile=false</span></code></li>
+<li><code class="docutils literal"><span class="pre">cloud.aws.credentials.profileName=</span></code>(空)</li>
+</ol>
+<ul class="last">
+<li><p class="first">application.ymlの設定例</p>
+<div class="highlight-yaml"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">cloud</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">aws</span><span class="p p-Indicator">:</span>
+    <span class="l l-Scalar l-Scalar-Plain">credentials</span><span class="p p-Indicator">:</span>
+      <span class="l l-Scalar l-Scalar-Plain">instanceProfile</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">false</span>
+      <span class="l l-Scalar l-Scalar-Plain">profileName</span><span class="p p-Indicator">:</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</div>
+<div class="admonition tip">
+<p class="first admonition-title">Tip</p>
+<p>開発者のPCなどのEC2インスタンス以外の環境で、Spring Cloud AWSを利用したAWSリソースへのアクセスを行うアプリケーションを実行する場合、AWS認証情報（Credentials）の取得に長時間を要する。
+これは、認証情報取得の際に実行される<code class="docutils literal"><span class="pre">AWSCredentialsProvider</span></code>のうちの一つである<code class="docutils literal"><span class="pre">InstanceProfileCredentialsProvider</span></code>が認証情報を取得できずにリトライを繰り返すためである。</p>
+<p>認証情報の取得はAWSリソースへのアクセスが発生する都度行われるため、アプリケーションのレスポンスが著しく低下する。
+そのため、EC2インスタンス以外の環境では<code class="docutils literal"><span class="pre">InstanceProfileCredentialsProvider</span></code>を無効にしておくことが望ましい。</p>
+<p><code class="docutils literal"><span class="pre">InstanceProfileCredentialsProvider</span></code>は<code class="docutils literal"><span class="pre">cloud.aws.credentials.instanceProfile=false</span></code>プロパティを設定しておくことで無効化できる。</p>
+<ul class="last">
+<li><p class="first">application.ymlの設定例</p>
+<div class="highlight-yaml"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">cloud</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">aws</span><span class="p p-Indicator">:</span>
+    <span class="l l-Scalar l-Scalar-Plain">credentials</span><span class="p p-Indicator">:</span>
+      <span class="l l-Scalar l-Scalar-Plain">instanceProfile</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">false</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="amazon-s3">
+<span id="create-aws-project-constrait-s3permission"></span><h3><a class="toc-backref" href="#id15">5.1.3.2. Amazon S3のアクセス許可設定</a><a class="headerlink" href="#amazon-s3" title="Permalink to this headline">¶</a></h3>
+<p>Amazon Simple Storage Service(以降、S3)に
+個人情報などの機密性の高い情報を含むファイルのアップロードを行う場合、
+S3バケットに対するアクセス許可を適切に付与する必要がある。</p>
+<p>本ガイドラインでは下記の章でS3を使用する。これらの機能を使用する場合、アクセス許可の設定が必要なことに注意されたい。</p>
+<ul class="simple">
+<li><a class="reference internal" href="../ImplementationAtEachLayer/EnvironmentValuesExternalManagement.html"><span class="doc">環境依存値の外部管理</span></a></li>
+<li><a class="reference internal" href="FileManagement/UploadFileManagement.html"><span class="doc">アップロードファイル管理</span></a></li>
+<li><a class="reference internal" href="StaticContents.html"><span class="doc">静的コンテンツの配信</span></a></li>
+</ul>
+<p>アクセス許可を付与する際には、</p>
+<ol class="arabic simple">
+<li>アプリケーションが行うバケットアクセスに必要なアクセス許可</li>
+<li>メンテナンスなどの運用上必要なアクセス許可</li>
+</ol>
+<p>のみを付与するものとし、不要なアクセス許可を付与しないこと。</p>
+<p>バケットポリシーを使用して、アプリケーションが使用するIAMユーザに対してアクセス許可を付与する場合以下のようになる。</p>
+<blockquote>
+<div><div class="highlight-json"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="nt">&quot;Version&quot;</span><span class="p">:</span> <span class="s2">&quot;2012-10-17&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;Statement&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="nt">&quot;Sid&quot;</span><span class="p">:</span> <span class="s2">&quot;Stmt1478067513034&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;Effect&quot;</span><span class="p">:</span> <span class="s2">&quot;Allow&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;Principal&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="nt">&quot;AWS&quot;</span><span class="p">:</span> <span class="s2">&quot;arn:aws:iam::XXXXXXXXXXXX:user/appuser&quot;</span>
+            <span class="p">},</span>
+            <span class="nt">&quot;Action&quot;</span><span class="p">:</span> <span class="p">[</span>
+                <span class="s2">&quot;s3:GetObject&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;s3:PutObject&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;s3:DeleteObject&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;s3:ListBucket&quot;</span>
+            <span class="p">],</span>
+            <span class="nt">&quot;Resource&quot;</span><span class="p">:</span> <span class="p">[</span>
+                <span class="s2">&quot;arn:aws:s3:::myBucket/*&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;arn:aws:s3:::myBucket&quot;</span>
+            <span class="p">]</span>
+        <span class="p">}</span>
+    <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div></blockquote>
+<p>上記例は、appuserに対して、myBucket配下のファイル（オブジェクト）の参照・更新・削除を行うアクセス許可を付与している。
+S3 Management ConsoleもしくはAWS CLIから設定することでアクセス許可を付与することができる。</p>
+<p>アクセス許可の詳細については、Amazon Simple Storage Service ドキュメント 開発者ガイド
+<a class="reference external" href="https://docs.aws.amazon.com/ja_jp/AmazonS3/latest/dev/s3-access-control.html">Amazon S3 リソースへのアクセス許可の管理</a>
+を参照されたい。</p>
+</div>
+<div class="section" id="amazon-ec2apamazonserviceexception">
+<span id="create-aws-project-constrait-amazon-service-exception"></span><h3><a class="toc-backref" href="#id16">5.1.3.3. Amazon EC2上でAPを起動するとAmazonServiceExceptionが発生する</a><a class="headerlink" href="#amazon-ec2apamazonserviceexception" title="Permalink to this headline">¶</a></h3>
+<p>EC2上でアプリケーションを起動しようとすると、
+<code class="docutils literal"><span class="pre">Caused</span> <span class="pre">by:</span> <span class="pre">com.amazonaws.AmazonServiceException:</span> <span class="pre">Stack</span> <span class="pre">for</span> <span class="pre">i-xxxxx</span> <span class="pre">does</span> <span class="pre">not</span> <span class="pre">exist...</span></code>が発生する。
+Spring Cloud AWSのAuto-configurationである<code class="docutils literal"><span class="pre">ContextStackAutoConfiguration</span></code>によって、
+アプリケーションのスタック名自動検出が有効になり、AWS CloudFormationのスタックが見つからない場合、
+<code class="docutils literal"><span class="pre">AmazonServiceException</span></code>が発生しAPが起動しない。</p>
+<p><code class="docutils literal"><span class="pre">cloud.aws.stack.auto</span> <span class="pre">=</span> <span class="pre">false</span></code>を設定し、スタックの自動検出を無効化することで回避することができる。</p>
+<p>設定例は <a class="reference internal" href="#create-aws-project-stack"><span class="std std-ref">スタックの自動検出の無効化</span></a> を参照されたい。</p>
+</div>
+<div class="section" id="amazon-ec2elasticache-redis">
+<span id="create-aws-project-constrait-cannot-find-cache"></span><h3><a class="toc-backref" href="#id17">5.1.3.4. Amazon EC2上でElastiCache Redis使用時の注意</a><a class="headerlink" href="#amazon-ec2elasticache-redis" title="Permalink to this headline">¶</a></h3>
+<p>EC2上でアプリケーションを起動しようとすると、<code class="docutils literal"><span class="pre">Spring</span> <span class="pre">Boot:</span> <span class="pre">java.lang.IllegalArgumentException:</span> <span class="pre">Cannot</span> <span class="pre">find</span> <span class="pre">cache</span> <span class="pre">named</span> <span class="pre">'xxx'</span> <span class="pre">for</span> <span class="pre">CacheableOperation</span></code>が発生する。
+Spring Cloud AWSのAuto-configurationである<code class="docutils literal"><span class="pre">ElastiCacheAutoConfiguration</span></code>によって、ElastiCacheの自動設定が有効になり、AWS ElastiCacheに<code class="docutils literal"><span class="pre">cache</span> <span class="pre">named</span></code>の設定がされていない場合、<code class="docutils literal"><span class="pre">IllegalArgumentException</span></code>が発生しAPが起動しない。
+そのため、<code class="docutils literal"><span class="pre">ElastiCacheAutoConfiguration</span></code>の自動設定を除外する。</p>
+<p>設定例は <a class="reference internal" href="#create-aws-project-autoconfiguration"><span class="std std-ref">Auto-Configurationの無効化</span></a> を参照されたい。</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="AutoScale.html" title="5.2. オートスケーリングの利用"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="5. AWS連携"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Macchinetta Server Framework Cloud Extension Development Guideline 1.0.1.RELEASE documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >5. AWS連携</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2018 NTT Corporation.
+    Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.5.3.Theme by <a href="http://github.com/vkvn">vkvn</a>
+    </div>
+    
+    <script>
+     
+     $(function() {
+    	   var $sidebar	= $('.sphinxsidebar'),
+    		     $window		= $(window),
+    		     offset		= $sidebar.offset(),
+    		     topPadding	= 3,
+    		     $scroll		= $('#scroll');
+    	   
+    	   $window.scroll(function() {
+    		     if ($scroll.is(':checked')) {
+				         if ($window.scrollTop() > offset.top) {
+					           $sidebar.stop().animate({
+						             marginTop:$window.scrollTop() - offset.top + topPadding
+					           });
+				         } else {
+					           $sidebar.stop().animate({
+						             marginTop:0
+					           });
+				         }
+			       }
+		     });
+    	   
+    	   var $navList = $('ul:first', $sidebar);
+    	   $('li:first', $navList).addClass('open');
+    	   
+    	   $navList.treeview({
+    		     persist: "location",
+    		     collapsed: true,
+    		     unique: false
+    	   });
+    	   
+	   });
+    </script>
+    
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-113850349-4"></script>
+    <script>
+     window.dataLayer = window.dataLayer || [];
+     function gtag(){dataLayer.push(arguments);}
+     gtag('js', new Date());
+
+     gtag('config', 'UA-113850349-4');
+    </script>
+  </body>
+</html>

@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>3.4.1. アップロードファイル管理 &#8212; Macchinetta Server Framework Cloud Extension Development Guideline 1.0.1.RELEASE documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/solar.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1.0.1.RELEASE',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="3.4.2. アップロードファイル管理(ダイレクトアップロード方式)" href="DirectFileUpload.html" />
+    <link rel="prev" title="3.4. ファイル管理" href="index.html" /><script src="../../_static/jquery.treeview.js" type="text/javascript"></script>
+<!-- <link href='http://fonts.googleapis.com/css?family=Source+Code+Pro|Open+Sans:300italic,400italic,700italic,400,300,700' rel='stylesheet' type='text/css'> -->
+<link href="../../_static/solarized-dark.css" rel="stylesheet">
+<link href="../../_static/jquery.treeview.css" rel="stylesheet">
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="DirectFileUpload.html" title="3.4.2. アップロードファイル管理(ダイレクトアップロード方式)"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="3.4. ファイル管理"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Macchinetta Server Framework Cloud Extension Development Guideline 1.0.1.RELEASE documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >3. アプリケーション開発</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" accesskey="U">3.4. ファイル管理</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><label><input id="scroll" type="checkbox"> scroll sidebar</label>
+
+  <h3><a href="../../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">3.4.1. アップロードファイル管理</a><ul>
+<li><a class="reference internal" href="#overview">3.4.1.1. Overview</a><ul>
+<li><a class="reference internal" href="#id4">3.4.1.1.1. 仮アップロードファイルの保存</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#how-to-use">3.4.1.2. How to use</a><ul>
+<li><a class="reference internal" href="#id5">3.4.1.2.1. ストレージサービスの利用</a><ul>
+<li><a class="reference internal" href="#amazon-web-service">3.4.1.2.1.1. Amazon Web Service</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">3.4. ファイル管理</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="DirectFileUpload.html"
+                        title="next chapter">3.4.2. アップロードファイル管理(ダイレクトアップロード方式)</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/ImplementationAtEachLayer/FileManagement/UploadFileManagement.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="id1">
+<h1>3.4.1. アップロードファイル管理<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h1>
+<div class="contents local topic" id="id2">
+<p class="topic-title first">目次</p>
+<ul class="simple">
+<li><a class="reference internal" href="#overview" id="id6">Overview</a><ul>
+<li><a class="reference internal" href="#id4" id="id7">仮アップロードファイルの保存</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#how-to-use" id="id8">How to use</a><ul>
+<li><a class="reference internal" href="#id5" id="id9">ストレージサービスの利用</a><ul>
+<li><a class="reference internal" href="#amazon-web-service" id="id10">Amazon Web Service</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="overview">
+<h2><a class="toc-backref" href="#id6">3.4.1.1. Overview</a><a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>本ガイドラインでは、クラウドネイティブなアプリケーションにおけるアップロードファイルの管理方法について説明する。</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>本ガイドラインでは、クラウド環境を利用する場合の留意点のみを説明し、ファイルアップロードを行う機能そのものの実装方法については説明しない。</p>
+<p class="last">ファイルアップロードを行う機能の実装方法については Macchinetta Server Framework for Java (1.x) Development Guideline <a class="reference external" href="https://macchinetta.github.io/server-guideline/1.5.1.RELEASE/ja/ArchitectureInDetail/WebApplicationDetail/FileUpload.html">ファイルアップロード</a>  を参照されたい。</p>
+</div>
+<div class="section" id="id4">
+<h3><a class="toc-backref" href="#id7">3.4.1.1.1. 仮アップロードファイルの保存</a><a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<p>クラウド環境では、クラウドベンダーが提供する機能を利用してAPサーバインスタンスの動的なスケーリングが可能である。
+柔軟なスケーリングを実現するため、仮アップロードファイルであってもAPサーバのローカルストレージには保存せず、クラウドベンダーが提供するストレージサービス上に保存することを推奨する。</p>
+<blockquote>
+<div><div class="figure">
+<a class="reference internal image-reference" href="../../_images/UploadFileManagementOverview1.png"><img alt="Screen image of file upload." src="../../_images/UploadFileManagementOverview1.png" style="width: 100%;" /></a>
+</div>
+</div></blockquote>
+<p>仮アップロードファイルであってもAPサーバインスタンスのローカルストレージに保存しない理由は以下のとおり。</p>
+<ul class="simple">
+<li>ファイルを保持しているAPサーバインスタンスがスケールインによって停止・削除された場合に、ファイルが破棄されてしまう。</li>
+<li>ユーザの操作を継続するために、ロードバランサのスティッキーセッション機能を利用して同一ユーザのリクエストを特定のAPサーバに振り分ける必要が有るため、ユーザの操作中にスケールインを行うことができない。</li>
+<li>スケールアウト後に操作中のユーザのリクエストを新規のサーバインスタンスに振り分ける事ができず、柔軟な負荷分散を行えない。</li>
+</ul>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>仮アップロードファイルに限らず、最終的なファイルの保存先についてもストレージサービスを利用することで、以下のメリットがある。</p>
+<ul class="simple">
+<li>システムの運用中であってもストレージサイズの拡張を自動的に行うことが出来る。</li>
+<li>ファイルを保存する物理的なストレージを分散させることでファイルI/Oが特定のストレージに集中することを防ぐ事ができるため、RDBなどに保存するよりも効率的な負荷分散を行うことが可能である。</li>
+</ul>
+<p class="last">具体的な利用方法についてはクラウドベンダーのリファレンスを参照されたい。</p>
+</div>
+</div>
+</div>
+<div class="section" id="how-to-use">
+<h2><a class="toc-backref" href="#id8">3.4.1.2. How to use</a><a class="headerlink" href="#how-to-use" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id5">
+<h3><a class="toc-backref" href="#id9">3.4.1.2.1. ストレージサービスの利用</a><a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
+<p>クラウドベンダーが提供するストレージサービスを利用し、一時ファイルのアップロード先として利用する。
+アプリケーションからの利用方法については、各クラウドサービスのリファレンスを参照されたい。</p>
+<div class="section" id="amazon-web-service">
+<h4><a class="toc-backref" href="#id10">3.4.1.2.1.1. Amazon Web Service</a><a class="headerlink" href="#amazon-web-service" title="Permalink to this headline">¶</a></h4>
+<p>クラウドベンダーとしてAWSを使用する場合、Spring Cloud for Amazon Web Services、AWS SDK for JavaおよびAmazon Simple Storage Serviceを使用してストレージサービスへのファイル保存を行う事ができる。</p>
+<p>実装方法については <a class="reference internal" href="../../AWSCollaboration/FileManagement/UploadFileManagement.html"><span class="doc">アップロードファイル管理</span></a> を参照。</p>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="DirectFileUpload.html" title="3.4.2. アップロードファイル管理(ダイレクトアップロード方式)"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="3.4. ファイル管理"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Macchinetta Server Framework Cloud Extension Development Guideline 1.0.1.RELEASE documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >3. アプリケーション開発</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" >3.4. ファイル管理</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2018 NTT Corporation.
+    Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.5.3.Theme by <a href="http://github.com/vkvn">vkvn</a>
+    </div>
+    
+    <script>
+     
+     $(function() {
+    	   var $sidebar	= $('.sphinxsidebar'),
+    		     $window		= $(window),
+    		     offset		= $sidebar.offset(),
+    		     topPadding	= 3,
+    		     $scroll		= $('#scroll');
+    	   
+    	   $window.scroll(function() {
+    		     if ($scroll.is(':checked')) {
+				         if ($window.scrollTop() > offset.top) {
+					           $sidebar.stop().animate({
+						             marginTop:$window.scrollTop() - offset.top + topPadding
+					           });
+				         } else {
+					           $sidebar.stop().animate({
+						             marginTop:0
+					           });
+				         }
+			       }
+		     });
+    	   
+    	   var $navList = $('ul:first', $sidebar);
+    	   $('li:first', $navList).addClass('open');
+    	   
+    	   $navList.treeview({
+    		     persist: "location",
+    		     collapsed: true,
+    		     unique: false
+    	   });
+    	   
+	   });
+    </script>
+    
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-113850349-4"></script>
+    <script>
+     window.dataLayer = window.dataLayer || [];
+     function gtag(){dataLayer.push(arguments);}
+     gtag('js', new Date());
+
+     gtag('config', 'UA-113850349-4');
+    </script>
+  </body>
+</html>

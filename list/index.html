@@ -15,6 +15,15 @@
 
         <link rel="canonical" href="https://macchinetta.github.io/cloud-guideline/list">
 
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-113850349-4"></script>
+        <script>
+         window.dataLayer = window.dataLayer || [];
+         function gtag(){dataLayer.push(arguments);}
+         gtag('js', new Date());
+
+         gtag('config', 'UA-113850349-4');
+        </script>
     </head>
 
     <body>
@@ -43,13 +52,13 @@
                         <li>1.0.1.RELEASE</li>
                         <ul>
                             <li>
-                                <a href="https://macchinetta.github.io/cloud-guideline/1.0.1.RELEASE/ja">HTML</a>
-                            </li>
-                            <li>
-                                <a href="https://macchinetta.github.io/cloud-guideline/1.0.1.RELEASE/ja/MacchinettaServerFrameworkCloudExtensionDevelopmentGuideline.zip">zip</a>
+                                <a href="https://macchinetta.github.io/cloud-guideline/1.0.1.RELEASE/ja" onclick="gtag('event', 'cloud', {'event_category' : 'download', 'event_label' : 'zip-1.0.1'});">HTML</a> |
+                                <a href="https://macchinetta.github.io/cloud-guideline/1.0.1.RELEASE/ja/MacchinettaServerFrameworkCloudExtensionDevelopmentGuideline.zip" onclick="gtag('event', 'server', {'event_category' : 'download', 'event_label' : 'pdf-1.0.1'});">zip</a>
                             </li>
                         </ul>
-                        <li><del>1.0.0.RELEASE</del></li>
+
+                        <li> <span style="text-decoration: line-through">1.0.0.RELEASE</span> (Missing)</li>
+
                     </ul>
 
                     <hr />

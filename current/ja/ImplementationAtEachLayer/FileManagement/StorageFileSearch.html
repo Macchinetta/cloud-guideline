@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>3.4.4. インターネットストレージ内ファイルの効率的な検索 &#8212; Macchinetta Server Framework Cloud Extension Development Guideline 1.0.1.RELEASE documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/solar.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1.0.1.RELEASE',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="3.5. 静的コンテンツの配信" href="../StaticContents.html" />
+    <link rel="prev" title="3.4.3. ダウンロードファイル管理" href="DownloadFileManagement.html" /><script src="../../_static/jquery.treeview.js" type="text/javascript"></script>
+<!-- <link href='http://fonts.googleapis.com/css?family=Source+Code+Pro|Open+Sans:300italic,400italic,700italic,400,300,700' rel='stylesheet' type='text/css'> -->
+<link href="../../_static/solarized-dark.css" rel="stylesheet">
+<link href="../../_static/jquery.treeview.css" rel="stylesheet">
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../StaticContents.html" title="3.5. 静的コンテンツの配信"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="DownloadFileManagement.html" title="3.4.3. ダウンロードファイル管理"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Macchinetta Server Framework Cloud Extension Development Guideline 1.0.1.RELEASE documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >3. アプリケーション開発</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" accesskey="U">3.4. ファイル管理</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><label><input id="scroll" type="checkbox"> scroll sidebar</label>
+
+  <h3><a href="../../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">3.4.4. インターネットストレージ内ファイルの効率的な検索</a><ul>
+<li><a class="reference internal" href="#overview">3.4.4.1. Overview</a><ul>
+<li><a class="reference internal" href="#storage-file-search-label">3.4.4.1.1. 処理方式概要</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#how-to-use">3.4.4.2. How to use</a><ul>
+<li><a class="reference internal" href="#id4">3.4.4.2.1. クラウドベンダーの利用</a><ul>
+<li><a class="reference internal" href="#amazon-web-service">3.4.4.2.1.1. Amazon Web Service</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="DownloadFileManagement.html"
+                        title="previous chapter">3.4.3. ダウンロードファイル管理</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../StaticContents.html"
+                        title="next chapter">3.5. 静的コンテンツの配信</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/ImplementationAtEachLayer/FileManagement/StorageFileSearch.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="id1">
+<h1>3.4.4. インターネットストレージ内ファイルの効率的な検索<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h1>
+<div class="contents local topic" id="id2">
+<p class="topic-title first">目次</p>
+<ul class="simple">
+<li><a class="reference internal" href="#overview" id="id5">Overview</a><ul>
+<li><a class="reference internal" href="#storage-file-search-label" id="id6">処理方式概要</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#how-to-use" id="id7">How to use</a><ul>
+<li><a class="reference internal" href="#id4" id="id8">クラウドベンダーの利用</a><ul>
+<li><a class="reference internal" href="#amazon-web-service" id="id9">Amazon Web Service</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="overview">
+<h2><a class="toc-backref" href="#id5">3.4.4.1. Overview</a><a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<div class="line-block">
+<div class="line">インターネットストレージは、インターネットを介しての様々なファイルの登録と取得をどこからでも行える利便性をアプリケーション開発者に提供する。</div>
+<div class="line">しかしその反面、インターネット経由でアクセスすることによる応答性能の低下や、データベースのような高度な検索機能が用意されていない点など、アプリケーション開発者側の実装による解決が必要な問題がある。</div>
+<div class="line">本ガイドラインでは、インターネットストレージ上のファイルを高度な検索機能により効率的に検索するための処理方式について説明する。</div>
+<div class="line"><br /></div>
+</div>
+<div class="section" id="storage-file-search-label">
+<span id="id3"></span><h3><a class="toc-backref" href="#id6">3.4.4.1.1. 処理方式概要</a><a class="headerlink" href="#storage-file-search-label" title="Permalink to this headline">¶</a></h3>
+<div class="line-block">
+<div class="line">インターネットストレージ上から目的のファイルを取得する際に、ファイル名を指定した検索など簡易的な絞込みには対応しているが、ファイルサイズや作成日、作成者などのメタデータを指定するような複雑な検索に対応していないことが多い。（特定の日に登録されたファイルをファイルサイズの大きい順に取得したい、など）</div>
+<div class="line">こういった検索性能の低さを補うため、検索性能の高いKVSなどをインターネットストレージと併用する処理方式を実装する。</div>
+</div>
+<div class="line-block">
+<div class="line">まずインターネットストレージへファイルを登録するタイミングで、後にファイルを検索する条件として利用するための検索用情報（ファイルサイズ、作成日、作成者など）とファイルのキー情報をKVSに登録するアプリケーションを実行する。</div>
+<div class="line">その後のインターネットストレージからファイルを取得するタイミングでは、検索アプリケーションがKVSを利用して検索条件に一致するファイルを特定しキー情報を提供することにより、複雑な検索条件によるファイルの絞込みに対応することができる。</div>
+</div>
+<blockquote>
+<div><div class="figure">
+<a class="reference internal image-reference" href="../../_images/StorageFileSearchOverview1.png"><img alt="Screen image of storage file search overview." src="../../_images/StorageFileSearchOverview1.png" style="width: 100%;" /></a>
+</div>
+<table border="1" class="docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">ファイルを登録したいユーザは、インターネットストレージにファイルを登録する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(2)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">インターネットストレージの更新をトリガに登録アプリケーションを実行する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(3)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">登録アプリケーションは、登録ファイルの情報を検索用情報としてKVSに登録する。（同時にファイルのキー情報も登録する。）</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(4)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">ファイルを取得したいユーザは、検索アプリケーションを介してKVSから検索条件に合致するファイルを特定し、ファイルのキー情報を取得する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(5)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">ファイルを取得したいユーザは、ファイルのキー情報を指定してインターネットストレージからファイルを取得する。</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">上記はファイル登録時のフローとなるがファイル削除の場合も同様で、登録アプリケーションがKVSから検索用情報を削除することにより検索アプリケーションから検索されなくなる。</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">検索アプリケーションによる検索結果は検索実行時点のKVSの断面となるため、検索結果取得後にインターネットストレージが更新された場合は取得した情報が最新ではなくなる。
+このため例えばダウンロード対象のファイルが既に削除されていたり、ダウンロードしたファイルのファイルサイズや作成者が異なる等の事象が発生し得ることに注意されたい。</p>
+</div>
+</div>
+</div>
+<div class="section" id="how-to-use">
+<h2><a class="toc-backref" href="#id7">3.4.4.2. How to use</a><a class="headerlink" href="#how-to-use" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id4">
+<h3><a class="toc-backref" href="#id8">3.4.4.2.1. クラウドベンダーの利用</a><a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<p>クラウドベンダー提供の環境を利用する場合のガイドラインについて記載箇所を示しておく。</p>
+<div class="section" id="amazon-web-service">
+<h4><a class="toc-backref" href="#id9">3.4.4.2.1.1. Amazon Web Service</a><a class="headerlink" href="#amazon-web-service" title="Permalink to this headline">¶</a></h4>
+<p>クラウドベンダーとしてAWSを使用する場合のインターネットストレージ内ファイルの効率的な検索については、
+<a class="reference internal" href="../../AWSCollaboration/FileManagement/StorageFileSearch.html"><span class="doc">インターネットストレージ内ファイルの効率的な検索</span></a>
+を参照されたい。</p>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../StaticContents.html" title="3.5. 静的コンテンツの配信"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="DownloadFileManagement.html" title="3.4.3. ダウンロードファイル管理"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Macchinetta Server Framework Cloud Extension Development Guideline 1.0.1.RELEASE documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >3. アプリケーション開発</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" >3.4. ファイル管理</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2018 NTT Corporation.
+    Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.5.3.Theme by <a href="http://github.com/vkvn">vkvn</a>
+    </div>
+    
+    <script>
+     
+     $(function() {
+    	   var $sidebar	= $('.sphinxsidebar'),
+    		     $window		= $(window),
+    		     offset		= $sidebar.offset(),
+    		     topPadding	= 3,
+    		     $scroll		= $('#scroll');
+    	   
+    	   $window.scroll(function() {
+    		     if ($scroll.is(':checked')) {
+				         if ($window.scrollTop() > offset.top) {
+					           $sidebar.stop().animate({
+						             marginTop:$window.scrollTop() - offset.top + topPadding
+					           });
+				         } else {
+					           $sidebar.stop().animate({
+						             marginTop:0
+					           });
+				         }
+			       }
+		     });
+    	   
+    	   var $navList = $('ul:first', $sidebar);
+    	   $('li:first', $navList).addClass('open');
+    	   
+    	   $navList.treeview({
+    		     persist: "location",
+    		     collapsed: true,
+    		     unique: false
+    	   });
+    	   
+	   });
+    </script>
+    
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-113850349-4"></script>
+    <script>
+     window.dataLayer = window.dataLayer || [];
+     function gtag(){dataLayer.push(arguments);}
+     gtag('js', new Date());
+
+     gtag('config', 'UA-113850349-4');
+    </script>
+  </body>
+</html>

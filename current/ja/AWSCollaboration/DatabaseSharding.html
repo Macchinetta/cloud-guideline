@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>5.9. データベースシャーディング &#8212; Macchinetta Server Framework Cloud Extension Development Guideline 1.0.1.RELEASE documentation</title>
+    
+    <link rel="stylesheet" href="../_static/solar.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.0.1.RELEASE',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="5.10. データベースリードレプリカ" href="DatabaseReadReplica.html" />
+    <link rel="prev" title="5.8. ログ管理" href="LogManagement.html" /><script src="../_static/jquery.treeview.js" type="text/javascript"></script>
+<!-- <link href='http://fonts.googleapis.com/css?family=Source+Code+Pro|Open+Sans:300italic,400italic,700italic,400,300,700' rel='stylesheet' type='text/css'> -->
+<link href="../_static/solarized-dark.css" rel="stylesheet">
+<link href="../_static/jquery.treeview.css" rel="stylesheet">
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="DatabaseReadReplica.html" title="5.10. データベースリードレプリカ"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="LogManagement.html" title="5.8. ログ管理"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Macchinetta Server Framework Cloud Extension Development Guideline 1.0.1.RELEASE documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">5. AWS連携</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><label><input id="scroll" type="checkbox"> scroll sidebar</label>
+
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">5.9. データベースシャーディング</a><ul>
+<li><a class="reference internal" href="#overview">5.9.1. Overview</a><ul>
+<li><a class="reference internal" href="#dynamodb">5.9.1.1. DynamoDB</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#how-to-use">5.9.2. How to use</a><ul>
+<li><a class="reference internal" href="#aws-implementation-repository-setting">5.9.2.1. シャードキーリポジトリの設定</a></li>
+<li><a class="reference internal" href="#aws-implementation-repository">5.9.2.2. シャードキーリポジトリの実装</a></li>
+<li><a class="reference internal" href="#id7">5.9.2.3. シャードキーリポジトリの使用</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="LogManagement.html"
+                        title="previous chapter">5.8. ログ管理</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="DatabaseReadReplica.html"
+                        title="next chapter">5.10. データベースリードレプリカ</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/AWSCollaboration/DatabaseSharding.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="id1">
+<h1>5.9. データベースシャーディング<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h1>
+<div class="contents local topic" id="id2">
+<p class="topic-title first">目次</p>
+<ul class="simple">
+<li><a class="reference internal" href="#overview" id="id8">Overview</a><ul>
+<li><a class="reference internal" href="#dynamodb" id="id9">DynamoDB</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#how-to-use" id="id10">How to use</a><ul>
+<li><a class="reference internal" href="#aws-implementation-repository-setting" id="id11">シャードキーリポジトリの設定</a></li>
+<li><a class="reference internal" href="#aws-implementation-repository" id="id12">シャードキーリポジトリの実装</a></li>
+<li><a class="reference internal" href="#id7" id="id13">シャードキーリポジトリの使用</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="overview">
+<h2><a class="toc-backref" href="#id8">5.9.1. Overview</a><a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>本ガイドラインでは、AWSを使用したデータベースシャーディングについて説明する。</p>
+<p><a class="reference internal" href="../ImplementationAtEachLayer/PersistenceLayerScalability.html"><span class="doc">データ永続層のスケール性の確保</span></a> や <a class="reference internal" href="../ArchitectureInDetail/DataAccessDetail/DataAccessMyBatis3.html"><span class="doc">データベースシャーディング</span></a> で説明したシャーディング方式を実現するにあたり、AWS上でシャーディングを実現する場合はシャードにはRDSを、シャードキー管理のための記憶装置にはKVS(Key-Value Store)であるDynamoDBを使用する。また、DynamoDBに格納するシャードキー情報は読み込み頻度が高く、値の更新の機会が少ないため、キャッシュ方式によりアクセスの負荷を低減する。DynamoDBへのアクセスにはSpring Data DynamoDBを使用する。シャードキー情報のキャッシュ化には <a class="reference internal" href="../ArchitectureInDetail/DataAccessDetail/CacheAbstraction.html"><span class="doc">キャッシュの抽象化（Cache Abstraction）</span></a> を使用する。</p>
+<p>本ガイドラインでは、以下に示すイメージの赤枠破線部分について説明する。</p>
+<blockquote>
+<div><div class="figure align-center">
+<a class="reference internal image-reference" href="../_images/DatabaseShardingOverview.png"><img alt="../_images/DatabaseShardingOverview.png" src="../_images/DatabaseShardingOverview.png" style="width: 90%;" /></a>
+</div>
+<table border="1" class="docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td>Controllerが<code class="docutils literal"><span class="pre">&#64;ShardWithAccount</span></code>と<code class="docutils literal"><span class="pre">&#64;Transactional</span></code>付のServiceメソッドを呼び出す。</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(2)</div>
+</div>
+</td>
+<td>Sharding AOPがDynamoDB Repositoryを呼び出しシャードキーを特定する。</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(3)</div>
+</div>
+</td>
+<td>Sharding AOPは、(2)で特定したシャードキーをRouting Data Sourceへ伝播する。</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(4)</div>
+</div>
+</td>
+<td>Transaction AOPは、Transaction Managerを呼び出す。</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(5)</div>
+</div>
+</td>
+<td>Transaction Managerは、Routing Data SourceからConnectionを取得する。</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(6)</div>
+</div>
+</td>
+<td>Transaction Managerは、(5)で取得した<code class="docutils literal"><span class="pre">Connection</span></code>でトランザクションを開始しConnection Holderへ<code class="docutils literal"><span class="pre">Connection</span></code>を格納する。</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(7)</div>
+</div>
+</td>
+<td>Serviceは、Shard RepositoryのDBアクセスメソッドを呼び出す。</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(8)</div>
+</div>
+</td>
+<td>Shard Repositoryは、Mybatis Springを経由してDBへクエリを発行する。</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(9)</div>
+</div>
+</td>
+<td>Mybatis Springは、(6)で格納した<code class="docutils literal"><span class="pre">Connection</span></code>をConnection Holderから取得しDBへアクセスする。</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+<div class="section" id="dynamodb">
+<span id="aws-dynamodb"></span><h3><a class="toc-backref" href="#id9">5.9.1.1. DynamoDB</a><a class="headerlink" href="#dynamodb" title="Permalink to this headline">¶</a></h3>
+<p>DynamoDBについては、 <a class="reference external" href="https://aws.amazon.com/jp/dynamodb/?sc_channel=PS&amp;sc_campaign=acquisition_JP&amp;sc_publisher=google&amp;sc_medium=dynamodb_b&amp;sc_content=dynamodb_p&amp;sc_detail=aws%20dynamodb&amp;sc_category=dynamodb&amp;sc_segment=92610484225&amp;sc_matchtype=p&amp;sc_country=JP&amp;sc_brand=brand&amp;ef_id=WEkmJgAABWLDjcaM:20161215074309:s">公式サイト</a> を参照されたい。</p>
+<p>DynamoDBのガイドについては、 <a class="reference external" href="https://aws.amazon.com/jp/documentation/dynamodb/">Amazon DynamoDB ドキュメント</a> を参照されたい。</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">DynamoDBにトランザクション機能はないため、RDB等との整合性をトランザクション機能により担保することができない点に注意されたい。
+また、デフォルトでは結果整合性モデルである点に注意されたい。詳細は <a class="reference external" href="http://docs.aws.amazon.com/ja_jp/amazondynamodb/latest/developerguide/HowItWorks.ReadConsistency.html">読み込み整合性</a> を参照されたい。</p>
+</div>
+</div>
+</div>
+<div class="section" id="how-to-use">
+<h2><a class="toc-backref" href="#id10">5.9.2. How to use</a><a class="headerlink" href="#how-to-use" title="Permalink to this headline">¶</a></h2>
+<p>AWSを使用する場合、<a class="reference internal" href="../ArchitectureInDetail/DataAccessDetail/DataAccessMyBatis3.html"><span class="doc">データベースシャーディング</span></a> で説明した<a class="reference internal" href="../ArchitectureInDetail/DataAccessDetail/DataAccessMyBatis3.html#get-shard-key-label"><span class="std std-ref">シャードキーの取得</span></a>の内容は、本ガイドラインで説明する以下の内容となる。</p>
+<p>DynamoDBへアクセスする<a class="reference internal" href="#aws-implementation-repository-setting"><span class="std std-ref">シャードキーリポジトリの設定</span></a>と<a class="reference internal" href="#aws-implementation-repository"><span class="std std-ref">シャードキーリポジトリの実装</span></a>について説明する。</p>
+<p>Spring Data module for DynamoDBの詳細については、 <a class="reference external" href="https://github.com/derjust/spring-data-dynamodb">Spring Data DynamoDB</a> を参照されたい。</p>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<div class="section" id="aws-implementation-repository-setting">
+<span id="id5"></span><h3><a class="toc-backref" href="#id11">5.9.2.1. シャードキーリポジトリの設定</a><a class="headerlink" href="#aws-implementation-repository-setting" title="Permalink to this headline">¶</a></h3>
+<p>以下に、pom.xmlで依存ライブラリの設定例を示す。</p>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">xxx-parent/pom.xml</span></code></li>
+</ul>
+<div class="highlight-xml"><div class="highlight"><pre><span></span><span class="nt">&lt;dependencyManagement&gt;</span>
+  <span class="nt">&lt;dependencies&gt;</span>
+    ・・・
+    <span class="c">&lt;!-- == Begin DynamoDB == --&gt;</span>
+    <span class="c">&lt;!-- (1) --&gt;</span>
+    <span class="nt">&lt;dependency&gt;</span>
+      <span class="nt">&lt;groupId&gt;</span>com.github.derjust<span class="nt">&lt;/groupId&gt;</span>
+      <span class="nt">&lt;artifactId&gt;</span>spring-data-dynamodb<span class="nt">&lt;/artifactId&gt;</span>
+      <span class="nt">&lt;version&gt;</span>${org.springframework.data.dynamodb-dependencies.version}<span class="nt">&lt;/version&gt;</span>
+    <span class="nt">&lt;/dependency&gt;</span>
+    <span class="c">&lt;!-- == End DynamoDB == --&gt;</span>
+  <span class="nt">&lt;/dependencies&gt;</span>
+<span class="nt">&lt;/dependencyManagement&gt;</span>
+<span class="nt">&lt;properties&gt;</span>
+  ・・・
+  <span class="c">&lt;!-- (2) --&gt;</span>
+  <span class="nt">&lt;org.springframework.data.dynamodb-dependencies.version&gt;</span>4.5.0<span class="nt">&lt;/org.springframework.data.dynamodb-dependencies.version&gt;</span>
+  ・・・
+<span class="nt">&lt;/properties&gt;</span>
+</pre></div>
+</div>
+<table border="1" class="docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><p class="first">spring-data-dynamodbをバージョン指定で設定する。</p>
+<p class="last">子pomでバージョン指定が不要になる。</p>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(2)</div>
+</div>
+</td>
+<td>spring-data-dynamodbのバージョンを設定する。</td>
+</tr>
+</tbody>
+</table>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">xxx-domain/pom.xml</span></code></li>
+</ul>
+<div class="highlight-xml"><div class="highlight"><pre><span></span>・・・
+<span class="c">&lt;!-- (1) --&gt;</span>
+<span class="nt">&lt;dependency&gt;</span>
+  <span class="nt">&lt;groupId&gt;</span>com.github.derjust<span class="nt">&lt;/groupId&gt;</span>
+  <span class="nt">&lt;artifactId&gt;</span>spring-data-dynamodb<span class="nt">&lt;/artifactId&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span>
+・・・
+</pre></div>
+</div>
+<table border="1" class="docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td>spring-data-dynamodbを設定する。</td>
+</tr>
+</tbody>
+</table>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p>以下に、DynamoDBのリージョンとシャードキーリポジトリインタフェースの設定例を示す。</p>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">xxx-web/src/java/resources/application-local.yml</span></code>にDynamoDBのリージョンを設定</li>
+</ul>
+<div class="highlight-yaml"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">cloud</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">aws</span><span class="p p-Indicator">:</span>
+    <span class="l l-Scalar l-Scalar-Plain">・・・</span>
+    <span class="l l-Scalar l-Scalar-Plain"># (1)</span>
+    <span class="l l-Scalar l-Scalar-Plain">dynamodb</span><span class="p p-Indicator">:</span>
+      <span class="l l-Scalar l-Scalar-Plain">region</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">ap-northeast-1</span>
+</pre></div>
+</div>
+<table border="1" class="docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td>DynamoDBのリージョンを設定する。</td>
+</tr>
+</tbody>
+</table>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">xxx-domain/src/main/resources/META-INF/spring/xxx-domain.xml</span></code>にシャードキーリポジトリインタフェースの設定</li>
+</ul>
+<div class="highlight-xml"><div class="highlight"><pre><span></span><span class="c">&lt;!-- (1) --&gt;</span>
+ <span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;amazonDynamoDB&quot;</span>
+   <span class="na">class=</span><span class="s">&quot;com.example.xxx.domain.common.dynamodb.DynamoDBClientFactory&quot;</span> <span class="na">factory-method=</span><span class="s">&quot;create&quot;</span><span class="nt">&gt;</span>
+   <span class="c">&lt;!-- (2) --&gt;</span>
+   <span class="nt">&lt;constructor-arg</span> <span class="na">index =</span><span class="s">&quot;0&quot;</span> <span class="na">value=</span><span class="s">&quot;${cloud.aws.dynamodb.region}&quot;</span> <span class="nt">/&gt;</span>
+ <span class="nt">&lt;/bean&gt;</span>
+<span class="c">&lt;!-- (3) --&gt;</span>
+<span class="nt">&lt;dynamodb:repositories</span> <span class="na">base-package=</span><span class="s">&quot;com.example.xxx.domain.common.shard.repository&quot;</span>
+  <span class="na">amazon-dynamodb-ref=</span><span class="s">&quot;amazonDynamoDB&quot;</span> <span class="nt">/&gt;</span>
+</pre></div>
+</div>
+<table border="1" class="docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">DynamoDBへアクセスするための<code class="docutils literal"><span class="pre">AmazonDynamoDB</span></code>を定義する。</div>
+<div class="line"><code class="docutils literal"><span class="pre">DynamoDBClientFactory</span></code>を使用してインスタンスを生成する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(2)</div>
+</div>
+</td>
+<td>DynamoDBリージョンをコンストラクタ引数で設定する。</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(3)</div>
+</div>
+</td>
+<td>シャードキーリポジトリのパッケージをスキャン対象に設定する。</td>
+</tr>
+</tbody>
+</table>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">DynamoDBClientFactory.java</span></code></li>
+</ul>
+<div class="highlight-java"><div class="highlight"><pre><span></span><span class="kd">public</span> <span class="kd">class</span> <span class="nc">DynamoDBClientFactory</span> <span class="o">{</span>
+     <span class="kd">public</span> <span class="kd">static</span> <span class="n">AmazonDynamoDB</span> <span class="nf">create</span><span class="o">(</span><span class="n">String</span> <span class="n">region</span><span class="o">)</span> <span class="o">{</span>
+        <span class="c1">// (1)</span>
+        <span class="k">return</span> <span class="n">AmazonDynamoDBClientBuilder</span><span class="o">.</span><span class="na">standard</span><span class="o">().</span><span class="na">withRegion</span><span class="o">(</span><span class="n">region</span><span class="o">).</span><span class="na">build</span><span class="o">();</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+<table border="1" class="docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">AmazonDynamoDBClientBuilder</span></code>を使用してインスタンスを生成する。</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+</div>
+<div class="section" id="aws-implementation-repository">
+<span id="id6"></span><h3><a class="toc-backref" href="#id12">5.9.2.2. シャードキーリポジトリの実装</a><a class="headerlink" href="#aws-implementation-repository" title="Permalink to this headline">¶</a></h3>
+<p>以下に、DynamoDBのテーブルShardAccountに格納されたデータのイメージを示す。</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="20%" />
+<col width="80%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">user_id</th>
+<th class="head">data_source_key</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">0000000001</div>
+</div>
+</td>
+<td>xxx1</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">0000000002</div>
+</div>
+</td>
+<td>xxx2</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">0000000003</div>
+</div>
+</td>
+<td>xxx3</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">・・・</div>
+</div>
+</td>
+<td>・・・</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>DynamoDBは、AWSアカウントとリージョンの組み合わせの単位でテーブル名がユニークとなっている必要がある。そのため、たとえば開発環境とテスト環境で同一のAWSアカウントとリージョンを使用して、データを排他的に管理したい場合は同名のテーブルを使用することができない。</p>
+<p>一方で、<code class="docutils literal"><span class="pre">&#64;DynamoDBTable</span></code>に設定するテーブル名を、変数化やプロファイル対応させてプログラマティックに動的に変更することは、DynamoDBのSDKやSpring Data DynamoDBの仕様上難しい。</p>
+<p class="last">そのため、同一アプリケーションを複数の排他的な環境で実行したい場合には、AWSアカウントもしくはリージョンを別にすることを推奨する。</p>
+</div>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p>DynamoDBへアクセスする為には、テーブルデータに対応したエンティティクラスとシャードキーリポジトリクラスを作成する。
+以下に、DynamoDBのエンティティクラス<code class="docutils literal"><span class="pre">ShardingAccount</span></code>とシャードキーリポジトリクラス<code class="docutils literal"><span class="pre">AccountShardKeyRepository</span></code>の実装例を示す。</p>
+<p>Spring DataのRepositoryの詳細については、<a class="reference external" href="http://terasolunaorg.github.io/guideline/5.4.1.RELEASE/ja/ArchitectureInDetail/DataAccessDetail/DataAccessJpa.html#repository">Spring Data JPA</a> を参照されたい。</p>
+<ul class="simple">
+<li>エンティティクラス<code class="docutils literal"><span class="pre">ShardingAccount</span></code></li>
+</ul>
+<div class="highlight-java"><div class="highlight"><pre><span></span><span class="kn">package</span> <span class="nn">com.example.xxx.domain.common.shard.model</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">java.io.Serializable</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBAttribute</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable</span><span class="o">;</span>
+<span class="c1">// (1)</span>
+<span class="nd">@DynamoDBTable</span><span class="o">(</span><span class="n">tableName</span> <span class="o">=</span> <span class="s">&quot;ShardAccount&quot;</span><span class="o">)</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">ShardingAccount</span> <span class="kd">implements</span> <span class="n">Serializable</span> <span class="o">{</span>
+
+  <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="kt">long</span> <span class="n">serialVersionUID</span> <span class="o">=</span> <span class="mi">1L</span><span class="o">;</span>
+  <span class="c1">// (2)</span>
+  <span class="nd">@DynamoDBHashKey</span><span class="o">(</span><span class="n">attributeName</span> <span class="o">=</span> <span class="s">&quot;user_id&quot;</span><span class="o">)</span>
+  <span class="kd">private</span> <span class="n">String</span> <span class="n">userId</span><span class="o">;</span>
+  <span class="c1">// (3)</span>
+  <span class="nd">@DynamoDBAttribute</span><span class="o">(</span><span class="n">attributeName</span> <span class="o">=</span> <span class="s">&quot;data_source_key&quot;</span><span class="o">)</span>
+  <span class="kd">private</span> <span class="n">String</span> <span class="n">dataSourceKey</span><span class="o">;</span>
+  <span class="c1">// setter and getter</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+<table border="1" class="docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td>DynamoDBエンティティとして使用するためのアノテーション<code class="docutils literal"><span class="pre">DynamoDBTable</span></code>を付与しテーブル名を設定する。</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(2)</div>
+</div>
+</td>
+<td><p class="first">ユーザID(ハッシュキー)の項目名を定義する。</p>
+<p class="last">アノテーション<code class="docutils literal"><span class="pre">DynamoDBHashKey</span></code></p>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(3)</div>
+</div>
+</td>
+<td>データソースキーの項目名を定義する。</td>
+</tr>
+</tbody>
+</table>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<ul class="simple">
+<li>リポジトリクラス<code class="docutils literal"><span class="pre">AccountShardKeyRepository</span></code></li>
+</ul>
+<div class="highlight-java"><div class="highlight"><pre><span></span><span class="kn">package</span> <span class="nn">com.example.xxx.domain.common.shard.repository</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">org.socialsignin.spring.data.dynamodb.repository.EnableScan</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.data.repository.CrudRepository</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">com.example.xxx.domain.common.shard.model.ShardingAccount</span><span class="o">;</span>
+<span class="c1">// (1)</span>
+<span class="nd">@EnableScan</span>
+<span class="c1">// (2)</span>
+<span class="kd">public</span> <span class="kd">interface</span> <span class="nc">AccountShardKeyRepository</span> <span class="kd">extends</span> <span class="n">CrudRepository</span><span class="o">&lt;</span><span class="n">ShardingAccount</span><span class="o">,</span> <span class="n">String</span><span class="o">&gt;</span> <span class="o">{</span>
+  <span class="c1">// (3)</span>
+  <span class="nd">@Override</span>
+  <span class="nd">@Cacheable</span><span class="o">(</span><span class="n">key</span> <span class="o">=</span> <span class="s">&quot;&#39;shardid/&#39; + #a0&quot;</span><span class="o">)</span>
+  <span class="n">ShardingAccount</span> <span class="nf">findOne</span><span class="o">(</span><span class="n">String</span> <span class="n">id</span><span class="o">);</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+<table border="1" class="docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td>DynamoDBリポジトリとして使用するためのアノテーション<code class="docutils literal"><span class="pre">EnableScan</span></code>を付与する。</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(2)</div>
+</div>
+</td>
+<td><code class="docutils literal"><span class="pre">CrudRepository</span></code>のサブインタフェースとして実装する。</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(3)</div>
+</div>
+</td>
+<td><p class="first">キャッシュの為、メソッドをオーバーライドしている。キャッシュの詳細は、<a class="reference internal" href="../ArchitectureInDetail/DataAccessDetail/CacheAbstraction.html"><span class="doc">キャッシュの抽象化（Cache Abstraction）</span></a> を、<code class="docutils literal"><span class="pre">&#64;Cacheable</span></code>アノテーションの属性<code class="docutils literal"><span class="pre">key</span></code>で設定している<code class="docutils literal"><span class="pre">#a0</span></code>については、<a class="reference internal" href="../ArchitectureInDetail/DataAccessDetail/CacheAbstraction.html#cache-data-regist"><span class="std std-ref">キャッシュするデータの選択</span></a>を参照されたい。</p>
+<p class="last">キャッシュが不要な場合は、本メソッドのオーバーライドは不要である。</p>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+</div>
+<div class="section" id="id7">
+<h3><a class="toc-backref" href="#id13">5.9.2.3. シャードキーリポジトリの使用</a><a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h3>
+<p>シャードキーリポジトリは<a class="reference internal" href="#aws-implementation-repository"><span class="std std-ref">シャードキーリポジトリの実装</span></a>で説明したように、<code class="docutils literal"><span class="pre">CrudRepository</span></code>のサブインタフェースとして実装し<code class="docutils literal"><span class="pre">CrudRepository</span></code>をそのまま使用するため追加実装は不要である。</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="DatabaseReadReplica.html" title="5.10. データベースリードレプリカ"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="LogManagement.html" title="5.8. ログ管理"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Macchinetta Server Framework Cloud Extension Development Guideline 1.0.1.RELEASE documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >5. AWS連携</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2018 NTT Corporation.
+    Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.5.3.Theme by <a href="http://github.com/vkvn">vkvn</a>
+    </div>
+    
+    <script>
+     
+     $(function() {
+    	   var $sidebar	= $('.sphinxsidebar'),
+    		     $window		= $(window),
+    		     offset		= $sidebar.offset(),
+    		     topPadding	= 3,
+    		     $scroll		= $('#scroll');
+    	   
+    	   $window.scroll(function() {
+    		     if ($scroll.is(':checked')) {
+				         if ($window.scrollTop() > offset.top) {
+					           $sidebar.stop().animate({
+						             marginTop:$window.scrollTop() - offset.top + topPadding
+					           });
+				         } else {
+					           $sidebar.stop().animate({
+						             marginTop:0
+					           });
+				         }
+			       }
+		     });
+    	   
+    	   var $navList = $('ul:first', $sidebar);
+    	   $('li:first', $navList).addClass('open');
+    	   
+    	   $navList.treeview({
+    		     persist: "location",
+    		     collapsed: true,
+    		     unique: false
+    	   });
+    	   
+	   });
+    </script>
+    
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-113850349-4"></script>
+    <script>
+     window.dataLayer = window.dataLayer || [];
+     function gtag(){dataLayer.push(arguments);}
+     gtag('js', new Date());
+
+     gtag('config', 'UA-113850349-4');
+    </script>
+  </body>
+</html>

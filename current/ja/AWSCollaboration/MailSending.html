@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>5.7. メール送信 &#8212; Macchinetta Server Framework Cloud Extension Development Guideline 1.0.1.RELEASE documentation</title>
+    
+    <link rel="stylesheet" href="../_static/solar.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.0.1.RELEASE',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="5.8. ログ管理" href="LogManagement.html" />
+    <link rel="prev" title="5.6.2. 非同期処理の実装（優先順位の設定）" href="Queuing/PriorityQueue.html" /><script src="../_static/jquery.treeview.js" type="text/javascript"></script>
+<!-- <link href='http://fonts.googleapis.com/css?family=Source+Code+Pro|Open+Sans:300italic,400italic,700italic,400,300,700' rel='stylesheet' type='text/css'> -->
+<link href="../_static/solarized-dark.css" rel="stylesheet">
+<link href="../_static/jquery.treeview.css" rel="stylesheet">
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="LogManagement.html" title="5.8. ログ管理"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="Queuing/PriorityQueue.html" title="5.6.2. 非同期処理の実装（優先順位の設定）"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Macchinetta Server Framework Cloud Extension Development Guideline 1.0.1.RELEASE documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">5. AWS連携</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><label><input id="scroll" type="checkbox"> scroll sidebar</label>
+
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">5.7. メール送信</a><ul>
+<li><a class="reference internal" href="#overview">5.7.1. Overview</a><ul>
+<li><a class="reference internal" href="#amazon-ses">5.7.1.1. Amazon SESとは</a></li>
+<li><a class="reference internal" href="#javaamazon-ses">5.7.1.2. JavaアプリケーションからのAmazon SESの利用</a></li>
+<li><a class="reference internal" href="#spring-cloud-awsamazon-ses">5.7.1.3. Spring Cloud AWSのコンポーネントを使用したAmazon SESの利用</a></li>
+<li><a class="reference internal" href="#spring-frameworkamazon-ses">5.7.1.4. Spring Frameworkのコンポーネントを使用したAmazon SESの利用</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#how-to-use">5.7.2. How to use</a><ul>
+<li><a class="reference internal" href="#id4">5.7.2.1. Amazon SESの設定</a></li>
+<li><a class="reference internal" href="#seshowtousedependentlibrary">5.7.2.2. 依存ライブラリの設定</a></li>
+<li><a class="reference internal" href="#spring-cloud-aws">5.7.2.3. Spring Cloud AWSの設定</a></li>
+<li><a class="reference internal" href="#simplemailmessage">5.7.2.4. SimpleMailMessageによるメール送信方法</a></li>
+<li><a class="reference internal" href="#id11">5.7.2.5. MimeMessageによるメール送信方法</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="Queuing/PriorityQueue.html"
+                        title="previous chapter">5.6.2. 非同期処理の実装（優先順位の設定）</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="LogManagement.html"
+                        title="next chapter">5.8. ログ管理</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/AWSCollaboration/MailSending.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="id1">
+<h1>5.7. メール送信<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h1>
+<div class="contents local topic" id="id2">
+<p class="topic-title first">目次</p>
+<ul class="simple">
+<li><a class="reference internal" href="#overview" id="id13">Overview</a><ul>
+<li><a class="reference internal" href="#amazon-ses" id="id14">Amazon SESとは</a></li>
+<li><a class="reference internal" href="#javaamazon-ses" id="id15">JavaアプリケーションからのAmazon SESの利用</a></li>
+<li><a class="reference internal" href="#spring-cloud-awsamazon-ses" id="id16">Spring Cloud AWSのコンポーネントを使用したAmazon SESの利用</a></li>
+<li><a class="reference internal" href="#spring-frameworkamazon-ses" id="id17">Spring Frameworkのコンポーネントを使用したAmazon SESの利用</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#how-to-use" id="id18">How to use</a><ul>
+<li><a class="reference internal" href="#id4" id="id19">Amazon SESの設定</a></li>
+<li><a class="reference internal" href="#seshowtousedependentlibrary" id="id20">依存ライブラリの設定</a></li>
+<li><a class="reference internal" href="#spring-cloud-aws" id="id21">Spring Cloud AWSの設定</a></li>
+<li><a class="reference internal" href="#simplemailmessage" id="id22">SimpleMailMessageによるメール送信方法</a></li>
+<li><a class="reference internal" href="#id11" id="id23">MimeMessageによるメール送信方法</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="overview">
+<h2><a class="toc-backref" href="#id13">5.7.1. Overview</a><a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>本節では、Amazon Simple Email Service（以下、Amazon SES）を使用したEメール送信の実装方法について説明する。</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>本ガイドラインで説明の対象としているのはメールを送信する部分のみである。メール送信に係る処理方式については言及していない。</p>
+<p class="last">また、Amazon SESが提供する機能についても、公式ドキュメントと記述が重複する為、メール送信に直接関わらないものは説明を割愛している。
+その為、本ガイドラインだけでなく、Amazon SESの公式ドキュメント<a class="reference external" href="https://aws.amazon.com/jp/ses/">Amazon Simple Email Service (SES)</a>を必ず参照した上で、開発に臨んで頂きたい。</p>
+</div>
+<div class="section" id="amazon-ses">
+<span id="aboutses"></span><h3><a class="toc-backref" href="#id14">5.7.1.1. Amazon SESとは</a><a class="headerlink" href="#amazon-ses" title="Permalink to this headline">¶</a></h3>
+<div class="line-block">
+<div class="line">Amazon SESは、Amazon Web Serviceが提供するEメールプラットフォームである。</div>
+<div class="line">Amazon Web Service上で動作する為、ユーザはメールサーバ構築やネットワークの管理などのインフラ整備を行う必要がなく、容易にメールサービスを実装することができる。</div>
+<div class="line">Amazon SESの詳細については、<a class="reference external" href="https://aws.amazon.com/jp/ses/">Amazon Simple Email Service (SES)</a>を参照されたい。</div>
+</div>
+</div>
+<div class="section" id="javaamazon-ses">
+<span id="useseswithjava"></span><h3><a class="toc-backref" href="#id15">5.7.1.2. JavaアプリケーションからのAmazon SESの利用</a><a class="headerlink" href="#javaamazon-ses" title="Permalink to this headline">¶</a></h3>
+<p>Amazon Web Serviceでは、JavaアプリケーションからAmazon SESを利用する為のAPIを提供している。</p>
+<ul class="simple">
+<li><strong>Amazon SES API(AWS SDK for Java)</strong></li>
+</ul>
+<blockquote>
+<div><div class="line-block">
+<div class="line"><code class="docutils literal"><span class="pre">com.amazonaws.services.simpleemail.AmazonSimpleEmailServiceClient</span></code>をはじめとする、AWSが提供するSDKに含まれるAmazon SES用のAPI。</div>
+<div class="line">詳細については<a class="reference external" href="https://aws.amazon.com/jp/documentation/sdk-for-java/">AWS SDK for Java</a>および <a class="reference external" href="http://docs.aws.amazon.com/ja_jp/ses/latest/DeveloperGuide/send-email-api.html">Amazon SES APIを使用してEメールを送信する</a>を参照されたい。</div>
+</div>
+</div></blockquote>
+<ul class="simple">
+<li><strong>SMTPインタフェース(Amazon SES SMTP Interface)</strong></li>
+</ul>
+<blockquote>
+<div><div class="line-block">
+<div class="line">SMTPを使用してAmazon SESにメール送信する為のインタフェース。</div>
+<div class="line">SMTPインタフェースの詳細については<a class="reference external" href="http://docs.aws.amazon.com/ja_jp/ses/latest/DeveloperGuide/send-email-smtp.html">Amazon SES SMTPインターフェイスを使用してEメールを送信する</a>を参照されたい。</div>
+</div>
+</div></blockquote>
+</div>
+<div class="section" id="spring-cloud-awsamazon-ses">
+<span id="useseswithspringcloudaws"></span><h3><a class="toc-backref" href="#id16">5.7.1.3. Spring Cloud AWSのコンポーネントを使用したAmazon SESの利用</a><a class="headerlink" href="#spring-cloud-awsamazon-ses" title="Permalink to this headline">¶</a></h3>
+<div class="line-block">
+<div class="line">Spring Cloudが提供する Spring Cloud for Amazon Web Services(以下、Spring Cloud AWS)を利用することで、設定ファイルの記述量を抑えてAmazon SESへのメール送信アプリケーションを実装することができる。</div>
+<div class="line"><strong>本ガイドラインでは、このSpring Cloud AWSを利用した実装方法について紹介する。</strong></div>
+</div>
+<p>Spring Cloud AWSを利用したメール送信については、Spring Cloud AWSのドキュメント<a class="reference external" href="http://cloud.spring.io/spring-cloud-static/spring-cloud-aws/1.2.1.RELEASE/#_sending_mails">Sending mails</a>に紹介されている為、本ガイドラインと合わせて参照されたい。</p>
+</div>
+<div class="section" id="spring-frameworkamazon-ses">
+<span id="useseswithspring"></span><h3><a class="toc-backref" href="#id17">5.7.1.4. Spring Frameworkのコンポーネントを使用したAmazon SESの利用</a><a class="headerlink" href="#spring-frameworkamazon-ses" title="Permalink to this headline">¶</a></h3>
+<div class="line-block">
+<div class="line">Spring Frameworkはメール送信を行うためのコンポーネント（<code class="docutils literal"><span class="pre">org.springframework.mail</span></code>パッケージ）を提供している。</div>
+<div class="line">このパッケージに含まれるコンポーネントはメール送信に係る詳細なロジックを隠蔽し、低レベルのAPIハンドリング(JavaMailのAPI呼び出し)を代行する。</div>
+<div class="line">詳しくは、Macchinetta Server Framework for Java (1.x) のガイドライン<a class="reference external" href="https://macchinetta.github.io/server-guideline/1.5.1.RELEASE/ja/ArchitectureInDetail/MessagingDetail/Email.html#spring-frameworkmail">Spring FrameworkのMail連携用コンポーネントについて</a>に紹介されている為、参照されたい。</div>
+</div>
+<p>本ガイドラインで使用するコンポーネントを以下に示す。</p>
+<ul>
+<li><dl class="first docutils">
+<dt><code class="docutils literal"><span class="pre">JavaMailSender</span></code></dt>
+<dd><div class="first last line-block">
+<div class="line">JavaMail用のメール送信インターフェース。</div>
+<div class="line">JavaMailの<a class="reference external" href="http://docs.oracle.com/javaee/7/api/javax/mail/internet/MimeMessage.html">MimeMessage</a>とSpringの<code class="docutils literal"><span class="pre">SimpleMailMessage</span></code>の両方に対応している。</div>
+</div>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><code class="docutils literal"><span class="pre">MimeMessageHelper</span></code></dt>
+<dd><div class="first last line-block">
+<div class="line">JavaMailのMimeMessageの作成を容易にするためのヘルパークラス。</div>
+<div class="line">MimeMessageHelperには、MimeMessageに値を設定するための便利なメソッドがいくつも用意されている。</div>
+</div>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><code class="docutils literal"><span class="pre">SimpleMailMessage</span></code></dt>
+<dd><div class="first last line-block">
+<div class="line">単純なメールメッセージを作成するためのクラス。</div>
+<div class="line">英文のプレーンテキストメールを作成する際に使用できる。</div>
+<div class="line">UTF-8等の特定のエンコード指定、HTMLメールや添付ファイル付きメールの送信、あるいはメールアドレスに個人名を付随させるといったリッチなメッセージの作成を行う際は、JavaMailの<code class="docutils literal"><span class="pre">MimeMessage</span></code>を使用する必要がある。</div>
+</div>
+</dd>
+</dl>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="how-to-use">
+<h2><a class="toc-backref" href="#id18">5.7.2. How to use</a><a class="headerlink" href="#how-to-use" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id4">
+<h3><a class="toc-backref" href="#id19">5.7.2.1. Amazon SESの設定</a><a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<div class="line-block">
+<div class="line">Amazon SESを使用する為に必要な設定について説明する。</div>
+<div class="line"><br /></div>
+<div class="line">Amazon SESの利用開始時点では、不正利用防止の為、サンドボックスと呼ばれる制限環境下で利用する事となる。</div>
+<div class="line">サンドボックス内では、認証済のメールアドレスでのみ、メールの送信・受信が可能な為、メールアドレス認証を行う必要がある。</div>
+<div class="line">メールアドレスの認証については、 <a class="reference external" href="http://docs.aws.amazon.com/ja_jp/ses/latest/DeveloperGuide/verify-email-addresses.html">Amazon SES でのEメールアドレスの検証</a>を参照されたい。</div>
+<div class="line"><br /></div>
+<div class="line">製造フェーズ等の開発段階ではサンドボックス環境を利用し、本番環境を想定した試験等のタイミングでサンドボックス外に移行する運用が考えられる。</div>
+<div class="line">サンドボックス外への移動については、 <a class="reference external" href="http://docs.aws.amazon.com/ja_jp/ses/latest/DeveloperGuide/request-production-access.html">Amazon SES サンドボックスの外への移動</a>を参照されたい。</div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p><strong>メールの送信上限について</strong></p>
+<p>Amazon SESを利用する際には、24 時間当たりに送信できるメールの最大数と、1秒あたりに送信できるメールの最大数が存在する。制限はサンドボックス内・外どちらにも存在する。</p>
+<p class="last">送信上限は必要に応じて引き上げ申請が可能な為、 <a class="reference external" href="https://docs.aws.amazon.com/ja_jp/ses/latest/DeveloperGuide/manage-sending-limits.html">Amazon SES の送信制限の管理</a>および
+<a class="reference external" href="https://docs.aws.amazon.com/ja_jp/ses/latest/DeveloperGuide/increase-sending-limits.html">Amazon SES の送信制限の引き上げ</a>を参照されたい。</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p><strong>メールボックスシミュレーターについて</strong></p>
+<p>テスト工程などでは、実在する宛先にメールを送らずに、バウンスやサプレッションリストへの送信確認などを行いたい場合が存在する。</p>
+<p class="last">Amazon SESはメールボックスシミュレータを提供している為、特定のアドレスをToに設定して送信することで、いくつかのシミュレートを行う事ができる。
+詳細については<a class="reference external" href="https://docs.aws.amazon.com/ja_jp/ses/latest/DeveloperGuide/mailbox-simulator.html">Amazon SES Eメール送信のテスト</a>を参照されたい。</p>
+</div>
+</div>
+<div class="section" id="seshowtousedependentlibrary">
+<span id="id9"></span><h3><a class="toc-backref" href="#id20">5.7.2.2. 依存ライブラリの設定</a><a class="headerlink" href="#seshowtousedependentlibrary" title="Permalink to this headline">¶</a></h3>
+<p>本ガイドラインで紹介する実装に必要となるライブラリの依存関係をpom.xmlに追加する。</p>
+<p>記述例を以下に示す。</p>
+<ul>
+<li><p class="first">xxx-domain/pom.xml</p>
+<div class="highlight-xml"><div class="highlight"><pre><span></span><span class="nt">&lt;dependencies&gt;</span>
+
+    <span class="c">&lt;!-- (1) --&gt;</span>
+    <span class="nt">&lt;dependency&gt;</span>
+        <span class="nt">&lt;groupId&gt;</span>org.springframework.cloud<span class="nt">&lt;/groupId&gt;</span>
+        <span class="nt">&lt;artifactId&gt;</span>spring-cloud-starter-aws<span class="nt">&lt;/artifactId&gt;</span>
+    <span class="nt">&lt;/dependency&gt;</span>
+    <span class="c">&lt;!-- (2) --&gt;</span>
+    <span class="nt">&lt;dependency&gt;</span>
+        <span class="nt">&lt;groupId&gt;</span>com.amazonaws<span class="nt">&lt;/groupId&gt;</span>
+        <span class="nt">&lt;artifactId&gt;</span>aws-java-sdk-ses<span class="nt">&lt;/artifactId&gt;</span>
+    <span class="nt">&lt;/dependency&gt;</span>
+    <span class="c">&lt;!-- (3) --&gt;</span>
+    <span class="nt">&lt;dependency&gt;</span>
+        <span class="nt">&lt;groupId&gt;</span>com.sun.mail<span class="nt">&lt;/groupId&gt;</span>
+        <span class="nt">&lt;artifactId&gt;</span>javax.mail<span class="nt">&lt;/artifactId&gt;</span>
+    <span class="nt">&lt;/dependency&gt;</span>
+
+<span class="nt">&lt;/dependencies&gt;</span>
+</pre></div>
+</div>
+<table border="1" class="docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">spring-cloud-starter-aws</span></code>をdependenciesに追加する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(2)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">aws-java-sdk-ses</span></code>をdependenciesに追加する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(3)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">javax.mail</span></code>をdependenciesに追加する。</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</li>
+</ul>
+</div>
+<div class="section" id="spring-cloud-aws">
+<h3><a class="toc-backref" href="#id21">5.7.2.3. Spring Cloud AWSの設定</a><a class="headerlink" href="#spring-cloud-aws" title="Permalink to this headline">¶</a></h3>
+<p>Spring Cloud AWSのメール送信コンポーネントを利用する為の設定を行う。</p>
+<p>記述例を以下に示す。</p>
+<ul class="simple">
+<li>xxx-infra.xml</li>
+</ul>
+<blockquote>
+<div><div class="highlight-xml"><div class="highlight"><pre><span></span><span class="c">&lt;!-- (1) --&gt;</span>
+<span class="nt">&lt;beans</span> <span class="na">xmlns=</span><span class="s">&quot;http://www.springframework.org/schema/beans&quot;</span>
+    <span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
+    <span class="na">xmlns:aws-mail=</span><span class="s">&quot;http://www.springframework.org/schema/cloud/aws/mail&quot;</span>
+    <span class="na">xsi:schemaLocation=</span><span class="s">&quot;http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd</span>
+<span class="s">        http://www.springframework.org/schema/cloud/aws/mail</span>
+<span class="s">        http://www.springframework.org/schema/cloud/aws/mail/spring-cloud-aws-mail.xsd&quot;</span><span class="nt">&gt;</span>
+
+    <span class="c">&lt;!-- (2) --&gt;</span>
+    <span class="nt">&lt;aws-mail:mail-sender</span> <span class="na">id=</span><span class="s">&quot;sesMailSender&quot;</span> <span class="na">region=</span><span class="s">&quot;us-east-1&quot;</span><span class="nt">/&gt;</span>
+</pre></div>
+</div>
+<table border="1" class="docutils">
+<colgroup>
+<col width="10%" />
+<col width="26%" />
+<col width="64%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">属性名</th>
+<th class="head">内容</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td>xmlns:aws-mail</td>
+<td><div class="first last line-block">
+<div class="line">aws-mail Namespaceを定義する。</div>
+<div class="line">値として<code class="docutils literal"><span class="pre">http://www.springframework.org/schema/cloud/aws/mail</span></code>を指定する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td>&#160;</td>
+<td>xsi:schemaLocation</td>
+<td><div class="first last line-block">
+<div class="line">スキーマのURLを指定する。</div>
+<div class="line">値に<code class="docutils literal"><span class="pre">http://www.springframework.org/schema/cloud/aws/mail</span></code>と<code class="docutils literal"><span class="pre">http://www.springframework.org/schema/cloud/aws/mail/spring-cloud-aws-mail.xsd</span></code>を追加する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(2)</div>
+</div>
+</td>
+<td>-</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">&lt;aws-mail:mail-sender/&gt;</span></code>を利用して、Spring Cloud AWSが提供する<code class="docutils literal"><span class="pre">JavaMailSender</span></code>の実装クラスをDIコンテナに登録する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">id</span></code></td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">JavaMailSender</span></code>の実装クラスがDIコンテナに登録される際のBeanIDとなる。</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">region</span></code></td>
+<td><div class="first line-block">
+<div class="line">Amazon SESで個別のリージョンを指定する必要がある場合、<code class="docutils literal"><span class="pre">region</span></code>属性にリージョンを指定する。</div>
+</div>
+<div class="last admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">本ガイドライン執筆現在、Amazon SESは限られたリージョンでしかサービスを提供していない。Amazon SES利用の際には留意して頂きたい。</p>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+<p>なお、上記の設定は、Spring BootのAuto-configurationが提供する<code class="docutils literal"><span class="pre">org.springframework.cloud.aws.autoconfigure.mail.MailSenderAutoConfiguration</span></code>が無効になっている事が前提である。
+デフォルトでは<code class="docutils literal"><span class="pre">MailSenderAutoConfiguration</span></code>は有効になっている為、本設定を行う際は、必ずAuto-configurationの設定を確認すること。</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last"><code class="docutils literal"><span class="pre">MailSenderAutoConfiguration</span></code>が提供するBean定義では、Amazon SESをEC2とは異なるリージョンで使用する場合に、リージョン情報の差し替えに対応できない。
+その為、本ガイドラインではaws-mail Namespaceを使用する方法を紹介している。</p>
+</div>
+<p><code class="docutils literal"><span class="pre">MailSenderAutoConfiguration</span></code>を無効にする設定例を以下に示す。</p>
+<ul>
+<li><p class="first">Bootstrap.java</p>
+<div class="highlight-java"><div class="highlight"><pre><span></span><span class="kn">package</span> <span class="nn">com.example.xxx.app</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">org.springframework.boot.autoconfigure.EnableAutoConfiguration</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.cloud.aws.autoconfigure.mail.MailSenderAutoConfiguration</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.boot.web.support.SpringBootServletInitializer</span><span class="o">;</span>
+
+<span class="c1">// omitted</span>
+
+<span class="nd">@EnableAutoConfiguration</span><span class="o">(</span><span class="n">exclude</span> <span class="o">=</span> <span class="n">MailSenderAutoConfiguration</span><span class="o">.</span><span class="na">class</span><span class="o">)</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">Bootstrap</span> <span class="kd">extends</span> <span class="n">SpringBootServletInitializer</span> <span class="o">{</span>
+
+    <span class="c1">// omitted</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">上記の記述例は、<code class="docutils literal"><span class="pre">MailSenderAutoConfiguration</span></code>の除外にフォーカスして紹介している。
+<code class="docutils literal"><span class="pre">Bootstrap</span></code>クラスのその他の定義例については、<a class="reference internal" href="../ImplementationAtEachLayer/CreateWebApplicationProject.html#create-project-making-entrypoint"><span class="std std-ref">エントリポイントの作成</span></a> にて紹介している為、必要に応じて参照されたい。</p>
+</div>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p><code class="docutils literal"><span class="pre">MailSenderAutoConfiguration</span></code>というクラス名のAuto-configurationクラスは複数存在する。</p>
+<p class="last">除外する際はパッケージ名まで確認の上、<code class="docutils literal"><span class="pre">org.springframework.cloud.aws.autoconfigure.mail.MailSenderAutoConfiguration</span></code>を対象とすること。</p>
+</div>
+</li>
+</ul>
+</div>
+<div class="section" id="simplemailmessage">
+<h3><a class="toc-backref" href="#id22">5.7.2.4. SimpleMailMessageによるメール送信方法</a><a class="headerlink" href="#simplemailmessage" title="Permalink to this headline">¶</a></h3>
+<p>英文のプレーンテキストメール（エンコードの指定や添付ファイル等が不要なメール）を送信する場合は、Springが提供している<code class="docutils literal"><span class="pre">SimpleMailMessage</span></code>クラスを使用する。</p>
+<p>実装例については、Macchinetta Server Framework for Java (1.x) のガイドライン<a class="reference external" href="https://macchinetta.github.io/server-guideline/1.5.1.RELEASE/ja/ArchitectureInDetail/MessagingDetail/Email.html#simplemailmessage">SimpleMailMessageによるメール送信方法</a>を参照されたい。</p>
+</div>
+<div class="section" id="id11">
+<h3><a class="toc-backref" href="#id23">5.7.2.5. MimeMessageによるメール送信方法</a><a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h3>
+<p>英文以外のメールやHTMLメール、添付ファイルの送信を行う場合、<code class="docutils literal"><span class="pre">javax.mail.internet.MimeMessage</span></code>クラスを使用する。
+本ガイドラインでは<code class="docutils literal"><span class="pre">MimeMessageHelper</span></code>クラスを使用してMimeMessageを作成する方法を推奨している。</p>
+<p>実装例については、Macchinetta Server Framework for Java (1.x) のガイドライン<a class="reference external" href="https://macchinetta.github.io/server-guideline/1.5.1.RELEASE/ja/ArchitectureInDetail/MessagingDetail/Email.html#id8">MimeMessageによるメール送信方法</a>を参照されたい。</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="LogManagement.html" title="5.8. ログ管理"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="Queuing/PriorityQueue.html" title="5.6.2. 非同期処理の実装（優先順位の設定）"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Macchinetta Server Framework Cloud Extension Development Guideline 1.0.1.RELEASE documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >5. AWS連携</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2018 NTT Corporation.
+    Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.5.3.Theme by <a href="http://github.com/vkvn">vkvn</a>
+    </div>
+    
+    <script>
+     
+     $(function() {
+    	   var $sidebar	= $('.sphinxsidebar'),
+    		     $window		= $(window),
+    		     offset		= $sidebar.offset(),
+    		     topPadding	= 3,
+    		     $scroll		= $('#scroll');
+    	   
+    	   $window.scroll(function() {
+    		     if ($scroll.is(':checked')) {
+				         if ($window.scrollTop() > offset.top) {
+					           $sidebar.stop().animate({
+						             marginTop:$window.scrollTop() - offset.top + topPadding
+					           });
+				         } else {
+					           $sidebar.stop().animate({
+						             marginTop:0
+					           });
+				         }
+			       }
+		     });
+    	   
+    	   var $navList = $('ul:first', $sidebar);
+    	   $('li:first', $navList).addClass('open');
+    	   
+    	   $navList.treeview({
+    		     persist: "location",
+    		     collapsed: true,
+    		     unique: false
+    	   });
+    	   
+	   });
+    </script>
+    
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-113850349-4"></script>
+    <script>
+     window.dataLayer = window.dataLayer || [];
+     function gtag(){dataLayer.push(arguments);}
+     gtag('js', new Date());
+
+     gtag('config', 'UA-113850349-4');
+    </script>
+  </body>
+</html>

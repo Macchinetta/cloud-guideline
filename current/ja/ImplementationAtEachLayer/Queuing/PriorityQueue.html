@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>3.7.2. 非同期実行（優先順位の設定） &#8212; Macchinetta Server Framework Cloud Extension Development Guideline 1.0.1.RELEASE documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/solar.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1.0.1.RELEASE',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="3.8. 環境依存値の外部管理" href="../EnvironmentValuesExternalManagement.html" />
+    <link rel="prev" title="3.7.1. 非同期実行（共通編）" href="AsynchronousProcessing.html" /><script src="../../_static/jquery.treeview.js" type="text/javascript"></script>
+<!-- <link href='http://fonts.googleapis.com/css?family=Source+Code+Pro|Open+Sans:300italic,400italic,700italic,400,300,700' rel='stylesheet' type='text/css'> -->
+<link href="../../_static/solarized-dark.css" rel="stylesheet">
+<link href="../../_static/jquery.treeview.css" rel="stylesheet">
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../EnvironmentValuesExternalManagement.html" title="3.8. 環境依存値の外部管理"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="AsynchronousProcessing.html" title="3.7.1. 非同期実行（共通編）"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Macchinetta Server Framework Cloud Extension Development Guideline 1.0.1.RELEASE documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >3. アプリケーション開発</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" accesskey="U">3.7. キューイング活用</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><label><input id="scroll" type="checkbox"> scroll sidebar</label>
+
+  <h3><a href="../../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">3.7.2. 非同期実行（優先順位の設定）</a><ul>
+<li><a class="reference internal" href="#overview">3.7.2.1. Overview</a><ul>
+<li><a class="reference internal" href="#id3">3.7.2.1.1. 処理方式概要</a></li>
+<li><a class="reference internal" href="#id4">3.7.2.1.2. 処理方式イメージ</a></li>
+<li><a class="reference internal" href="#id5">3.7.2.1.3. フロントサーバの処理方式</a></li>
+<li><a class="reference internal" href="#id6">3.7.2.1.4. バックサーバの処理方式</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#how-to-use">3.7.2.2. How to use</a><ul>
+<li><a class="reference internal" href="#id7">3.7.2.2.1. メッセージングサービスの利用した優先順位の設定</a><ul>
+<li><a class="reference internal" href="#amazon-web-service">3.7.2.2.1.1. Amazon Web Service</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#appendix">3.7.2.3. Appendix</a><ul>
+<li><a class="reference internal" href="#id8">3.7.2.3.1. 厳密な優先順位の制御</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="AsynchronousProcessing.html"
+                        title="previous chapter">3.7.1. 非同期実行（共通編）</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../EnvironmentValuesExternalManagement.html"
+                        title="next chapter">3.8. 環境依存値の外部管理</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/ImplementationAtEachLayer/Queuing/PriorityQueue.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="id1">
+<h1>3.7.2. 非同期実行（優先順位の設定）<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h1>
+<div class="contents local topic" id="id2">
+<p class="topic-title first">目次</p>
+<ul class="simple">
+<li><a class="reference internal" href="#overview" id="id9">Overview</a><ul>
+<li><a class="reference internal" href="#id3" id="id10">処理方式概要</a></li>
+<li><a class="reference internal" href="#id4" id="id11">処理方式イメージ</a></li>
+<li><a class="reference internal" href="#id5" id="id12">フロントサーバの処理方式</a></li>
+<li><a class="reference internal" href="#id6" id="id13">バックサーバの処理方式</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#how-to-use" id="id14">How to use</a><ul>
+<li><a class="reference internal" href="#id7" id="id15">メッセージングサービスの利用した優先順位の設定</a><ul>
+<li><a class="reference internal" href="#amazon-web-service" id="id16">Amazon Web Service</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#appendix" id="id17">Appendix</a><ul>
+<li><a class="reference internal" href="#id8" id="id18">厳密な優先順位の制御</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="overview">
+<h2><a class="toc-backref" href="#id9">3.7.2.1. Overview</a><a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<div class="line-block">
+<div class="line">本ガイドラインでは、非同期実行における優先順位付けを実現するための方式を説明する。</div>
+<div class="line"><br /></div>
+<div class="line">本方式は、無料ユーザーと会員ユーザーでサービスレベル（公開までの時間）に応じた優先順位付けをバッチジョブ（キューを使用）にて実施する場合などで有効な手段となる。</div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">本ガイドラインでは、キューサービスが優先順位をサポートしていない場合に優先順位を制御する方式を説明しているが、キューサービスが優先順位をサポートしている場合は、そちらの仕組みを利用されたい。</p>
+</div>
+<div class="section" id="id3">
+<h3><a class="toc-backref" href="#id10">3.7.2.1.1. 処理方式概要</a><a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<div class="line-block">
+<div class="line">キューを優先順位に応じて複数用意し、実行要求メッセージを優先順位によってにキューに入れ分けることで、バッチ処理の優先順位を付ける方式。</div>
+<div class="line">本方式では、キューに対応するサーバの性能（CPU性能や台数など）は、優先順位に応じたものにしておく必要がある。</div>
+</div>
+</div>
+<div class="section" id="id4">
+<h3><a class="toc-backref" href="#id11">3.7.2.1.2. 処理方式イメージ</a><a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<p>本ガイドラインで紹介する優先順位を付ける方式のイメージを示す。</p>
+<div class="figure">
+<a class="reference internal image-reference" href="../../_images/PriorityQueue1.png"><img alt="Screen image of asynchronous processing." src="../../_images/PriorityQueue1.png" style="width: 100%;" /></a>
+</div>
+<p>上記イメージでは、アプリケーションサーバはフロントサーバとバックサーバに分けた構成としている。
+フロントサーバにはクライアントからリクエストを受け付けるアプリケーションを配置し、バックサーバにはバッチ処理を行うアプリケーションを配置する。</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">フロント側アプリケーションは、ユーザーのサービスレベルに応じた優先度でキューサービスにバッチ処理の実行要求メッセージの送信を振り分ける。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(2)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">優先度が低いキューに割り振られた場合にバック側アプリケーションは、キューサービスからバッチ処理の実行要求メッセージを受信し、フロント側アプリケーションとは非同期に処理を実行する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(3)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">優先度が高いキューに割り振られた場合にバック側アプリケーションは、(2)よりも高い性能で同様の処理を実行する。</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">処理するサーバ性能とキューイングされたメッセージ数のバランスにより、優先順位が低い方の処理が早く終るケースがある。
+そのため優先度が高いキューに多くの残ジョブ数が溜まる場合により早く捌くために、優先順位の低いキューと優先順位の高いキューの処理速度を監視してチューニング対象とすることが望ましい。</p>
+</div>
+</div>
+<div class="section" id="id5">
+<h3><a class="toc-backref" href="#id12">3.7.2.1.3. フロントサーバの処理方式</a><a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
+<p>フロントサーバの処理方式については、共通編の
+<a class="reference internal" href="AsynchronousProcessing.html#asynchoronous-processing-front-label"><span class="std std-ref">フロントサーバの処理方式</span></a>を参照されたい。</p>
+</div>
+<div class="section" id="id6">
+<h3><a class="toc-backref" href="#id13">3.7.2.1.4. バックサーバの処理方式</a><a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
+<p>バックサーバの処理方式については、共通編の
+<a class="reference internal" href="AsynchronousProcessing.html#asynchoronous-processing-back-label"><span class="std std-ref">バックサーバの処理方式</span></a>を参照されたい。</p>
+</div>
+</div>
+<div class="section" id="how-to-use">
+<h2><a class="toc-backref" href="#id14">3.7.2.2. How to use</a><a class="headerlink" href="#how-to-use" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id7">
+<h3><a class="toc-backref" href="#id15">3.7.2.2.1. メッセージングサービスの利用した優先順位の設定</a><a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h3>
+<p>クラウドベンダーが提供するメッセージングサービスを利用し、非同期処理（優先順位の設定）を実装する。</p>
+<ol class="arabic">
+<li><dl class="first docutils">
+<dt>サービスレベルに応じたメッセージ送信</dt>
+<dd><ul class="first last simple">
+<li>サービスレベルに応じた優先度のキューに実行要求メッセージを送信する機能を実装する。</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>サービスレベルに応じたメッセージ受信</dt>
+<dd><ul class="first last simple">
+<li>サービスレベルに応じた優先度のキューから実行要求メッセージを受信する機能を実装する。</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+<div class="section" id="amazon-web-service">
+<h4><a class="toc-backref" href="#id16">3.7.2.2.1.1. Amazon Web Service</a><a class="headerlink" href="#amazon-web-service" title="Permalink to this headline">¶</a></h4>
+<p>クラウドベンダーとしてAWSを使用する場合の優先順位の設定の実装例については、
+<a class="reference internal" href="../../AWSCollaboration/Queuing/PriorityQueue.html"><span class="doc">非同期処理の実装（優先順位の設定）</span></a>
+を参照されたい。</p>
+</div>
+</div>
+</div>
+<div class="section" id="appendix">
+<h2><a class="toc-backref" href="#id17">3.7.2.3. Appendix</a><a class="headerlink" href="#appendix" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id8">
+<h3><a class="toc-backref" href="#id18">3.7.2.3.1. 厳密な優先順位の制御</a><a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h3>
+<div class="line-block">
+<div class="line">厳密な優先順位の制御とは、ある静止点のメッセージを必ず優先順位の高い順に処理する場合の方式である。</div>
+<div class="line">ここでは、参考までに実現方式を紹介する。</div>
+</div>
+<div class="figure">
+<a class="reference internal image-reference" href="../../_images/StrictPriorityQueue.png"><img alt="Screen image of asynchronous processing." src="../../_images/StrictPriorityQueue.png" style="width: 100%;" /></a>
+</div>
+<table border="1" class="docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">処理可能なメッセージ数の上限を優先度の高いキューより取得する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(2)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">取得済みのメッセージ数が上限に達していない場合に、上限までの残り数を優先度の低い方から取得する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(3)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">取得したメッセージを並列で処理する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(4)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">メッセージ毎に、処理が完了した場合はキューから削除、失敗した場合はその旨通知を行いメッセージを再処理可能とする。</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">状況に因って優先度低のキューがいつまでも処理されない可能性があるため、要求に応じて優先度毎の処理割合を決めて制御するなどの工夫も必要となる。</p>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../EnvironmentValuesExternalManagement.html" title="3.8. 環境依存値の外部管理"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="AsynchronousProcessing.html" title="3.7.1. 非同期実行（共通編）"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Macchinetta Server Framework Cloud Extension Development Guideline 1.0.1.RELEASE documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >3. アプリケーション開発</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" >3.7. キューイング活用</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2018 NTT Corporation.
+    Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.5.3.Theme by <a href="http://github.com/vkvn">vkvn</a>
+    </div>
+    
+    <script>
+     
+     $(function() {
+    	   var $sidebar	= $('.sphinxsidebar'),
+    		     $window		= $(window),
+    		     offset		= $sidebar.offset(),
+    		     topPadding	= 3,
+    		     $scroll		= $('#scroll');
+    	   
+    	   $window.scroll(function() {
+    		     if ($scroll.is(':checked')) {
+				         if ($window.scrollTop() > offset.top) {
+					           $sidebar.stop().animate({
+						             marginTop:$window.scrollTop() - offset.top + topPadding
+					           });
+				         } else {
+					           $sidebar.stop().animate({
+						             marginTop:0
+					           });
+				         }
+			       }
+		     });
+    	   
+    	   var $navList = $('ul:first', $sidebar);
+    	   $('li:first', $navList).addClass('open');
+    	   
+    	   $navList.treeview({
+    		     persist: "location",
+    		     collapsed: true,
+    		     unique: false
+    	   });
+    	   
+	   });
+    </script>
+    
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-113850349-4"></script>
+    <script>
+     window.dataLayer = window.dataLayer || [];
+     function gtag(){dataLayer.push(arguments);}
+     gtag('js', new Date());
+
+     gtag('config', 'UA-113850349-4');
+    </script>
+  </body>
+</html>

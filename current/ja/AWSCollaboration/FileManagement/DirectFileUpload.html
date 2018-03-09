@@ -1,0 +1,1454 @@
+<!DOCTYPE html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>5.4.2. アップロードファイル管理(ダイレクトアップロード方式) &#8212; Macchinetta Server Framework Cloud Extension Development Guideline 1.0.1.RELEASE documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/solar.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1.0.1.RELEASE',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="5.4.3. ダウンロードファイル管理" href="DownloadFileManagement.html" />
+    <link rel="prev" title="5.4.1. アップロードファイル管理" href="UploadFileManagement.html" /><script src="../../_static/jquery.treeview.js" type="text/javascript"></script>
+<!-- <link href='http://fonts.googleapis.com/css?family=Source+Code+Pro|Open+Sans:300italic,400italic,700italic,400,300,700' rel='stylesheet' type='text/css'> -->
+<link href="../../_static/solarized-dark.css" rel="stylesheet">
+<link href="../../_static/jquery.treeview.css" rel="stylesheet">
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="DownloadFileManagement.html" title="5.4.3. ダウンロードファイル管理"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="UploadFileManagement.html" title="5.4.1. アップロードファイル管理"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Macchinetta Server Framework Cloud Extension Development Guideline 1.0.1.RELEASE documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >5. AWS連携</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" accesskey="U">5.4. ファイル管理</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><label><input id="scroll" type="checkbox"> scroll sidebar</label>
+
+  <h3><a href="../../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">5.4.2. アップロードファイル管理(ダイレクトアップロード方式)</a><ul>
+<li><a class="reference internal" href="#overview">5.4.2.1. Overview</a><ul>
+<li><a class="reference internal" href="#abstractofdirectupload">5.4.2.1.1. 処理方式概要</a></li>
+<li><a class="reference internal" href="#sts">5.4.2.1.2. STSの利用</a></li>
+<li><a class="reference internal" href="#s3">5.4.2.1.3. S3の利用</a><ul>
+<li><a class="reference internal" href="#usingaccesspolicyfordirectupload">5.4.2.1.3.1. アクセスポリシー</a></li>
+<li><a class="reference internal" href="#s3post">5.4.2.1.3.2. S3へのPOSTアップロード</a></li>
+<li><a class="reference internal" href="#post">5.4.2.1.3.3. POSTポリシー</a></li>
+<li><a class="reference internal" href="#addingmetadata">5.4.2.1.3.4. メタデータの付与</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#usingsignaturev4">5.4.2.1.4. 署名バージョン4による署名</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#how-to-use">5.4.2.2. How to use</a><ul>
+<li><a class="reference internal" href="#iam">5.4.2.2.1. IAMの設定</a></li>
+<li><a class="reference internal" href="#cors">5.4.2.2.2. CORSの設定</a></li>
+<li><a class="reference internal" href="#howtoimplementsserverside">5.4.2.2.3. サーバサイドの実装</a><ul>
+<li><a class="reference internal" href="#addinglibrary">5.4.2.2.3.1. 依存ライブラリの追加</a></li>
+<li><a class="reference internal" href="#gettemporarycredentials">5.4.2.2.3.2. 一時的セキュリティ認証情報の取得</a></li>
+<li><a class="reference internal" href="#createpostpolicy">5.4.2.2.3.3. POSTポリシーの作成・署名</a></li>
+<li><a class="reference internal" href="#howtoimplementsdirectuploadauthinfo">5.4.2.2.3.4. クライアントへの返却用オブジェクトの実装</a></li>
+<li><a class="reference internal" href="#controller">5.4.2.2.3.5. Controllerの実装</a></li>
+<li><a class="reference internal" href="#settingpropertiessample">5.4.2.2.3.6. 外部定義プロパティ値の設定</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#howtoimplementsclientside">5.4.2.2.4. クライアントサイドの実装</a><ul>
+<li><a class="reference internal" href="#javascript">5.4.2.2.4.1. JavaScriptの実装</a></li>
+<li><a class="reference internal" href="#directuploaderrorhandling">5.4.2.2.4.2. エラーハンドリングについて</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="UploadFileManagement.html"
+                        title="previous chapter">5.4.1. アップロードファイル管理</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="DownloadFileManagement.html"
+                        title="next chapter">5.4.3. ダウンロードファイル管理</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/AWSCollaboration/FileManagement/DirectFileUpload.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="id1">
+<h1>5.4.2. アップロードファイル管理(ダイレクトアップロード方式)<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h1>
+<div class="contents local topic" id="id2">
+<p class="topic-title first">目次</p>
+<ul class="simple">
+<li><a class="reference internal" href="#overview" id="id22">Overview</a><ul>
+<li><a class="reference internal" href="#abstractofdirectupload" id="id23">処理方式概要</a></li>
+<li><a class="reference internal" href="#sts" id="id24">STSの利用</a></li>
+<li><a class="reference internal" href="#s3" id="id25">S3の利用</a><ul>
+<li><a class="reference internal" href="#usingaccesspolicyfordirectupload" id="id26">アクセスポリシー</a></li>
+<li><a class="reference internal" href="#s3post" id="id27">S3へのPOSTアップロード</a></li>
+<li><a class="reference internal" href="#post" id="id28">POSTポリシー</a></li>
+<li><a class="reference internal" href="#addingmetadata" id="id29">メタデータの付与</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#usingsignaturev4" id="id30">署名バージョン4による署名</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#how-to-use" id="id31">How to use</a><ul>
+<li><a class="reference internal" href="#iam" id="id32">IAMの設定</a></li>
+<li><a class="reference internal" href="#cors" id="id33">CORSの設定</a></li>
+<li><a class="reference internal" href="#howtoimplementsserverside" id="id34">サーバサイドの実装</a><ul>
+<li><a class="reference internal" href="#addinglibrary" id="id35">依存ライブラリの追加</a></li>
+<li><a class="reference internal" href="#gettemporarycredentials" id="id36">一時的セキュリティ認証情報の取得</a></li>
+<li><a class="reference internal" href="#createpostpolicy" id="id37">POSTポリシーの作成・署名</a></li>
+<li><a class="reference internal" href="#howtoimplementsdirectuploadauthinfo" id="id38">クライアントへの返却用オブジェクトの実装</a></li>
+<li><a class="reference internal" href="#controller" id="id39">Controllerの実装</a></li>
+<li><a class="reference internal" href="#settingpropertiessample" id="id40">外部定義プロパティ値の設定</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#howtoimplementsclientside" id="id41">クライアントサイドの実装</a><ul>
+<li><a class="reference internal" href="#javascript" id="id42">JavaScriptの実装</a></li>
+<li><a class="reference internal" href="#directuploaderrorhandling" id="id43">エラーハンドリングについて</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="overview">
+<h2><a class="toc-backref" href="#id22">5.4.2.1. Overview</a><a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>本ガイドラインでは、Amazon Simple Storage Service(以降、S3)とAWS Security Token Service(以降、STS)を使用したファイルのダイレクトアップロードについて説明する。</p>
+<div class="section" id="abstractofdirectupload">
+<span id="id3"></span><h3><a class="toc-backref" href="#id23">5.4.2.1.1. 処理方式概要</a><a class="headerlink" href="#abstractofdirectupload" title="Permalink to this headline">¶</a></h3>
+<p>S3を使用したダイレクトアップロードを行う場合、
+本ガイドラインではPOSTメソッドによるアップロードを推奨している。
+方式のイメージは以下の通り。</p>
+<div class="figure">
+<a class="reference internal image-reference" href="../../_images/DirectFileUploadUsingS3Overview.png"><img alt="Screen image of file upload." src="../../_images/DirectFileUploadUsingS3Overview.png" style="width: 100%;" /></a>
+</div>
+<table border="1" class="docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">クライアント(ブラウザ)はアプリケーションに対して、ファイルアップロードの要求を行う。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(2)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">アプリケーションは、Amazon STSに対してAssumeRoleリクエストを発行し、一時的セキュリティ認証情報を取得する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(3)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">アプリケーションは、POSTによるアップロード用のポリシードキュメントを作成する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(4)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">アプリケーションは、(3)で作成したPOSTポリシードキュメントに対し、バージョン4の署名を行う。</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(5)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">アプリケーションは、POSTポリシードキュメントを含む資格情報と、ダイレクトアップロード用のJavaScriptコードをクライアントに返却する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(6)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">クライアントは、受け取ったJavaScriptを使用してブラウザから直接S3へファイルをアップロードする。アップロードにはHTTPのPOSTメソッドを使用する。</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<p>ブラウザからS3に対してダイレクトアップロードを行う方式は上記以外にも存在する。
+例えばJavaScript内からaws-sdkを利用する方式や、S3の署名付きURLを利用する方式が考えられるが、
+前者はaws-sdkの資格情報(アクセスキー、シークレットキー)がクライアント側に晒される問題があり、
+後者ではアップロードするファイルにサイズ制限を設ける事ができない。
+これらのセキュリティ上の問題を考慮し、本ガイドラインではPOSTによるアップロード方式を推奨している。</p>
+</div>
+<div class="section" id="sts">
+<span id="usingsecuritytokenservice"></span><h3><a class="toc-backref" href="#id24">5.4.2.1.2. STSの利用</a><a class="headerlink" href="#sts" title="Permalink to this headline">¶</a></h3>
+<p>本ガイドラインで紹介する方式では、POSTによるファイルアップロードを行うが、アップロードの際にクライアントにAWSのアクセスキーが開示される。
+アプリケーションで使用しているアクセスキーがそのまま開示されることはセキュリティ上問題である為、
+STSを使用して取得した一時的なセキュリティ認証情報(アクセスキー・シークレットキー)を使用する。
+これにより、クライアントに開示されるのは一時的なアクセスキーとなる。
+一時的セキュリティ認証情報の有効期限を短くすることで、悪意あるユーザーに悪用されるリスクを抑える事ができる為、
+本ガイドラインでは、最も短い有効期限(15分)を設定する例を紹介している。</p>
+<p>また、STSで一時的セキュリティ認証情報を取得する際のリクエストとして、AssumeRoleリクエストを使用することで、以下が可能である。</p>
+<ul class="simple">
+<li>一時的セキュリティ認証情報への既存のIAMロールの引き継ぎ</li>
+<li>一時的セキュリティ認証情報へのユーザーポリシー設定</li>
+</ul>
+<p>例えば、S3の特定バケットへのPutObjectのみを許可されたIAMロールを引き継ぎ、かつ特定のオブジェクトキーのみにPutObjectが許されたユーザーポリシーを追加できる。</p>
+<p>一時的セキュリティ認証情報、およびAssumeRole利用については以下の公式ドキュメントにて説明されている。実装前に参照されたい。</p>
+<blockquote>
+<div><ul class="simple">
+<li><a class="reference external" href="http://docs.aws.amazon.com/ja_jp/IAM/latest/UserGuide/id_credentials_temp.html">一時的セキュリティ認証情報</a></li>
+<li><a class="reference external" href="http://docs.aws.amazon.com/ja_jp/IAM/latest/UserGuide/id_roles_use_switch-role-api.html">IAM ロールの切り替え（API）</a></li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="s3">
+<span id="usings3fordirectupload"></span><h3><a class="toc-backref" href="#id25">5.4.2.1.3. S3の利用</a><a class="headerlink" href="#s3" title="Permalink to this headline">¶</a></h3>
+<p>本ガイドラインで紹介するダイレクトアップロード方式で必要となる、S3の各機能について紹介する。
+なお、S3の概要や基本的な利用法についてはここで紹介しない為、必要に応じて<a class="reference external" href="https://aws.amazon.com/jp/documentation/s3/">公式ドキュメント</a>を参照されたい。</p>
+<div class="section" id="usingaccesspolicyfordirectupload">
+<span id="id6"></span><h4><a class="toc-backref" href="#id26">5.4.2.1.3.1. アクセスポリシー</a><a class="headerlink" href="#usingaccesspolicyfordirectupload" title="Permalink to this headline">¶</a></h4>
+<p>S3の全てのリソースは、デフォルトでは所有者(リソース作成者のAWSアカウント)のみがアクセスできる設定となっている。
+リソースに対するアクセス権限を付与する為に、アクセスポリシーを提供している。
+アクセスポリシーは、バケットポリシーに代表されるリソースベースのポリシーと、ユーザーベースのポリシーに分けられる。</p>
+<p>本方式では、STSから取得する一時的セキュリティ認証情報に対し、ユーザーベースのIAMポリシーを付与してアクセス制限を行う。</p>
+<p>S3のアクセスポリシー、およびIAMポリシーについては、以下の公式ドキュメントにて説明されている。
+アクセスポリシーを扱う上で重要な情報である為、時間を取って必ず一読頂きたい。</p>
+<blockquote>
+<div><ul class="simple">
+<li><a class="reference external" href="http://docs.aws.amazon.com/ja_jp/AmazonS3/latest/dev/s3-access-control.html">Amazon S3 リソースへのアクセス許可の管理</a></li>
+<li><a class="reference external" href="http://docs.aws.amazon.com/ja_jp/IAM/latest/UserGuide/reference_policies.html">AWS IAMポリシーのリファレンス</a></li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="s3post">
+<span id="aboutpostupload"></span><h4><a class="toc-backref" href="#id27">5.4.2.1.3.2. S3へのPOSTアップロード</a><a class="headerlink" href="#s3post" title="Permalink to this headline">¶</a></h4>
+<p>S3はHTTPのPOSTメソッドによるファイルアップロードをサポートしており、本ガイドラインではこのPOSTアップロードを使用する。
+詳細については <a class="reference external" href="http://docs.aws.amazon.com/ja_jp/AmazonS3/latest/API/sigv4-UsingHTTPPOST.html">Authenticating Requests in Browser-Based Uploads Using POST (AWS Signature Version 4)</a>を参照されたい。</p>
+</div>
+<div class="section" id="post">
+<span id="aboutpostpolicy"></span><h4><a class="toc-backref" href="#id28">5.4.2.1.3.3. POSTポリシー</a><a class="headerlink" href="#post" title="Permalink to this headline">¶</a></h4>
+<p>POSTを用いて非公開バケットへのファイルアップロードを行う場合、リクエストにPOSTポリシーを含める必要がある。
+POSTポリシーには、AWSの資格情報に加え、アップロードファイルサイズの制限や、アップロード可能なオブジェクトキーパターンなどを含めることができる。
+POSTポリシーに記載されていない情報がアップロードリクエストに含まれていた場合は、アップロードに失敗する。例えば、アップロード時にメタデータを付与したい場合、メタデータについての設定をPOSTポリシーに記載する必要がある。</p>
+<p>S3のPOSTポリシーの詳細については<a class="reference external" href="http://docs.aws.amazon.com/ja_jp/AmazonS3/latest/API/sigv4-HTTPPOSTConstructPolicy.html">Creating a POST Policy</a>および <a class="reference external" href="http://docs.aws.amazon.com/ja_jp/AmazonS3/latest/API/sigv4-authentication-HTTPPOST.html">Authenticating Requests: Browser-Based Uploads Using POST (AWS Signature Version 4)</a>を参照されたい。</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">POSTポリシーは、バケットポリシーやIAMポリシーとは異なる書式であり、AWS Policy Generatorでは作成できない。
+ポリシーを作成する際は、混同しないよう注意されたい。</p>
+</div>
+</div>
+<div class="section" id="addingmetadata">
+<span id="id7"></span><h4><a class="toc-backref" href="#id29">5.4.2.1.3.4. メタデータの付与</a><a class="headerlink" href="#addingmetadata" title="Permalink to this headline">¶</a></h4>
+<p>S3のオブジェクトには、メタデータを付与することができる。
+アップロードされたファイルを利用する際に、アップロードユーザの特定や、アップロードファイルの種別・用途等の情報が必要になるケースが考えられる。
+ユースケースによって必要なメタデータを適宜付与するよう検討されたい。</p>
+<p>メタデータには、システムメタデータとユーザー定義メタデータの2種類があり、
+任意の名前(キー)と値を付与する場合には、ユーザー定義メタデータを使用する。
+ユーザー定義メタデータを付与する際は、メタデータの名前を<code class="docutils literal"><span class="pre">x-amz-meta-</span></code>から始める必要がある。</p>
+<p>なお、本ガイドラインの実装例では、ユーザー定義メタデータとして、アップロードしたファイルの元ファイル名を保持する例を紹介している。</p>
+<p>メタデータについての詳細は、<a class="reference external" href="http://docs.aws.amazon.com/ja_jp/AmazonS3/latest/dev/UsingMetadata.html#object-metadata">オブジェクトメタデータ</a>を参照されたい。</p>
+</div>
+</div>
+<div class="section" id="usingsignaturev4">
+<span id="id9"></span><h3><a class="toc-backref" href="#id30">5.4.2.1.4. 署名バージョン4による署名</a><a class="headerlink" href="#usingsignaturev4" title="Permalink to this headline">¶</a></h3>
+<p>ダイレクトアップロード方式では、サーバサイドでのAWS SDKを用いたアップロードと違い、ブラウザからAWSに対して直接リクエストを行う。
+その為、改ざんされていない正規のリクエストであることを証明する為、一時的セキュリティ認証情報を用いてPOSTポリシードキュメントに対して署名を行う。</p>
+<p>署名については<a class="reference external" href="https://docs.aws.amazon.com/ja_jp/general/latest/gr/signing_aws_api_requests.html">AWS API リクエストへの署名</a>も併せて参照されたい。</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">AWSは署名バージョンとしてバージョン2とバージョン4の2種類をサポートしているが、本ガイドラインでは、AWSが推奨する署名バージョン4を採用した方式を説明している。</p>
+</div>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">本ガイドラインで紹介する方式のように、POSTでのアップロードを行う場合、
+<a class="reference external" href="https://docs.aws.amazon.com/ja_jp/general/latest/gr/sigv4_signing.html">署名バージョン4を使用してAWSリクエストに署名する</a>に説明されている署名プロセスは適用できない為、注意が必要である。
+POSTアップロードのリクエストへの署名は、
+<a class="reference external" href="http://docs.aws.amazon.com/ja_jp/AmazonS3/latest/API/sigv4-UsingHTTPPOST.html#sigv4-post-signature-calc">Calculating a Signature</a>で説明されているように、先述のPOSTポリシーに対して行う。</p>
+</div>
+</div>
+</div>
+<div class="section" id="how-to-use">
+<h2><a class="toc-backref" href="#id31">5.4.2.2. How to use</a><a class="headerlink" href="#how-to-use" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="iam">
+<span id="settingsiamrole"></span><h3><a class="toc-backref" href="#id32">5.4.2.2.1. IAMの設定</a><a class="headerlink" href="#iam" title="Permalink to this headline">¶</a></h3>
+<p>STSのAssumeRoleリクエストを使用して一時的セキュリティ認証情報を取得する為には、引受元のロールを作成する必要がある。
+ロールの作成方法については、<a class="reference external" href="http://docs.aws.amazon.com/ja_jp/IAM/latest/UserGuide/id_roles_create_for-user.html">IAMユーザーにアクセス権限を委任するロールの作成</a>を参照されたい。</p>
+<p>本方式ではPutObjectのみを使用する為、ダイレクトアップロード用のバケットに対するPutObject許可ポリシーがアタッチされたIAMロールを使用する。
+PutObjectのみを許可するポリシーの例を以下に示す。</p>
+<div class="highlight-json"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="nt">&quot;Version&quot;</span><span class="p">:</span> <span class="s2">&quot;2012-10-17&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;Statement&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="nt">&quot;Sid&quot;</span><span class="p">:</span> <span class="s2">&quot;Stmt1499682024000&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;Effect&quot;</span><span class="p">:</span> <span class="s2">&quot;Allow&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;Action&quot;</span><span class="p">:</span> <span class="p">[</span>
+                <span class="s2">&quot;s3:PutObject&quot;</span>
+            <span class="p">],</span>
+            <span class="nt">&quot;Resource&quot;</span><span class="p">:</span> <span class="p">[</span>
+                <span class="s2">&quot;arn:aws:s3:::direct.upload/*&quot;</span>
+            <span class="p">]</span>
+        <span class="p">}</span>
+    <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="cors">
+<span id="howtosettingofcors"></span><h3><a class="toc-backref" href="#id33">5.4.2.2.2. CORSの設定</a><a class="headerlink" href="#cors" title="Permalink to this headline">¶</a></h3>
+<p>アップロード先のバケットに対し、CORSの設定を行う。</p>
+<p>localhostからのクロスオリジンリクエスト(POST)を許可する設定例を以下に示す。</p>
+<div class="highlight-xml"><div class="highlight"><pre><span></span><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
+<span class="nt">&lt;CORSConfiguration</span> <span class="na">xmlns=</span><span class="s">&quot;http://s3.amazonaws.com/doc/2006-03-01/&quot;</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;CORSRule&gt;</span>
+    <span class="nt">&lt;AllowedOrigin&gt;</span>http://localhost:8080<span class="nt">&lt;/AllowedOrigin&gt;</span>
+    <span class="nt">&lt;AllowedMethod&gt;</span>POST<span class="nt">&lt;/AllowedMethod&gt;</span>
+    <span class="nt">&lt;AllowedHeader&gt;</span>*<span class="nt">&lt;/AllowedHeader&gt;</span>
+  <span class="nt">&lt;/CORSRule&gt;</span>
+<span class="nt">&lt;/CORSConfiguration&gt;</span>
+</pre></div>
+</div>
+<p>設定の詳細については、<a class="reference external" href="http://docs.aws.amazon.com/ja_jp/AmazonS3/latest/dev/cors.html">Cross-Origin Resource Sharing (CORS)</a>を参照されたい。</p>
+</div>
+<div class="section" id="howtoimplementsserverside">
+<span id="id11"></span><h3><a class="toc-backref" href="#id34">5.4.2.2.3. サーバサイドの実装</a><a class="headerlink" href="#howtoimplementsserverside" title="Permalink to this headline">¶</a></h3>
+<p>ダイレクトアップロードの為のサーバサイド実装について説明する。</p>
+<div class="section" id="addinglibrary">
+<span id="id12"></span><h4><a class="toc-backref" href="#id35">5.4.2.2.3.1. 依存ライブラリの追加</a><a class="headerlink" href="#addinglibrary" title="Permalink to this headline">¶</a></h4>
+<p>本方式の実装で必要となる依存ライブラリの追加を行う。</p>
+<ul>
+<li><p class="first">pom.xml</p>
+<div class="highlight-xml"><div class="highlight"><pre><span></span><span class="c">&lt;!-- (1) --&gt;</span>
+<span class="nt">&lt;dependency&gt;</span>
+    <span class="nt">&lt;groupId&gt;</span>com.amazonaws<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>aws-java-sdk-sts<span class="nt">&lt;/artifactId&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span>
+<span class="c">&lt;!-- (2) --&gt;</span>
+<span class="nt">&lt;dependency&gt;</span>
+    <span class="nt">&lt;groupId&gt;</span>com.amazonaws<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>aws-java-sdk-iam<span class="nt">&lt;/artifactId&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span>
+</pre></div>
+</div>
+</li>
+</ul>
+<blockquote>
+<div><table border="1" class="docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">aws-java-sdk-sts</span></code>の依存関係を追加する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(2)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">aws-java-sdk-iam</span></code>の依存関係を追加する。</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+</div>
+<div class="section" id="gettemporarycredentials">
+<span id="id13"></span><h4><a class="toc-backref" href="#id36">5.4.2.2.3.2. 一時的セキュリティ認証情報の取得</a><a class="headerlink" href="#gettemporarycredentials" title="Permalink to this headline">¶</a></h4>
+<p>STSに対してAssumeRoleリクエストを発行し、既存ロールを受け継いだ一時的セキュリティ認証情報を取得する。
+ここでは、Controllerから呼び出されるヘルパークラスとして、<code class="docutils literal"><span class="pre">DirectUploadHelper</span></code>を作成する例を示しながら説明する。</p>
+<ul>
+<li><p class="first">AssumeRoleリクエストを発行する実装例</p>
+<div class="highlight-java"><div class="highlight"><pre><span></span><span class="nd">@Component</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">DirectUploadHelper</span> <span class="kd">implements</span> <span class="n">InitializingBean</span> <span class="o">{</span>
+
+    <span class="c1">// omitted</span>
+
+    <span class="nd">@Value</span><span class="o">(</span><span class="s">&quot;${upload.roleName}&quot;</span><span class="o">)</span>
+    <span class="n">String</span> <span class="n">roleName</span><span class="o">;</span> <span class="c1">// (1)</span>
+
+    <span class="nd">@Value</span><span class="o">(</span><span class="s">&quot;${upload.roleSessionName}&quot;</span><span class="o">)</span>
+    <span class="n">String</span> <span class="n">roleSessionName</span><span class="o">;</span> <span class="c1">// (1)</span>
+
+    <span class="kd">private</span> <span class="n">String</span> <span class="n">roleArn</span><span class="o">;</span>
+
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="kt">int</span> <span class="n">STS_MIN_DURATION_MINUTES</span> <span class="o">=</span> <span class="mi">15</span><span class="o">;</span>
+
+    <span class="kd">private</span> <span class="n">Credentials</span> <span class="nf">getTemporaryCredentials</span><span class="o">(</span><span class="n">String</span> <span class="n">bucketName</span><span class="o">,</span> <span class="n">String</span> <span class="n">objectKey</span><span class="o">)</span> <span class="o">{</span>
+
+        <span class="n">String</span> <span class="n">resourceArn</span> <span class="o">=</span> <span class="s">&quot;arn:aws:s3:::&quot;</span> <span class="o">+</span> <span class="n">bucketName</span> <span class="o">+</span> <span class="s">&quot;/&quot;</span> <span class="o">+</span> <span class="n">objectKey</span><span class="o">;</span>
+
+        <span class="c1">// (2)</span>
+        <span class="n">Statement</span> <span class="n">statement</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Statement</span><span class="o">(</span><span class="n">Statement</span><span class="o">.</span><span class="na">Effect</span><span class="o">.</span><span class="na">Allow</span><span class="o">)</span>
+                <span class="o">.</span><span class="na">withActions</span><span class="o">(</span><span class="n">S3Actions</span><span class="o">.</span><span class="na">PutObject</span><span class="o">)</span>
+                <span class="o">.</span><span class="na">withResources</span><span class="o">(</span><span class="k">new</span> <span class="n">Resource</span><span class="o">(</span><span class="n">resourceArn</span><span class="o">));</span>
+        <span class="n">String</span> <span class="n">iamPolicy</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Policy</span><span class="o">().</span><span class="na">withStatements</span><span class="o">(</span><span class="n">statement</span><span class="o">).</span><span class="na">toJson</span><span class="o">();</span>
+
+        <span class="kt">int</span> <span class="n">minDurationSeconds</span> <span class="o">=</span> <span class="o">(</span><span class="kt">int</span><span class="o">)</span> <span class="n">TimeUnit</span><span class="o">.</span><span class="na">MINUTES</span><span class="o">.</span><span class="na">toSeconds</span><span class="o">(</span><span class="n">STS_MIN_DURATION_MINUTES</span><span class="o">);</span>
+
+        <span class="c1">// (3)</span>
+        <span class="n">AssumeRoleRequest</span> <span class="n">assumeRoleRequest</span> <span class="o">=</span> <span class="k">new</span> <span class="n">AssumeRoleRequest</span><span class="o">()</span>
+                <span class="o">.</span><span class="na">withRoleArn</span><span class="o">(</span><span class="n">roleArn</span><span class="o">)</span>
+                <span class="o">.</span><span class="na">withDurationSeconds</span><span class="o">(</span><span class="n">minDurationSeconds</span><span class="o">)</span>
+                <span class="o">.</span><span class="na">withRoleSessionName</span><span class="o">(</span><span class="n">roleSessionName</span><span class="o">)</span>
+                <span class="o">.</span><span class="na">withPolicy</span><span class="o">(</span><span class="n">iamPolicy</span><span class="o">);</span>
+
+        <span class="k">return</span> <span class="n">AWSSecurityTokenServiceClientBuilder</span><span class="o">.</span><span class="na">defaultClient</span><span class="o">()</span>
+                <span class="o">.</span><span class="na">assumeRole</span><span class="o">(</span><span class="n">assumeRoleRequest</span><span class="o">).</span><span class="na">getCredentials</span><span class="o">();</span> <span class="c1">// (4)</span>
+    <span class="o">}</span>
+
+    <span class="c1">// (5)</span>
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">afterPropertiesSet</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
+        <span class="n">GetRoleRequest</span> <span class="n">request</span> <span class="o">=</span> <span class="k">new</span> <span class="n">GetRoleRequest</span><span class="o">();</span>
+        <span class="n">request</span><span class="o">.</span><span class="na">setRoleName</span><span class="o">(</span><span class="n">roleName</span><span class="o">);</span>
+
+        <span class="n">roleArn</span> <span class="o">=</span> <span class="n">AmazonIdentityManagementClientBuilder</span><span class="o">.</span><span class="na">defaultClient</span><span class="o">()</span>
+                <span class="o">.</span><span class="na">getRole</span><span class="o">(</span><span class="n">request</span><span class="o">).</span><span class="na">getRole</span><span class="o">().</span><span class="na">getArn</span><span class="o">();</span>
+    <span class="o">}</span>
+
+    <span class="c1">// omitted</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+<table border="1" class="docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">ロール名、ロールセッション名を取得する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(2)</div>
+</div>
+</td>
+<td><div class="first line-block">
+<div class="line">取得する一時的セキュリティ認証情報に付与するIAMポリシーを設定できる。</div>
+<div class="line">ここでは、アップロード対象のオブジェクトキーに対するPutObjectのみを許可するIAMポリシーを設定している。</div>
+</div>
+<div class="last admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">AssumeRoleで引き受けるロールが持っているIAMポリシーから、制限を緩める事はできない。</p>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(3)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">AssumeRoleリクエストを発行する為のリクエストオブジェクトを生成する。</div>
+<div class="line">引き受けるロールのARN、一時的セキュリティ認証情報の有効時間(分)、ロールセッション名、IAMポリシーを渡している。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(4)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">AWSSecurityTokenServiceClientBuilder</span></code>から<code class="docutils literal"><span class="pre">AWSSecurityTokenServiceClient</span></code>を取得する。</div>
+<div class="line">取得した<code class="docutils literal"><span class="pre">AWSSecurityTokenServiceClient</span></code>に対してAssumeRoleリクエストを発行し、一時的セキュリティ認証情報として<code class="docutils literal"><span class="pre">Credentials</span></code>を取得する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(5)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">ロール名からロールARNを取得する。</div>
+<div class="line"><code class="docutils literal"><span class="pre">AmazonIdentityManagementClientBuilder</span></code>から取得したIAMクライアントを介して、ロールARNを取得する。</div>
+<div class="line">ロールARNの取得はアプリケーション起動時にのみ行えば良い為、<code class="docutils literal"><span class="pre">afterPropertiesSet</span></code>メソッドに実装している。</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</li>
+</ul>
+</div>
+<div class="section" id="createpostpolicy">
+<span id="id14"></span><h4><a class="toc-backref" href="#id37">5.4.2.2.3.3. POSTポリシーの作成・署名</a><a class="headerlink" href="#createpostpolicy" title="Permalink to this headline">¶</a></h4>
+<p>POSTによるアップロードリクエストに付加するPOSTポリシーを作成する。
+引き続き、<code class="docutils literal"><span class="pre">DirectUploadHelper</span></code>を実装する例を示しながら説明する。</p>
+<ul>
+<li><p class="first">POSTポリシーを作成し、署名する実装例</p>
+<div class="highlight-java"><div class="highlight"><pre><span></span><span class="nd">@Component</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">DirectUploadHelper</span> <span class="kd">implements</span> <span class="n">InitializingBean</span> <span class="o">{</span>
+
+    <span class="c1">// omitted</span>
+
+    <span class="c1">// (1)</span>
+    <span class="nd">@Value</span><span class="o">(</span><span class="s">&quot;${upload.durationseconds:30}&quot;</span><span class="o">)</span>
+    <span class="kt">int</span> <span class="n">durationSeconds</span><span class="o">;</span>
+
+    <span class="nd">@Value</span><span class="o">(</span><span class="s">&quot;${upload.limitBytes}&quot;</span><span class="o">)</span>
+    <span class="kt">int</span> <span class="n">fileSizeLimit</span><span class="o">;</span>
+
+    <span class="c1">// (2)</span>
+    <span class="nd">@Inject</span>
+    <span class="n">ObjectMapper</span> <span class="n">objectMapper</span><span class="o">;</span>
+
+    <span class="nd">@Inject</span>
+    <span class="n">RegionProvider</span> <span class="n">regionProvider</span><span class="o">;</span>
+
+    <span class="kd">public</span> <span class="n">DirectUploadAuthInfo</span> <span class="nf">getDirectUploadInfo</span><span class="o">(</span><span class="n">String</span> <span class="n">bucketName</span><span class="o">,</span>
+            <span class="n">String</span> <span class="n">fileName</span><span class="o">,</span> <span class="n">SampleUserDetails</span> <span class="n">userDetails</span><span class="o">)</span> <span class="o">{</span>
+
+        <span class="n">String</span> <span class="n">objectKey</span> <span class="o">=</span> <span class="n">createObjectKey</span><span class="o">(</span><span class="n">userDetails</span><span class="o">);</span> <span class="c1">// (3)</span>
+
+        <span class="n">Credentials</span> <span class="n">credentials</span> <span class="o">=</span> <span class="n">getTemporaryCredentials</span><span class="o">(</span><span class="n">bucketName</span><span class="o">,</span> <span class="n">objectKey</span><span class="o">);</span> <span class="c1">// (4)</span>
+
+        <span class="n">String</span> <span class="n">regionName</span> <span class="o">=</span> <span class="n">regionProvider</span><span class="o">.</span><span class="na">getRegion</span><span class="o">().</span><span class="na">getName</span><span class="o">();</span> <span class="c1">// (5)</span>
+
+        <span class="n">String</span> <span class="n">serviceName</span> <span class="o">=</span> <span class="s">&quot;s3&quot;</span><span class="o">;</span>
+
+        <span class="n">DateTime</span> <span class="n">nowUTC</span> <span class="o">=</span> <span class="k">new</span> <span class="n">DateTime</span><span class="o">(</span><span class="n">DateTimeZone</span><span class="o">.</span><span class="na">UTC</span><span class="o">);</span> <span class="c1">// (6)</span>
+
+        <span class="n">String</span> <span class="n">date</span> <span class="o">=</span> <span class="n">nowUTC</span><span class="o">.</span><span class="na">toString</span><span class="o">(</span><span class="s">&quot;yyyyMMdd&quot;</span><span class="o">);</span> <span class="c1">// (7)</span>
+
+        <span class="n">String</span> <span class="n">acl</span> <span class="o">=</span> <span class="s">&quot;private&quot;</span><span class="o">;</span>
+
+        <span class="n">String</span> <span class="n">credentialString</span> <span class="o">=</span> <span class="n">credentials</span><span class="o">.</span><span class="na">getAccessKeyId</span><span class="o">()</span> <span class="o">+</span> <span class="s">&quot;/&quot;</span> <span class="o">+</span> <span class="n">date</span> <span class="o">+</span> <span class="s">&quot;/&quot;</span>
+                    <span class="o">+</span> <span class="n">regionName</span> <span class="o">+</span> <span class="s">&quot;/&quot;</span> <span class="o">+</span> <span class="n">serviceName</span> <span class="o">+</span> <span class="s">&quot;/&quot;</span> <span class="o">+</span> <span class="s">&quot;aws4_request&quot;</span><span class="o">;</span>  <span class="c1">// (8)</span>
+
+        <span class="n">String</span> <span class="n">securityToken</span> <span class="o">=</span> <span class="n">credentials</span><span class="o">.</span><span class="na">getSessionToken</span><span class="o">();</span>
+
+        <span class="n">String</span> <span class="n">s3endpoint</span> <span class="o">=</span> <span class="s">&quot;s3-&quot;</span> <span class="o">+</span> <span class="n">regionName</span> <span class="o">+</span> <span class="s">&quot;.amazonaws.com&quot;</span><span class="o">;</span>
+
+        <span class="n">String</span> <span class="n">targetUrl</span> <span class="o">=</span> <span class="s">&quot;https://&quot;</span> <span class="o">+</span> <span class="n">bucketName</span> <span class="o">+</span> <span class="s">&quot;.&quot;</span> <span class="o">+</span> <span class="n">s3endpoint</span> <span class="o">+</span> <span class="s">&quot;/&quot;</span><span class="o">;</span>
+
+        <span class="n">String</span> <span class="n">algorithm</span> <span class="o">=</span> <span class="s">&quot;AWS4-HMAC-SHA256&quot;</span><span class="o">;</span> <span class="c1">// (9)</span>
+
+        <span class="n">String</span> <span class="n">iso8601dateTime</span> <span class="o">=</span> <span class="n">nowUTC</span><span class="o">.</span><span class="na">toString</span><span class="o">(</span><span class="s">&quot;yyyyMMdd&#39;T&#39;HHmmss&#39;Z&#39;&quot;</span><span class="o">);</span> <span class="c1">// (10)</span>
+
+        <span class="n">PostPolicy</span> <span class="n">postPolicy</span> <span class="o">=</span> <span class="k">new</span> <span class="n">PostPolicy</span><span class="o">();</span>  <span class="c1">// (11)</span>
+        <span class="n">postPolicy</span><span class="o">.</span><span class="na">setExpiration</span><span class="o">(</span><span class="n">nowUTC</span><span class="o">.</span><span class="na">plusSeconds</span><span class="o">(</span><span class="n">durationSeconds</span><span class="o">).</span><span class="na">toString</span><span class="o">());</span> <span class="c1">// (12)</span>
+        <span class="n">postPolicy</span><span class="o">.</span><span class="na">setConditions</span><span class="o">(</span><span class="k">new</span> <span class="n">String</span><span class="o">[][]{</span> <span class="c1">// (13)</span>
+            <span class="o">{</span> <span class="s">&quot;eq&quot;</span><span class="o">,</span> <span class="s">&quot;$bucket&quot;</span><span class="o">,</span> <span class="n">bucketName</span> <span class="o">},</span>
+            <span class="o">{</span> <span class="s">&quot;eq&quot;</span><span class="o">,</span> <span class="s">&quot;$key&quot;</span><span class="o">,</span> <span class="n">objectKey</span> <span class="o">},</span>
+            <span class="o">{</span> <span class="s">&quot;eq&quot;</span><span class="o">,</span> <span class="s">&quot;$acl&quot;</span><span class="o">,</span> <span class="n">acl</span> <span class="o">},</span>
+            <span class="o">{</span> <span class="s">&quot;eq&quot;</span><span class="o">,</span> <span class="s">&quot;$x-amz-meta-filename&quot;</span><span class="o">,</span> <span class="n">fileName</span> <span class="o">},</span>
+            <span class="o">{</span> <span class="s">&quot;eq&quot;</span><span class="o">,</span> <span class="s">&quot;$x-amz-credential&quot;</span><span class="o">,</span> <span class="n">credentialString</span> <span class="o">},</span>
+            <span class="o">{</span> <span class="s">&quot;eq&quot;</span><span class="o">,</span> <span class="s">&quot;$x-amz-security-token&quot;</span><span class="o">,</span> <span class="n">securityToken</span> <span class="o">},</span>
+            <span class="o">{</span> <span class="s">&quot;eq&quot;</span><span class="o">,</span> <span class="s">&quot;$x-amz-algorithm&quot;</span><span class="o">,</span> <span class="n">algorithm</span> <span class="o">},</span>
+            <span class="o">{</span> <span class="s">&quot;eq&quot;</span><span class="o">,</span> <span class="s">&quot;$x-amz-date&quot;</span><span class="o">,</span> <span class="n">iso8601dateTime</span> <span class="o">},</span>
+            <span class="o">{</span> <span class="s">&quot;content-length-range&quot;</span><span class="o">,</span> <span class="s">&quot;0&quot;</span><span class="o">,</span> <span class="n">fileSizeLimit</span> <span class="o">}</span>
+        <span class="o">});</span>
+
+        <span class="n">String</span> <span class="n">policyDocument</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+        <span class="k">try</span> <span class="o">{</span>  <span class="c1">// (14)</span>
+            <span class="n">policyDocument</span> <span class="o">=</span> <span class="n">objectMapper</span><span class="o">.</span><span class="na">writeValueAsString</span><span class="o">(</span><span class="n">postPolicy</span><span class="o">);</span>
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">JsonProcessingException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="n">SystemException</span><span class="o">(</span><span class="s">&quot;e.xx.fw.9001&quot;</span><span class="o">,</span> <span class="s">&quot;invalid policy.&quot;</span><span class="o">,</span> <span class="n">e</span><span class="o">);</span>
+        <span class="o">}</span>
+
+        <span class="n">String</span> <span class="n">base64policy</span> <span class="o">=</span> <span class="n">Base64</span><span class="o">.</span><span class="na">encodeBase64String</span><span class="o">(</span><span class="n">policyDocument</span><span class="o">.</span><span class="na">getBytes</span><span class="o">(</span>
+                    <span class="n">StandardCharsets</span><span class="o">.</span><span class="na">UTF_8</span><span class="o">));</span> <span class="c1">// (15)</span>
+
+        <span class="kt">byte</span><span class="o">[]</span> <span class="n">signingKey</span> <span class="o">=</span> <span class="n">getSignatureKey</span><span class="o">(</span><span class="n">credentials</span><span class="o">.</span><span class="na">getSecretAccessKey</span><span class="o">(),</span> <span class="n">date</span><span class="o">,</span>
+                    <span class="n">regionName</span><span class="o">,</span> <span class="n">serviceName</span><span class="o">);</span> <span class="c1">// (16)</span>
+
+        <span class="n">String</span> <span class="n">signatureForPolicy</span> <span class="o">=</span> <span class="n">Hex</span><span class="o">.</span><span class="na">encodeHexString</span><span class="o">(</span><span class="n">calculateHmacSHA256</span><span class="o">(</span>
+                    <span class="n">base64policy</span><span class="o">,</span> <span class="n">signingKey</span><span class="o">));</span> <span class="c1">// (17)</span>
+
+        <span class="c1">// (18)</span>
+        <span class="n">DirectUploadAuthInfo</span> <span class="n">res</span> <span class="o">=</span> <span class="k">new</span> <span class="n">DirectUploadAuthInfo</span><span class="o">();</span>
+        <span class="n">res</span><span class="o">.</span><span class="na">setTargetUrl</span><span class="o">(</span><span class="n">targetUrl</span><span class="o">);</span>
+        <span class="n">res</span><span class="o">.</span><span class="na">setAcl</span><span class="o">(</span><span class="n">acl</span><span class="o">);</span>
+        <span class="n">res</span><span class="o">.</span><span class="na">setDate</span><span class="o">(</span><span class="n">iso8601dateTime</span><span class="o">);</span>
+        <span class="n">res</span><span class="o">.</span><span class="na">setObjectKey</span><span class="o">(</span><span class="n">objectKey</span><span class="o">);</span>
+        <span class="n">res</span><span class="o">.</span><span class="na">setSecurityToken</span><span class="o">(</span><span class="n">securityToken</span><span class="o">);</span>
+        <span class="n">res</span><span class="o">.</span><span class="na">setAlgorithm</span><span class="o">(</span><span class="n">algorithm</span><span class="o">);</span>
+        <span class="n">res</span><span class="o">.</span><span class="na">setCredential</span><span class="o">(</span><span class="n">credential</span><span class="o">);</span>
+        <span class="n">res</span><span class="o">.</span><span class="na">setSignature</span><span class="o">(</span><span class="n">signatureForPolicy</span><span class="o">);</span>
+        <span class="n">res</span><span class="o">.</span><span class="na">setPolicy</span><span class="o">(</span><span class="n">base64policy</span><span class="o">);</span>
+        <span class="n">res</span><span class="o">.</span><span class="na">setRawFileName</span><span class="o">(</span><span class="n">fileName</span><span class="o">);</span>
+        <span class="n">res</span><span class="o">.</span><span class="na">setFileSizeLimit</span><span class="o">(</span><span class="n">fileSizeLimit</span><span class="o">);</span>
+
+        <span class="k">return</span> <span class="n">res</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="c1">// (3)</span>
+    <span class="kd">private</span> <span class="n">String</span> <span class="nf">createObjectKey</span><span class="o">(</span><span class="n">SampleUserDetails</span> <span class="n">userDetails</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">String</span> <span class="n">userId</span> <span class="o">=</span> <span class="n">userDetails</span><span class="o">.</span><span class="na">getUsername</span><span class="o">();</span>
+        <span class="k">return</span> <span class="n">userId</span> <span class="o">+</span> <span class="s">&quot;/&quot;</span> <span class="o">+</span> <span class="n">UUID</span><span class="o">.</span><span class="na">randomUUID</span><span class="o">();</span>
+    <span class="o">}</span>
+
+    <span class="kd">private</span> <span class="kt">byte</span><span class="o">[]</span> <span class="nf">getSignatureKey</span><span class="o">(</span><span class="n">String</span> <span class="n">key</span><span class="o">,</span> <span class="n">String</span> <span class="n">dateStamp</span><span class="o">,</span> <span class="n">String</span> <span class="n">region</span><span class="o">,</span>
+            <span class="n">String</span> <span class="n">serviceName</span><span class="o">)</span> <span class="o">{</span>
+        <span class="kt">byte</span><span class="o">[]</span> <span class="n">kSecret</span>  <span class="o">=</span> <span class="o">(</span><span class="s">&quot;AWS4&quot;</span> <span class="o">+</span> <span class="n">key</span><span class="o">).</span><span class="na">getBytes</span><span class="o">(</span><span class="n">StandardCharsets</span><span class="o">.</span><span class="na">UTF_8</span><span class="o">);</span>
+        <span class="kt">byte</span><span class="o">[]</span> <span class="n">kDate</span>    <span class="o">=</span> <span class="n">calculateHmacSHA256</span><span class="o">(</span><span class="n">dateStamp</span><span class="o">,</span> <span class="n">kSecret</span><span class="o">);</span>
+        <span class="kt">byte</span><span class="o">[]</span> <span class="n">kRegion</span>  <span class="o">=</span> <span class="n">calculateHmacSHA256</span><span class="o">(</span><span class="n">region</span><span class="o">,</span> <span class="n">kDate</span><span class="o">);</span>
+        <span class="kt">byte</span><span class="o">[]</span> <span class="n">kService</span> <span class="o">=</span> <span class="n">calculateHmacSHA256</span><span class="o">(</span><span class="n">serviceName</span><span class="o">,</span> <span class="n">kRegion</span><span class="o">);</span>
+        <span class="kt">byte</span><span class="o">[]</span> <span class="n">kSigning</span> <span class="o">=</span> <span class="n">calculateHmacSHA256</span><span class="o">(</span><span class="s">&quot;aws4_request&quot;</span><span class="o">,</span> <span class="n">kService</span><span class="o">);</span>
+        <span class="k">return</span> <span class="n">kSigning</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">private</span> <span class="kt">byte</span><span class="o">[]</span> <span class="nf">calculateHmacSHA256</span><span class="o">(</span><span class="n">String</span> <span class="n">stringToSign</span><span class="o">,</span> <span class="kt">byte</span><span class="o">[]</span> <span class="n">signingKey</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">String</span> <span class="n">algorithm</span> <span class="o">=</span> <span class="s">&quot;HmacSHA256&quot;</span><span class="o">;</span>
+        <span class="n">Mac</span> <span class="n">mac</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+        <span class="k">try</span> <span class="o">{</span>
+            <span class="n">mac</span> <span class="o">=</span> <span class="n">Mac</span><span class="o">.</span><span class="na">getInstance</span><span class="o">(</span><span class="n">algorithm</span><span class="o">);</span>
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">NoSuchAlgorithmException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="n">SystemException</span><span class="o">(</span><span class="s">&quot;e.xx.fw.9001&quot;</span><span class="o">,</span> <span class="s">&quot;invalid algorithm.&quot;</span><span class="o">,</span> <span class="n">e</span><span class="o">);</span>
+        <span class="o">}</span>
+        <span class="k">try</span> <span class="o">{</span>
+            <span class="n">mac</span><span class="o">.</span><span class="na">init</span><span class="o">(</span><span class="k">new</span> <span class="n">SecretKeySpec</span><span class="o">(</span><span class="n">signingKey</span><span class="o">,</span> <span class="n">algorithm</span><span class="o">));</span>
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">InvalidKeyException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="n">SystemException</span><span class="o">(</span><span class="s">&quot;e.xx.fw.9001&quot;</span><span class="o">,</span> <span class="s">&quot;invalid encoding key.&quot;</span><span class="o">,</span> <span class="n">e</span><span class="o">);</span>
+        <span class="o">}</span>
+
+        <span class="k">return</span> <span class="n">mac</span><span class="o">.</span><span class="na">doFinal</span><span class="o">(</span><span class="n">stringToSign</span><span class="o">.</span><span class="na">getBytes</span><span class="o">(</span><span class="n">StandardCharsets</span><span class="o">.</span><span class="na">UTF_8</span><span class="o">));</span>
+    <span class="o">}</span>
+
+    <span class="c1">// (11)</span>
+    <span class="kd">private</span> <span class="kd">class</span> <span class="nc">PostPolicy</span> <span class="o">{</span>
+
+        <span class="kd">private</span> <span class="n">String</span> <span class="n">expiration</span><span class="o">;</span>
+
+        <span class="kd">private</span> <span class="n">String</span><span class="o">[][]</span> <span class="n">conditions</span><span class="o">;</span>
+
+        <span class="c1">// accessor is omitted</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+<table border="1" class="docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">POSTポリシー有効期間(秒)、アップロードサイズ上限(バイト)を取得する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(2)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">ObjectMapper</span></code>、<code class="docutils literal"><span class="pre">RegionProvider</span></code>をインジェクションする。</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(3)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">アップロードするオブジェクトキーを生成する。</div>
+<div class="line">本実装例では、ログインしたユーザIDと、UUIDによるランダムな文字列を結合してオブジェクトキーとしている。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(4)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><a class="reference internal" href="#gettemporarycredentials"><span class="std std-ref">一時的セキュリティ認証情報の取得</span></a>にて先述した一時的セキュリティ認証情報を取得する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(5)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">RegionProvider</span></code>を使用して、リージョン名を取得する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(6)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">UTCでの現在日時を取得する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(7)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">Credential文字列作成に使用する為、取得したUTCの現在日時を&#8221;yyyyMMdd&#8221;形式にフォーマットする。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(8)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">Credential文字列を作成する。</div>
+<div class="line">Credential文字列の書式は、<a class="reference external" href="http://docs.aws.amazon.com/ja_jp/AmazonS3/latest/API/sigv4-auth-using-authorization-header.html">Using the Authorization Header (AWS Signature Version 4)</a>を参照されたい。</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(9)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">署名計算用のアルゴリズム。署名バージョン4を使用する場合は<code class="docutils literal"><span class="pre">AWS4-HMAC-SHA256</span></code>を指定する必要がある。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(10)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">署名バージョン4に使用する日時情報<code class="docutils literal"><span class="pre">x-amz-date</span></code>を作成する。</div>
+<div class="line"><code class="docutils literal"><span class="pre">x-amz-date</span></code>はUTCでYYYYMMDD&#8217;T&#8217;HHMMSS&#8217;Z&#8217;のISO8601形式である必要がある。ミリ秒を含めてはいけない為、注意されたい。</div>
+<div class="line">参考:<a class="reference external" href="https://docs.aws.amazon.com/ja_jp/general/latest/gr/sigv4-date-handling.html">署名バージョン4の日付の処理</a></div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(11)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">POSTポリシーを作成する。</div>
+<div class="line">本実装例では、POSTポリシーを表す<code class="docutils literal"><span class="pre">PostPolicy</span></code>クラスを作成した後、<code class="docutils literal"><span class="pre">com.fasterxml.jackson.databind.ObjectMapper</span></code>によりJSON文字列に変換している。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(12)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">POSTポリシーに有効期限を示す日時情報を作成する。ISO8601形式であるが、<code class="docutils literal"><span class="pre">x-amz-date</span></code>とは書式が異なる為、注意されたい。</div>
+<div class="line">本例では、外部定義されている有効期間(秒)を現在日時に可算し、有効期限としている。</div>
+<div class="line">参考:<a class="reference external" href="http://docs.aws.amazon.com/ja_jp/AmazonS3/latest/API/sigv4-HTTPPOSTConstructPolicy.html#sigv4-HTTPPOSTExpiration">Expiration</a></div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(13)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">POSTポリシーの条件文(conditions)を作成する。</div>
+<div class="line">本例では、値のマッチングタイプを完全一致(Exact Matches)としているが、必要に応じて前方一致(Starts With)や任意の値(Matching Any Content)とすることも可能である。</div>
+<div class="line">POSTポリシーに設定できる条件については<a class="reference external" href="http://docs.aws.amazon.com/ja_jp/AmazonS3/latest/API/sigv4-HTTPPOSTConstructPolicy.html">Creating a POST Policy</a>を参照されたい。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(14)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">PostPolicy</span></code>クラスをJSON文字列に変換する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(15)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">作成したPOSTポリシーをBASE64エンコードする。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(16)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">一時的セキュリティ認証情報のシークレットキーを元に、署名キーを取得する。</div>
+<div class="line">本例では、<a class="reference external" href="https://docs.aws.amazon.com/ja_jp/general/latest/gr/signature-v4-examples.html#signature-v4-examples-java">署名バージョン4の署名キーを取得する方法の例</a>に示された実装例を元に実装している。</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(17)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">取得した署名キーを使用して、BASE64エンコード済のPOSTポリシーに対して署名計算を行う。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(18)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">クライアントでアップロードに必要となる情報を、オブジェクトに設定する。</div>
+<div class="line">本オブジェクトの実装例は後述する。</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</li>
+</ul>
+</div>
+<div class="section" id="howtoimplementsdirectuploadauthinfo">
+<span id="id18"></span><h4><a class="toc-backref" href="#id38">5.4.2.2.3.4. クライアントへの返却用オブジェクトの実装</a><a class="headerlink" href="#howtoimplementsdirectuploadauthinfo" title="Permalink to this headline">¶</a></h4>
+<p>POSTポリシーやCredential文字列などの、クライアントに連携する情報を保持するオブジェクトを作成する。
+以下は一例の為、実装にあたってクライアントに連携すべき情報が他にある場合は、適宜フィールドを追加されたい。</p>
+<ul>
+<li><p class="first">POSTポリシー、認証情報等を持つオブジェクトの実装例</p>
+<div class="highlight-java"><div class="highlight"><pre><span></span><span class="kd">public</span> <span class="kd">class</span> <span class="nc">DirectUploadAuthInfo</span> <span class="o">{</span>
+
+    <span class="kd">private</span> <span class="n">String</span> <span class="n">targetUrl</span><span class="o">;</span>
+
+    <span class="kd">private</span> <span class="n">String</span> <span class="n">acl</span><span class="o">;</span>
+
+    <span class="kd">private</span> <span class="n">String</span> <span class="n">policy</span><span class="o">;</span>
+
+    <span class="kd">private</span> <span class="n">String</span> <span class="n">securityToken</span><span class="o">;</span>
+
+    <span class="kd">private</span> <span class="n">String</span> <span class="n">objectKey</span><span class="o">;</span>
+
+    <span class="kd">private</span> <span class="n">String</span> <span class="n">date</span><span class="o">;</span>
+
+    <span class="kd">private</span> <span class="n">String</span> <span class="n">algorithm</span><span class="o">;</span>
+
+    <span class="kd">private</span> <span class="n">String</span> <span class="n">credential</span><span class="o">;</span>
+
+    <span class="kd">private</span> <span class="n">String</span> <span class="n">signature</span><span class="o">;</span>
+
+    <span class="kd">private</span> <span class="n">String</span> <span class="n">rawFileName</span><span class="o">;</span>
+
+    <span class="kd">private</span> <span class="n">String</span> <span class="n">fileSizeLimit</span><span class="o">;</span>
+
+    <span class="c1">// accessor is omitted</span>
+
+<span class="o">}</span>
+</pre></div>
+</div>
+<table border="1" class="docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">フィールド</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">targetUrl</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">POSTメソッドでアクセスする際の対象URL</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">acl</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">アップロードしたファイルの公開範囲</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">policy</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">POSTポリシードキュメント</div>
+<div class="line">POSTポリシーはBASE64エンコードされている必要がある。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">securityToken</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">一時的セキュリティ認証情報のセキュリティトークン</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">objectKey</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">アップロードするファイルのオブジェクトキー</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">date</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">日時情報</div>
+<div class="line">タイムゾーンはUTCで、YYYYMMDD&#8217;T&#8217;HHMMSS&#8217;Z&#8217;のISO8601形式である必要がある。</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">algorithm</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">署名アルゴリズム</div>
+<div class="line">署名バージョン4の場合は<code class="docutils literal"><span class="pre">AWS4-HMAC-SHA256</span></code>固定。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">credential</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">一時的セキュリティ認証情報やリージョン等の情報を含んだ文字列</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">signature</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">POSTポリシーに対しての署名</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">rawFileName</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">アップロードするファイルの元ファイル名</div>
+<div class="line">本例では、アップロード時のメタデータに元ファイル名を含める為、本フィールドを作成している。</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">fileSizeLimit</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">アップロードする際のサイズ上限</div>
+<div class="line">本例では、JavaScript側にて、ファイルサイズ上限値を画面表示させたいケースを想定している。</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</li>
+</ul>
+</div>
+<div class="section" id="controller">
+<span id="howtoimplementsdirectuploadcontroller"></span><h4><a class="toc-backref" href="#id39">5.4.2.2.3.5. Controllerの実装</a><a class="headerlink" href="#controller" title="Permalink to this headline">¶</a></h4>
+<p>アップロード要求を受け付けるControllerの実装例について説明する。</p>
+<ul>
+<li><p class="first">Controller実装例</p>
+<div class="highlight-java"><div class="highlight"><pre><span></span><span class="nd">@Controller</span>
+<span class="nd">@RequestMapping</span><span class="o">(</span><span class="s">&quot;upload&quot;</span><span class="o">)</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">DirectUploadController</span> <span class="o">{</span>
+
+    <span class="nd">@Value</span><span class="o">(</span><span class="s">&quot;${upload.bucketName}&quot;</span><span class="o">)</span>
+    <span class="n">String</span> <span class="n">directUploadBucketName</span><span class="o">;</span>
+
+    <span class="nd">@Inject</span>
+    <span class="n">DirectUploadHelper</span> <span class="n">directUploadHelper</span><span class="o">;</span> <span class="c1">// (1)</span>
+
+    <span class="nd">@GetMapping</span> <span class="c1">// (2)</span>
+    <span class="kd">public</span> <span class="n">String</span> <span class="nf">upload</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="s">&quot;upload/index&quot;</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="nd">@GetMapping</span><span class="o">(</span><span class="n">params</span> <span class="o">=</span> <span class="s">&quot;info&quot;</span><span class="o">)</span> <span class="c1">// (3)</span>
+    <span class="nd">@ResponseBody</span> <span class="c1">// (4)</span>
+    <span class="kd">public</span> <span class="n">DirectUploadAuthInfo</span> <span class="nf">getInfoForDirectUpload</span><span class="o">(</span>
+            <span class="nd">@RequestParam</span><span class="o">(</span><span class="s">&quot;filename&quot;</span><span class="o">)</span> <span class="n">String</span> <span class="n">fileName</span><span class="o">,</span> <span class="c1">// (5)</span>
+            <span class="nd">@AuthenticationPrincipal</span> <span class="n">SampleUserDetails</span> <span class="n">userDetails</span><span class="o">)</span> <span class="o">{</span> <span class="c1">// (6)</span>
+
+        <span class="k">return</span> <span class="n">directUploadHelper</span><span class="o">.</span><span class="na">getDirectUploadInfo</span><span class="o">(</span><span class="n">directUploadBucketName</span><span class="o">,</span>
+                <span class="n">fileName</span><span class="o">,</span> <span class="n">userDetails</span><span class="o">);</span> <span class="c1">// (7)</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+<table border="1" class="docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">一時的セキュリティ認証情報の取得、POSTポリシーの作成・署名等を行うヘルパークラスをインジェクションする。</div>
+<div class="line">ヘルパークラスの実装例は<a class="reference internal" href="#gettemporarycredentials"><span class="std std-ref">一時的セキュリティ認証情報の取得</span></a>および<a class="reference internal" href="#createpostpolicy"><span class="std std-ref">POSTポリシーの作成・署名</span></a>に示している。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(2)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">ダイレクトアップロード画面へ遷移させるハンドラメソッドを作成する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(3)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">ダイレクトアップロードに必要な情報をクライアントに返却するハンドラメソッドを作成する。</div>
+<div class="line">本メソッドはクライアントサイドで実装したJavaScriptから呼び出される。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(4)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">ResponseBody</span></code>アノテーションを付与することで、メソッドの返却オブジェクトをJSON文字列に変換してクライアントに返却できる。</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(5)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">アップロード対象のファイル名をオブジェクトキーとする為、引数でファイル名を受け取る。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(6)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">本実装例では、アップロードを行ったユーザIDをオブジェクトキーの接頭辞として使用する為、<code class="docutils literal"><span class="pre">AuthenticationPrincipal</span></code>アノテーションを使用し、ログインユーザ情報を引数で受け取る。</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(7)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">ヘルパークラスのメソッドを呼び出し、POSTによるアップロード時に必要となる情報を持つオブジェクトを作成する。</div>
+<div class="line">作成したオブジェクトを呼び出し元に返却する。</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</li>
+</ul>
+</div>
+<div class="section" id="settingpropertiessample">
+<span id="id19"></span><h4><a class="toc-backref" href="#id40">5.4.2.2.3.6. 外部定義プロパティ値の設定</a><a class="headerlink" href="#settingpropertiessample" title="Permalink to this headline">¶</a></h4>
+<p>本ガイドラインの実装例で使用している外部定義プロパティ例を以下に示す。</p>
+<blockquote>
+<div><div class="highlight-yaml"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">upload</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">bucketName</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">direct.upload</span>  <span class="c1">#(1)</span>
+  <span class="l l-Scalar l-Scalar-Plain">roleName</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">s3-direct</span>  <span class="c1">#(2)</span>
+  <span class="l l-Scalar l-Scalar-Plain">roleSessionName</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">s3-direct01</span>  <span class="c1">#(3)</span>
+  <span class="l l-Scalar l-Scalar-Plain">durationseconds</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">30</span>  <span class="c1">#(4)</span>
+  <span class="l l-Scalar l-Scalar-Plain">limitBytes</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">819200</span>  <span class="c1">#(5)</span>
+</pre></div>
+</div>
+<table border="1" class="docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">アップロード先のS3バケット名</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(2)</div>
+</div>
+</td>
+<td><div class="first line-block">
+<div class="line">一時的セキュリティ認証情報にて引き受けるIAMロールのロール名</div>
+</div>
+<div class="last admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">AssumeRoleリクエストではロールARNを使用するが、ロールARNにはAWSのアカウントIDが含まれる為、
+本ガイドラインではロール名からロールARNを取得する実装例を紹介している。</p>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(3)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">AssumeRoleリクエストによって取得した一時的セキュリティ認証情報の識別名</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(4)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">一時的セキュリティ認証情報の有効期限(秒)</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(5)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">アップロードファイルサイズの上限(バイト)</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+</div>
+</div>
+<div class="section" id="howtoimplementsclientside">
+<span id="id20"></span><h3><a class="toc-backref" href="#id41">5.4.2.2.4. クライアントサイドの実装</a><a class="headerlink" href="#howtoimplementsclientside" title="Permalink to this headline">¶</a></h3>
+<p>ダイレクトアップロードの為のクライアントサイド実装について説明する。</p>
+<div class="section" id="javascript">
+<span id="howtoimplementsdirectuploadjavascript"></span><h4><a class="toc-backref" href="#id42">5.4.2.2.4.1. JavaScriptの実装</a><a class="headerlink" href="#javascript" title="Permalink to this headline">¶</a></h4>
+<p>アップロード画面に埋め込むJavaScriptの実装例について説明する。
+なお、本実装例では、JavaScriptライブラリであるjQueryを使用している。</p>
+<ul>
+<li><p class="first">html実装例</p>
+<div class="highlight-html"><div class="highlight"><pre><span></span><span class="c">&lt;!-- omitted --&gt;</span>
+
+<span class="p">&lt;</span><span class="nt">input</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;file&quot;</span> <span class="na">id</span><span class="o">=</span><span class="s">&quot;file&quot;</span> <span class="na">name</span><span class="o">=</span><span class="s">&quot;file&quot;</span><span class="p">/&gt;</span>
+<span class="p">&lt;</span><span class="nt">button</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;button&quot;</span> <span class="na">id</span><span class="o">=</span><span class="s">&quot;uploadFile&quot;</span> <span class="na">onclick</span><span class="o">=</span><span class="s">&quot;&quot;</span><span class="p">&gt;</span>登録<span class="p">&lt;/</span><span class="nt">button</span><span class="p">&gt;</span>
+
+<span class="c">&lt;!-- omitted --&gt;</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">JavaScript実装例</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span></span><span class="nx">$</span><span class="p">(</span><span class="s2">&quot;#uploadFile&quot;</span><span class="p">).</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;click&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(){</span>
+    <span class="kd">var</span> <span class="nx">file</span> <span class="o">=</span> <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#file&#39;</span><span class="p">).</span><span class="nx">prop</span><span class="p">(</span><span class="s1">&#39;files&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">];</span> <span class="c1">// (1)</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="nx">file</span><span class="p">)</span> <span class="p">{</span>
+        <span class="kd">var</span> <span class="nx">fileName</span> <span class="o">=</span> <span class="nx">file</span><span class="p">.</span><span class="nx">name</span><span class="p">;</span>
+
+        <span class="nx">$</span><span class="p">.</span><span class="nx">ajax</span><span class="p">({</span> <span class="c1">// (2)</span>
+            <span class="nx">url</span><span class="o">:</span> <span class="s1">&#39;${pageContext.request.contextPath}/upload?info&amp;filename=&#39;</span> <span class="o">+</span> <span class="nx">fileName</span><span class="p">,</span>
+            <span class="nx">type</span><span class="o">:</span> <span class="s1">&#39;GET&#39;</span>
+        <span class="p">}).</span><span class="nx">done</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">data</span><span class="p">,</span> <span class="nx">textStatus</span><span class="p">,</span> <span class="nx">jqXHR</span><span class="p">)</span> <span class="p">{</span>
+            <span class="kd">var</span> <span class="nx">formData</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">FormData</span><span class="p">();</span> <span class="c1">// (3)</span>
+            <span class="nx">formData</span><span class="p">.</span><span class="nx">append</span><span class="p">(</span><span class="s1">&#39;key&#39;</span><span class="p">,</span> <span class="nx">data</span><span class="p">.</span><span class="nx">objectKey</span><span class="p">);</span>
+            <span class="nx">formData</span><span class="p">.</span><span class="nx">append</span><span class="p">(</span><span class="s1">&#39;x-amz-credential&#39;</span><span class="p">,</span> <span class="nx">data</span><span class="p">.</span><span class="nx">credential</span><span class="p">);</span>
+            <span class="nx">formData</span><span class="p">.</span><span class="nx">append</span><span class="p">(</span><span class="s1">&#39;acl&#39;</span><span class="p">,</span> <span class="nx">data</span><span class="p">.</span><span class="nx">acl</span><span class="p">);</span>
+            <span class="nx">formData</span><span class="p">.</span><span class="nx">append</span><span class="p">(</span><span class="s1">&#39;x-amz-security-token&#39;</span><span class="p">,</span> <span class="nx">data</span><span class="p">.</span><span class="nx">securityToken</span><span class="p">);</span>
+            <span class="nx">formData</span><span class="p">.</span><span class="nx">append</span><span class="p">(</span><span class="s1">&#39;x-amz-algorithm&#39;</span><span class="p">,</span> <span class="nx">data</span><span class="p">.</span><span class="nx">algorithm</span><span class="p">);</span>
+            <span class="nx">formData</span><span class="p">.</span><span class="nx">append</span><span class="p">(</span><span class="s1">&#39;x-amz-date&#39;</span><span class="p">,</span> <span class="nx">data</span><span class="p">.</span><span class="nx">date</span><span class="p">);</span>
+            <span class="nx">formData</span><span class="p">.</span><span class="nx">append</span><span class="p">(</span><span class="s1">&#39;x-amz-meta-filename&#39;</span><span class="p">,</span> <span class="nx">data</span><span class="p">.</span><span class="nx">rawFileName</span><span class="p">);</span>
+            <span class="nx">formData</span><span class="p">.</span><span class="nx">append</span><span class="p">(</span><span class="s1">&#39;policy&#39;</span><span class="p">,</span> <span class="nx">data</span><span class="p">.</span><span class="nx">policy</span><span class="p">);</span>
+            <span class="nx">formData</span><span class="p">.</span><span class="nx">append</span><span class="p">(</span><span class="s1">&#39;x-amz-signature&#39;</span><span class="p">,</span> <span class="nx">data</span><span class="p">.</span><span class="nx">signature</span><span class="p">);</span>
+            <span class="nx">formData</span><span class="p">.</span><span class="nx">append</span><span class="p">(</span><span class="s1">&#39;file&#39;</span><span class="p">,</span> <span class="nx">file</span><span class="p">);</span>
+
+            <span class="nx">$</span><span class="p">.</span><span class="nx">ajax</span><span class="p">({</span> <span class="c1">// (4)</span>
+                <span class="nx">url</span><span class="o">:</span> <span class="nx">data</span><span class="p">.</span><span class="nx">targetUrl</span><span class="p">,</span>
+                <span class="nx">type</span><span class="o">:</span> <span class="s1">&#39;POST&#39;</span><span class="p">,</span>
+                <span class="nx">data</span><span class="o">:</span> <span class="nx">formData</span><span class="p">,</span>
+                <span class="nx">contentType</span><span class="o">:</span> <span class="kc">false</span><span class="p">,</span>
+                <span class="nx">processData</span><span class="o">:</span> <span class="kc">false</span>
+            <span class="p">}).</span><span class="nx">done</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">data</span><span class="p">,</span> <span class="nx">textStatus</span><span class="p">,</span> <span class="nx">jqXHR</span><span class="p">)</span> <span class="p">{</span>
+                <span class="c1">// omitted</span>
+            <span class="p">}).</span><span class="nx">fail</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">jqXHR</span><span class="p">,</span> <span class="nx">textStatus</span><span class="p">,</span> <span class="nx">errorThrown</span><span class="p">)</span> <span class="p">{</span>
+                <span class="c1">// omitted</span>
+            <span class="p">});</span>
+        <span class="p">}).</span><span class="nx">fail</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">jqXHR</span><span class="p">,</span> <span class="nx">textStatus</span><span class="p">,</span> <span class="nx">errorThrown</span><span class="p">)</span> <span class="p">{</span>
+            <span class="c1">// omitted</span>
+        <span class="p">});</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="c1">// omitted</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="kc">false</span><span class="p">;</span>
+<span class="p">});</span>
+</pre></div>
+</div>
+<table border="1" class="docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">選択されたファイルを取得する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(2)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">ajaxメソッドを使用し、サーバサイドアプリケーションに対してGETリクエストを発行する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(3)</div>
+</div>
+</td>
+<td><div class="first line-block">
+<div class="line">GETに対するレスポンスとして、ダイレクトアップロードに使用する認証情報等を受け取った後、ダイレクトアップロード用のリクエストを作成する。</div>
+<div class="line">フォームを作成し、サーバサイドから受け取った情報をリクエストボディに格納する。</div>
+<div class="line">フォームのフィールドについては、<a class="reference external" href="http://docs.aws.amazon.com/ja_jp/AmazonS3/latest/API/sigv4-HTTPPOSTForms.html#sigv4-HTTPPOSTFormFields">Creating an HTML Form</a>を参照されたい。</div>
+</div>
+<div class="last admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">fileは最後に追加する必要がある為、注意されたい。</p>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(4)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">ajaxメソッドを使用し、S3に対してダイレクトアップロードのPOSTリクエストを発行する。</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</li>
+</ul>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">本実装例では、クライアントサイドでのファイルサイズチェック実装は割愛しているが、
+実開発ではPOSTポリシーとJavaScriptの両方でファイルサイズチェックを行う事が望ましい。</p>
+</div>
+</div>
+<div class="section" id="directuploaderrorhandling">
+<span id="id21"></span><h4><a class="toc-backref" href="#id43">5.4.2.2.4.2. エラーハンドリングについて</a><a class="headerlink" href="#directuploaderrorhandling" title="Permalink to this headline">¶</a></h4>
+<p>S3に対するダイレクトアップロードが失敗した場合、S3からXML形式のエラードキュメントが返却される。
+ファイルサイズ制限超過やポリシー違反など、失敗原因ごとのエラーメッセージを表示したい場合にはこのエラードキュメントからエラーコードを取得する事で、原因の細分化が可能である。</p>
+<p>エラーレスポンスの詳細については、<a class="reference external" href="http://docs.aws.amazon.com/ja_jp/AmazonS3/latest/dev/UsingRESTError.html">REST エラーレスポンス</a>を参照されたい。</p>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="DownloadFileManagement.html" title="5.4.3. ダウンロードファイル管理"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="UploadFileManagement.html" title="5.4.1. アップロードファイル管理"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Macchinetta Server Framework Cloud Extension Development Guideline 1.0.1.RELEASE documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >5. AWS連携</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" >5.4. ファイル管理</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2018 NTT Corporation.
+    Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.5.3.Theme by <a href="http://github.com/vkvn">vkvn</a>
+    </div>
+    
+    <script>
+     
+     $(function() {
+    	   var $sidebar	= $('.sphinxsidebar'),
+    		     $window		= $(window),
+    		     offset		= $sidebar.offset(),
+    		     topPadding	= 3,
+    		     $scroll		= $('#scroll');
+    	   
+    	   $window.scroll(function() {
+    		     if ($scroll.is(':checked')) {
+				         if ($window.scrollTop() > offset.top) {
+					           $sidebar.stop().animate({
+						             marginTop:$window.scrollTop() - offset.top + topPadding
+					           });
+				         } else {
+					           $sidebar.stop().animate({
+						             marginTop:0
+					           });
+				         }
+			       }
+		     });
+    	   
+    	   var $navList = $('ul:first', $sidebar);
+    	   $('li:first', $navList).addClass('open');
+    	   
+    	   $navList.treeview({
+    		     persist: "location",
+    		     collapsed: true,
+    		     unique: false
+    	   });
+    	   
+	   });
+    </script>
+    
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-113850349-4"></script>
+    <script>
+     window.dataLayer = window.dataLayer || [];
+     function gtag(){dataLayer.push(arguments);}
+     gtag('js', new Date());
+
+     gtag('config', 'UA-113850349-4');
+    </script>
+  </body>
+</html>

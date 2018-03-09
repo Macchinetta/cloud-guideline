@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>5.6.2. 非同期処理の実装（優先順位の設定） &#8212; Macchinetta Server Framework Cloud Extension Development Guideline 1.0.1.RELEASE documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/solar.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1.0.1.RELEASE',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="5.7. メール送信" href="../MailSending.html" />
+    <link rel="prev" title="5.6.1. 非同期処理の実装（共通編）" href="AsynchronousProcessing.html" /><script src="../../_static/jquery.treeview.js" type="text/javascript"></script>
+<!-- <link href='http://fonts.googleapis.com/css?family=Source+Code+Pro|Open+Sans:300italic,400italic,700italic,400,300,700' rel='stylesheet' type='text/css'> -->
+<link href="../../_static/solarized-dark.css" rel="stylesheet">
+<link href="../../_static/jquery.treeview.css" rel="stylesheet">
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../MailSending.html" title="5.7. メール送信"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="AsynchronousProcessing.html" title="5.6.1. 非同期処理の実装（共通編）"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Macchinetta Server Framework Cloud Extension Development Guideline 1.0.1.RELEASE documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >5. AWS連携</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" accesskey="U">5.6. キューイング活用</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><label><input id="scroll" type="checkbox"> scroll sidebar</label>
+
+  <h3><a href="../../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">5.6.2. 非同期処理の実装（優先順位の設定）</a><ul>
+<li><a class="reference internal" href="#overview">5.6.2.1. Overview</a><ul>
+<li><a class="reference internal" href="#aws">5.6.2.1.1. AWS上での構成</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#how-to-use">5.6.2.2. How to use</a><ul>
+<li><a class="reference internal" href="#amazon-sqs">5.6.2.2.1. Amazon SQSの設定</a><ul>
+<li><a class="reference internal" href="#id3">5.6.2.2.1.1. キューの作成</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id4">5.6.2.2.2. メッセージの送受信に共通する設定</a></li>
+<li><a class="reference internal" href="#id5">5.6.2.2.3. メッセージを同期送信する方法</a><ul>
+<li><a class="reference internal" href="#id6">5.6.2.2.3.1. 優先順位変更の同期送信</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id7">5.6.2.2.4. メッセージを非同期受信する方法</a><ul>
+<li><a class="reference internal" href="#id8">5.6.2.2.4.1. 優先順位変更の非同期受信</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#appendix">5.6.2.3. Appendix</a><ul>
+<li><a class="reference internal" href="#id9">5.6.2.3.1. 遅延キュー設定</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="AsynchronousProcessing.html"
+                        title="previous chapter">5.6.1. 非同期処理の実装（共通編）</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../MailSending.html"
+                        title="next chapter">5.7. メール送信</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/AWSCollaboration/Queuing/PriorityQueue.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="id1">
+<h1>5.6.2. 非同期処理の実装（優先順位の設定）<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h1>
+<div class="contents local topic" id="id2">
+<p class="topic-title first">目次</p>
+<ul class="simple">
+<li><a class="reference internal" href="#overview" id="id11">Overview</a><ul>
+<li><a class="reference internal" href="#aws" id="id12">AWS上での構成</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#how-to-use" id="id13">How to use</a><ul>
+<li><a class="reference internal" href="#amazon-sqs" id="id14">Amazon SQSの設定</a><ul>
+<li><a class="reference internal" href="#id3" id="id15">キューの作成</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id4" id="id16">メッセージの送受信に共通する設定</a></li>
+<li><a class="reference internal" href="#id5" id="id17">メッセージを同期送信する方法</a><ul>
+<li><a class="reference internal" href="#id6" id="id18">優先順位変更の同期送信</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id7" id="id19">メッセージを非同期受信する方法</a><ul>
+<li><a class="reference internal" href="#id8" id="id20">優先順位変更の非同期受信</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#appendix" id="id21">Appendix</a><ul>
+<li><a class="reference internal" href="#id9" id="id22">遅延キュー設定</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="overview">
+<h2><a class="toc-backref" href="#id11">5.6.2.1. Overview</a><a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<div class="line-block">
+<div class="line">本ガイドラインでは、Amazon Simple Queue Service（以下、Amazon SQS）を使用した非同期処理（優先順位の設定）の実装方法について説明する。</div>
+</div>
+<div class="section" id="aws">
+<h3><a class="toc-backref" href="#id12">5.6.2.1.1. AWS上での構成</a><a class="headerlink" href="#aws" title="Permalink to this headline">¶</a></h3>
+<p><a class="reference internal" href="../../ImplementationAtEachLayer/Queuing/PriorityQueue.html"><span class="doc">非同期実行（優先順位の設定）</span></a> に則って、AWS上では以下の構成とする。</p>
+<div class="figure">
+<a class="reference internal image-reference" href="../../_images/PriorityQueue.png"><img alt="Screen image of asynchronous processing." src="../../_images/PriorityQueue.png" style="width: 100%;" /></a>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">優先順位に応じたキューを2つ用意し、処理能力の違うバックサーバ2つで処理することを前提として説明を進める。</p>
+</div>
+</div>
+</div>
+<div class="section" id="how-to-use">
+<h2><a class="toc-backref" href="#id13">5.6.2.2. How to use</a><a class="headerlink" href="#how-to-use" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="amazon-sqs">
+<h3><a class="toc-backref" href="#id14">5.6.2.2.1. Amazon SQSの設定</a><a class="headerlink" href="#amazon-sqs" title="Permalink to this headline">¶</a></h3>
+<p>Amazon SQSを使用する為に必要な設定について説明する。</p>
+<div class="section" id="id3">
+<h4><a class="toc-backref" href="#id15">5.6.2.2.1.1. キューの作成</a><a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h4>
+<div class="line-block">
+<div class="line">優先順位の設定を行うために、キューを優先順位の数だけ作成する必要がある。</div>
+<div class="line">本ガイドラインでは、優先度高と優先度低の2つのキューを作成する。</div>
+<div class="line">キューの作成方法については、共通編の<a class="reference internal" href="AsynchronousProcessing.html#creatingqueues"><span class="std std-ref">キューの作成</span></a>を参照されたい。</div>
+</div>
+</div>
+</div>
+<div class="section" id="id4">
+<h3><a class="toc-backref" href="#id16">5.6.2.2.2. メッセージの送受信に共通する設定</a><a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<p>メッセージの送受信に共通する設定については、共通編の<a class="reference internal" href="AsynchronousProcessing.html#sqshowtouseenviromentsetting"><span class="std std-ref">メッセージの送受信に共通する設定</span></a>を参照されたい。</p>
+</div>
+<div class="section" id="id5">
+<h3><a class="toc-backref" href="#id17">5.6.2.2.3. メッセージを同期送信する方法</a><a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
+<p>優先順位の設定を行う場合に、クライアントからAmazon SQSキューへメッセージを同期送信する方法を説明する。
+共通的な同期送信の方法については、共通編の<a class="reference internal" href="AsynchronousProcessing.html#sqshowtousesyncsendmessage"><span class="std std-ref">メッセージを同期送信する方法</span></a>を参照されたい。</p>
+<div class="section" id="id6">
+<h4><a class="toc-backref" href="#id18">5.6.2.2.3.1. 優先順位変更の同期送信</a><a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h4>
+<div class="line-block">
+<div class="line"><a class="reference internal" href="AsynchronousProcessing.html#sqshowtousesettingforsyncsend"><span class="std std-ref">基本的な同期送信</span></a>に基づいて優先順位を使用したキューへのメッセージ同期送信の振り分けを行う実装例を紹介する。</div>
+</div>
+<ul>
+<li><p class="first">優先順位を使用したキューへのメッセージ同期送信の振り分け実装</p>
+<p>実装例を以下に示す。</p>
+<ul class="simple">
+<li>PriorityQueueMessageSendServiceImpl.java</li>
+</ul>
+<blockquote>
+<div><div class="highlight-java"><div class="highlight"><pre><span></span><span class="kn">package</span> <span class="nn">com.example.xxx.domain.service.message</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">java.util.UUID</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">javax.inject.Inject</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">org.springframework.beans.factory.annotation.Value</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.jms.core.JmsMessagingTemplate</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.stereotype.Service</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">com.example.xxx.domain.model.FTMessage</span><span class="o">;</span>
+
+<span class="nd">@Service</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">PriorityQueueMessageSendServiceImpl</span> <span class="kd">implements</span>
+                                                 <span class="n">PriorityQueueMessageSendService</span> <span class="o">{</span>
+
+    <span class="nd">@Inject</span>
+    <span class="n">JmsMessagingTemplate</span> <span class="n">jmsMessagingTemplate</span><span class="o">;</span>
+
+    <span class="nd">@Value</span><span class="o">(</span><span class="s">&quot;${app.priority.queue.high.name}&quot;</span><span class="o">)</span>
+    <span class="kd">private</span> <span class="n">String</span> <span class="n">highPriorityQueueName</span><span class="o">;</span>
+
+    <span class="nd">@Value</span><span class="o">(</span><span class="s">&quot;${app.priority.queue.low.name}&quot;</span><span class="o">)</span>
+    <span class="kd">private</span> <span class="n">String</span> <span class="n">lowPriorityQueueName</span><span class="o">;</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="n">String</span> <span class="nf">sendMassage</span><span class="o">(</span><span class="kt">boolean</span> <span class="n">premium</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">String</span> <span class="n">requestId</span> <span class="o">=</span> <span class="n">UUID</span><span class="o">.</span><span class="na">randomUUID</span><span class="o">().</span><span class="na">toString</span><span class="o">();</span>
+
+        <span class="c1">// (1)</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">premium</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">jmsMessagingTemplate</span><span class="o">.</span><span class="na">convertAndSend</span><span class="o">(</span><span class="n">highPriorityQueueName</span><span class="o">,</span>
+                    <span class="k">new</span> <span class="n">FTMessage</span><span class="o">(</span><span class="s">&quot;send message with high priority queue&quot;</span><span class="o">,</span> <span class="n">requestId</span><span class="o">));</span>
+        <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+            <span class="n">jmsMessagingTemplate</span><span class="o">.</span><span class="na">convertAndSend</span><span class="o">(</span><span class="n">lowPriorityQueueName</span><span class="o">,</span>
+                    <span class="k">new</span> <span class="n">FTMessage</span><span class="o">(</span><span class="s">&quot;send message with low priority queue&quot;</span><span class="o">,</span> <span class="n">requestId</span><span class="o">));</span>
+        <span class="o">}</span>
+        <span class="k">return</span> <span class="n">requestId</span><span class="o">;</span>
+    <span class="o">}</span>
+
+<span class="o">}</span>
+</pre></div>
+</div>
+<table border="1" class="docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">優先度を判別して、優先順位に応じたキューへ <code class="docutils literal"><span class="pre">JmsMessagingTemplate</span></code>の<code class="docutils literal"><span class="pre">convertAndSend</span></code>メソッドを使用してメッセージを送信する。</div>
+<div class="line">実装例では、ユーザがプレミアム会員の場合に優先度高のキュー名を指定してメッセージを送信し、プレミアム会員でない場合に優先度低のキュー名を指定してメッセージを送信する。</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="id7">
+<h3><a class="toc-backref" href="#id19">5.6.2.2.4. メッセージを非同期受信する方法</a><a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h3>
+<p>優先順位の設定を行う場合に、Amazon SQSキューからメッセージを非同期受信する方法を説明する。
+共通的な非同期受信方法については、共通編の<a class="reference internal" href="AsynchronousProcessing.html#sqshowtouseasyncreceivemessage"><span class="std std-ref">メッセージを非同期受信する方法</span></a>を参照されたい。</p>
+<div class="section" id="id8">
+<h4><a class="toc-backref" href="#id20">5.6.2.2.4.1. 優先順位変更の非同期受信</a><a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h4>
+<div class="line-block">
+<div class="line"><a class="reference internal" href="AsynchronousProcessing.html#sqshowtousesettingforasyncreceive"><span class="std std-ref">基本的な非同期受信</span></a>に基づいて優先順位を使用したキューへのメッセージ非同期受信の実装例を紹介する。</div>
+</div>
+<ul class="simple">
+<li>優先順位を使用したリスナークラスの実装</li>
+</ul>
+<blockquote>
+<div><p>実装例を以下に示す。</p>
+<ul class="simple">
+<li>HighPriorityQueueListener.java</li>
+</ul>
+<blockquote>
+<div><div class="highlight-java"><div class="highlight"><pre><span></span><span class="kn">package</span> <span class="nn">com.example.xxx.app.listener</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">javax.inject.Inject</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">org.slf4j.Logger</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.slf4j.LoggerFactory</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.beans.factory.annotation.Value</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.context.annotation.Profile</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.jms.annotation.JmsListener</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.jms.support.JmsHeaders</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.messaging.handler.annotation.Header</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.stereotype.Component</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">com.example.xxx.app.common.handler.JmsErrorHandler</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">com.example.xxx.domain.common.exception.DuplicateReceivingException</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">com.example.xxx.domain.common.logging.LogMessages</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">com.example.xxx.domain.model.FTMessage</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">com.example.xxx.domain.service.message.MessageService</span><span class="o">;</span>
+
+
+<span class="nd">@Component</span>
+<span class="nd">@Profile</span><span class="o">(</span><span class="s">&quot;high-priority-queue&quot;</span><span class="o">)</span> <span class="c1">// (1)</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">HighPriorityQueueListener</span> <span class="o">{</span>
+
+    <span class="c1">// omitted</span>
+
+    <span class="nd">@Inject</span>
+    <span class="n">MessageService</span> <span class="n">messageService</span><span class="o">;</span>
+
+    <span class="nd">@Value</span><span class="o">(</span><span class="s">&quot;${app.priority.queue.high.name}&quot;</span><span class="o">)</span>
+    <span class="n">String</span> <span class="n">queueName</span><span class="o">;</span>
+
+    <span class="nd">@JmsListener</span><span class="o">(</span><span class="n">destination</span> <span class="o">=</span> <span class="s">&quot;${app.priority.queue.high.name}&quot;</span><span class="o">,</span> <span class="n">concurrency</span> <span class="o">=</span> <span class="s">&quot;${app.priority.queue.high.concurrency}&quot;</span><span class="o">)</span> <span class="c1">// (2)</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">receive</span><span class="o">(</span><span class="n">FTMessage</span> <span class="n">ftMessage</span><span class="o">,</span>
+            <span class="nd">@Header</span><span class="o">(</span><span class="n">JmsHeaders</span><span class="o">.</span><span class="na">MESSAGE_ID</span><span class="o">)</span> <span class="n">String</span> <span class="n">messageId</span><span class="o">)</span> <span class="o">{</span>
+
+        <span class="k">try</span> <span class="o">{</span>
+            <span class="c1">// omitted</span>
+            <span class="n">messageService</span><span class="o">.</span><span class="na">processMessage</span><span class="o">(</span><span class="n">ftMessage</span><span class="o">,</span> <span class="n">messageId</span><span class="o">,</span>
+                    <span class="n">queueName</span><span class="o">);</span>
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">DuplicateReceivingException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">return</span><span class="o">;</span> <span class="c1">// (3)</span>
+        <span class="o">}</span>
+        <span class="c1">// omitted</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+<table border="1" class="docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">同一アプリケーション内でリスナーを実装した場合に、優先順位に応じた処理能力毎にバッチサーバ上で起動を行うため、<code class="docutils literal"><span class="pre">&#64;Profile</span></code>を付与して起動を制御する。</div>
+<div class="line">サーバ起動時に<code class="docutils literal"><span class="pre">-Dspring.profiles.active=high-priority-queue</span></code>を指定して使用する対象のリスナのみ稼動させる。</div>
+<div class="line">実装例では優先順位の高いキューを指定したサンプルとなっているが、優先順位の低いキューを指定する場合は適宣読み替えて実装する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(2)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">非同期受信用のメソッドに対し&#64;JmsListenerアノテーションを設定する。</div>
+<div class="line">destination属性には、受信先のキュー名を指定する。</div>
+<div class="line">concurrency属性には、リスナーメソッドの並列数の下限・上限を指定する。</div>
+<div class="line">実装例では優先順位の高いキューを指定したサンプルとなっているが、優先順位の低いキューを指定する場合は適宣読み替えて実装する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(3)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">一意性制約違反によって発生する<code class="docutils literal"><span class="pre">DuplicateReceivingException</span></code>をcatchする。</div>
+<div class="line">リスナの処理結果として、2重受信の場合に正常応答を返却するため例外をスローしない。</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+</div></blockquote>
+</div>
+</div>
+</div>
+<div class="section" id="appendix">
+<h2><a class="toc-backref" href="#id21">5.6.2.3. Appendix</a><a class="headerlink" href="#appendix" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id9">
+<h3><a class="toc-backref" href="#id22">5.6.2.3.1. 遅延キュー設定</a><a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h3>
+<div class="line-block">
+<div class="line">優先順位低のバッチ処理に遅延キューを使用して処理開始時間を遅延させることで、優先順位高と優先順位低の差をさらに明確にすることができる。</div>
+<div class="line">遅延キューの作成方法は、<a class="reference external" href="http://docs.aws.amazon.com/ja_jp/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-delay-queues.html">Amazon SQS 遅延キュー</a> を参照されたい。を参照されたい。</div>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../MailSending.html" title="5.7. メール送信"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="AsynchronousProcessing.html" title="5.6.1. 非同期処理の実装（共通編）"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Macchinetta Server Framework Cloud Extension Development Guideline 1.0.1.RELEASE documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >5. AWS連携</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" >5.6. キューイング活用</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2018 NTT Corporation.
+    Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.5.3.Theme by <a href="http://github.com/vkvn">vkvn</a>
+    </div>
+    
+    <script>
+     
+     $(function() {
+    	   var $sidebar	= $('.sphinxsidebar'),
+    		     $window		= $(window),
+    		     offset		= $sidebar.offset(),
+    		     topPadding	= 3,
+    		     $scroll		= $('#scroll');
+    	   
+    	   $window.scroll(function() {
+    		     if ($scroll.is(':checked')) {
+				         if ($window.scrollTop() > offset.top) {
+					           $sidebar.stop().animate({
+						             marginTop:$window.scrollTop() - offset.top + topPadding
+					           });
+				         } else {
+					           $sidebar.stop().animate({
+						             marginTop:0
+					           });
+				         }
+			       }
+		     });
+    	   
+    	   var $navList = $('ul:first', $sidebar);
+    	   $('li:first', $navList).addClass('open');
+    	   
+    	   $navList.treeview({
+    		     persist: "location",
+    		     collapsed: true,
+    		     unique: false
+    	   });
+    	   
+	   });
+    </script>
+    
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-113850349-4"></script>
+    <script>
+     window.dataLayer = window.dataLayer || [];
+     function gtag(){dataLayer.push(arguments);}
+     gtag('js', new Date());
+
+     gtag('config', 'UA-113850349-4');
+    </script>
+  </body>
+</html>
