@@ -176,7 +176,7 @@ PutObjectのみを許可するポリシーの例を以下に示す。
                   "s3:PutObject"
               ],
               "Resource": [
-                  "arn:aws:s3:::direct.upload/*"
+                  "arn:aws:s3:::direct-upload/*"
               ]
           }
       ]
@@ -682,7 +682,7 @@ Controllerの実装
   .. code-block:: yaml
 
         upload:
-          bucketName: direct.upload  #(1)
+          bucketName: direct-upload  #(1)
           roleName: s3-direct  #(2)
           roleSessionName: s3-direct01  #(3)
           durationseconds: 30  #(4)
@@ -743,37 +743,53 @@ JavaScriptの実装
     $("#uploadFile").on('click', function(){
         var file = $('#file').prop('files')[0]; // (1)
 
-        if (file) {
-            var fileName = file.name;
+        var getAjax = function () {
+            var uploadFileName = file.name;
+            var dfd = new $.Deferred();
 
             $.ajax({ // (2)
-                url: '${pageContext.request.contextPath}/upload?info&filename=' + fileName,
+                url: '${pageContext.request.contextPath}/upload?info&filename=' + uploadFileName,
                 type: 'GET'
-            }).done(function(data, textStatus, jqXHR) {
-                var formData = new FormData(); // (3)
-                formData.append('key', data.objectKey);
-                formData.append('x-amz-credential', data.credential);
-                formData.append('acl', data.acl);
-                formData.append('x-amz-security-token', data.securityToken);
-                formData.append('x-amz-algorithm', data.algorithm);
-                formData.append('x-amz-date', data.date);
-                formData.append('x-amz-meta-filename', data.rawFileName);
-                formData.append('policy', data.policy);
-                formData.append('x-amz-signature', data.signature);
-                formData.append('file', file);
+            }).then(function(data) {
+                // omitted
+            }).catch(function(jqXHR, textStatus, errorThrown) {
+                // omitted
+            });
+            return dfd.promise();
+        }
 
-                $.ajax({ // (4)
-                    url: data.targetUrl,
-                    type: 'POST',
-                    data: formData,
-                    contentType: false,
-                    processData: false
-                }).done(function(data, textStatus, jqXHR) {
-                    // omitted
-                }).fail(function(jqXHR, textStatus, errorThrown) {
-                    // omitted
-                });
-            }).fail(function(jqXHR, textStatus, errorThrown) {
+        var postAjax = function (getresult) {
+            var dfd = new $.Deferred();
+            var formData = new FormData(); // (3)
+            formData.append('key', getresult.objectKey);
+            formData.append('x-amz-credential', getresult.credential);
+            formData.append('acl', getresult.acl);
+            formData.append('x-amz-security-token',getresult.securityToken);
+            formData.append('x-amz-algorithm', getresult.algorithm);
+            formData.append('x-amz-date', getresult.date);
+            formData.append('x-amz-meta-filename', getresult.rawFileName);
+            formData.append('policy', getresult.policy);
+            formData.append('x-amz-signature', getresult.signature);
+            formData.append('file',file);
+
+            $.ajax({ // (4)
+                url: getresult.targetUrl,
+                type: 'POST',
+                data: formData,
+                contentType: false,
+                processData: false
+            }).then(function(data, textStatus, jqXHR) {
+                // omitted
+            }).catch(function(jqXHR, textStatus, errorThrown) {
+                // omitted
+            });
+            return dfd.promise();
+        }
+
+        if (file) {
+            getAjax()
+            .then(postAjax)
+            .catch(function(jqXHR, textStatus, errorThrown, getresult) {
                 // omitted
             });
         } else {

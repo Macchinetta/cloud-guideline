@@ -81,7 +81,7 @@ How to use
 Config Serverの構築
 """"""""""""""""""""""""""""""""
 Spring Frameworkから提供されている「Spring Cloud Config Server」機能を使用した、環境依存値の一元管理方法について説明する。
-「Spring Cloud Config Server」の構築の詳細については、\ `公式リファレンスの"Spring Cloud Config Server" <http://cloud.spring.io/spring-cloud-static/spring-cloud-config/1.3.3.RELEASE/single/spring-cloud-config.html>`_\ を参照されたい。
+「Spring Cloud Config Server」の構築の詳細については、\ `公式リファレンスの"Spring Cloud Config Server" <http://cloud.spring.io/spring-cloud-static/spring-cloud-config/2.0.1.RELEASE/single/spring-cloud-config.html>`_\ を参照されたい。
 
 pom.xmlで必要なjarを設定する。
 
@@ -223,7 +223,7 @@ Config Clientとなるアプリケーションに、以下の設定を行う。
 
     # upload directories
       upload:
-        bucketName: xxx.upload.private.dev #(1)
+        bucketName: xxx-upload-private-dev #(1)
         temporaryDirectory: tmp/
         saveDirectory: save/
 
@@ -234,7 +234,7 @@ Config Clientとなるアプリケーションに、以下の設定を行う。
 
     # upload directories
       upload:
-        bucketName: xxx.upload.private.production #(2)
+        bucketName: xxx-upload-private-production #(2)
         temporaryDirectory: tmp/
         saveDirectory: save/
 
@@ -590,7 +590,7 @@ configプロジェクトの作成
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 configプロジェクトの構成について説明する。
-Spring Bootプロジェクトについては、\ `公式リファレンスの"Using Spring Boot" <http://docs.spring.io/spring-boot/docs/1.5.7.RELEASE/reference/htmlsingle/#using-boot>`_\ を参照されたい。
+Spring Bootプロジェクトについては、\ `公式リファレンスの"Using Spring Boot" <https://docs.spring.io/spring-boot/docs/2.0.4.RELEASE/reference/htmlsingle/#using-boot>`_\ を参照されたい。
 
 .. code-block:: console
 
@@ -658,7 +658,6 @@ Spring Bootプロジェクトについては、\ `公式リファレンスの"Us
            <dependency>
                <groupId>org.springframework.cloud</groupId>
                <artifactId>spring-cloud-config-server</artifactId>
-               <version>1.2.3.RELEASE</version>
            </dependency>
            <dependency>
                <groupId>org.springframework.boot</groupId>

@@ -118,7 +118,7 @@ Spring JMSを使用したAmazon SQSの利用
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 | Spring Frameworkが提供するSpring JMSライブラリ経由でSQSを利用する方法について説明する。
-| Spring JMSについては、|base_framework_name| のガイドライン\ `Spring Frameworkのコンポーネントを使用したJMSの利用 <https://macchinetta.github.io/server-guideline/1.5.1.RELEASE/ja/ArchitectureInDetail/MessagingDetail/JMS.html#spring-frameworkjms>`_\に詳しい利用法が記されている為、参照されたい。
+| Spring JMSについては、|base_framework_name| のガイドライン\ `Spring Frameworkのコンポーネントを使用したJMSの利用 <https://macchinetta.github.io/server-guideline/1.6.0.RELEASE/ja/ArchitectureInDetail/MessagingDetail/JMS.html#spring-frameworkjms>`_\に詳しい利用法が記されている為、参照されたい。
 
 .. note::
 
@@ -268,6 +268,7 @@ Amazon Web Serviceのコンソール、またはクエリAPIから、アプリ�
          <dependency>
              <groupId>org.springframework</groupId>
              <artifactId>spring-jms</artifactId>
+             <version>4.3.14.RELEASE</version>
          </dependency>
 
          <!-- (2) -->
@@ -288,7 +289,7 @@ Amazon Web Serviceのコンソール、またはクエリAPIから、アプリ�
        - 説明
      * - | (1)
        - | Spring Frameworkが提供する\ ``spring-jms``\ をdependenciesに追加する。
-         | バージョンはSpring IO Platformによって定義されているため、pom.xmlで指定しなくてよい。
+         | Amazon SQSはJMS1.1をサポートしているため、バージョンはJMS1.1に対応する4.3.14.RELEASEを指定する。
      * - | (2)
        - | JMSプロバイダとして、Amazon SQSのJMSインタフェース \ ``amazon-sqs-java-messaging-lib``\ をdependenciesに追加する。
 
@@ -338,7 +339,7 @@ ConnectionFactoryの設定
 
  .. note:: **ConnectionFactoryの定義方法について**
 
-  |base_framework_name| のガイドライン\ `ConnectionFactoryの設定 <https://macchinetta.github.io/server-guideline/1.5.1.RELEASE/ja/ArchitectureInDetail/MessagingDetail/JMS.html#connectionfactory>`_\ では、
+  |base_framework_name| のガイドライン\ `ConnectionFactoryの設定 <https://macchinetta.github.io/server-guideline/1.6.0.RELEASE/ja/ArchitectureInDetail/MessagingDetail/JMS.html#connectionfactory>`_\ では、
   Bean定義ファイルがアプリケーションサーバ提供のJMSプロバイダ依存となることを防ぐため、\ ``ConnectionFactory``\ をアプリケーションサーバ側にて定義することを推奨しているが、
   本ガイドラインで紹介しているケースにおいては、JMSプロバイダはクラウドベンダー提供のライブラリを使用する為、アプリケーションサーバ側に定義する必要性は低い。
 
@@ -366,7 +367,7 @@ Spring JMSは、JMSプロバイダによる解決を行う \ ``DynamicDestinatio
 
 | クライアントからAmazon SQSキューへメッセージを同期送信する方法を説明する。
 
-本ガイドラインでは、|base_framework_name| のガイドライン \ `メッセージを同期送信する方法 <https://macchinetta.github.io/server-guideline/1.5.1.RELEASE/ja/ArchitectureInDetail/MessagingDetail/JMS.html#jmshowtousesyncsendmessage>`_\ との差分について重点的に紹介している為、
+本ガイドラインでは、|base_framework_name| のガイドライン \ `メッセージを同期送信する方法 <https://macchinetta.github.io/server-guideline/1.6.0.RELEASE/ja/ArchitectureInDetail/MessagingDetail/JMS.html#jmshowtousesyncsendmessage>`_\ との差分について重点的に紹介している為、
 本ガイドラインと併せて、|base_framework_name| のガイドラインも参照されたい。
 
 .. _SQSHowToUseSettingForSyncSend:
@@ -418,12 +419,12 @@ Spring JMSは、JMSプロバイダによる解決を行う \ ``DynamicDestinatio
   デフォルト設定のまま使用する場合は、Bean定義は不要である。
 
 
-なお、\ ``JmsTemplate``\ の設定については、|base_framework_name| のガイドライン\ `メッセージを同期送信する方法 <https://macchinetta.github.io/server-guideline/1.5.1.RELEASE/ja/ArchitectureInDetail/MessagingDetail/JMS.html#jmshowtousesyncsendmessage>`_\に詳しく紹介されている為、必要に応じて参照されたい。
+なお、\ ``JmsTemplate``\ の設定については、|base_framework_name| のガイドライン\ `メッセージを同期送信する方法 <https://macchinetta.github.io/server-guideline/1.6.0.RELEASE/ja/ArchitectureInDetail/MessagingDetail/JMS.html#jmshowtousesyncsendmessage>`_\に詳しく紹介されている為、必要に応じて参照されたい。
 
 - 送信対象のJavaBeanの実装
 
   | フロントサーバ、バックサーバの両アプリケーションで共用するオブジェクトの為、modelプロジェクトに作成する。
-  | modelの共有についての詳細は、|base_framework_name| のガイドライン \ `プロジェクト構成について <https://macchinetta.github.io/server-guideline/1.5.1.RELEASE/ja/ArchitectureInDetail/MessagingDetail/JMS.html#jmsoverviewaboutprojectconfiguration>`_\を参照されたい。
+  | modelの共有についての詳細は、|base_framework_name| のガイドライン \ `プロジェクト構成について <https://macchinetta.github.io/server-guideline/1.6.0.RELEASE/ja/ArchitectureInDetail/MessagingDetail/JMS.html#jmsoverviewaboutprojectconfiguration>`_\を参照されたい。
 
   実装例を以下に示す。
 
@@ -520,12 +521,12 @@ Spring JMSは、JMSプロバイダによる解決を行う \ ``DynamicDestinatio
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 | Amazon SQSキューからメッセージを非同期受信する方法を説明する。
 
-本ガイドラインでは、|base_framework_name| のガイドライン \ `メッセージを非同期受信する方法 <https://macchinetta.github.io/server-guideline/1.5.1.RELEASE/ja/ArchitectureInDetail/MessagingDetail/JMS.html#jmshowtouseasyncreceivemessage>`_\ との差分について重点的に紹介している為、
+本ガイドラインでは、|base_framework_name| のガイドライン \ `メッセージを非同期受信する方法 <https://macchinetta.github.io/server-guideline/1.6.0.RELEASE/ja/ArchitectureInDetail/MessagingDetail/JMS.html#jmshowtouseasyncreceivemessage>`_\ との差分について重点的に紹介している為、
 本ガイドラインと併せて、|base_framework_name| のガイドラインも参照されたい。
 
 .. warning::
 
-   Amazon SQSはトランザクションをサポートしていない為、|base_framework_name| のガイドライン \ `トランザクション管理 <https://macchinetta.github.io/server-guideline/1.5.1.RELEASE/ja/ArchitectureInDetail/MessagingDetail/JMS.html#jmshowtousetransactionmanagementforasyncreceive>`_\ で紹介されているような、
+   Amazon SQSはトランザクションをサポートしていない為、|base_framework_name| のガイドライン \ `トランザクション管理 <https://macchinetta.github.io/server-guideline/1.6.0.RELEASE/ja/ArchitectureInDetail/MessagingDetail/JMS.html#jmshowtousetransactionmanagementforasyncreceive>`_\ で紹介されているような、
    メッセージングとDBのトランザクションを組み合わせる設計は行えない為、注意が必要である。
 
 .. _SQSHowToUseSettingForAsyncReceive:
@@ -845,7 +846,7 @@ Spring JMSは、JMSプロバイダによる解決を行う \ ``DynamicDestinatio
 | メッセージIDを出力させることで、不規則に出力された場合でも、ログを結びつけることができる。
 | 上記の例だと、3行目と6行目は4,5行目を跨いでいるが、同じリクエストに関するログであることがわかる。
 |
-| このような横断的なログ出力は、MDCを利用することで可能となる。MDCについては、|base_framework_name| のガイドライン\ `MDCの使用 <https://macchinetta.github.io/server-guideline/1.5.1.RELEASE/ja/ArchitectureInDetail/GeneralFuncDetail/Logging.html#mdc>`_\に詳しい利用法が記されている為、参照されたい。
+| このような横断的なログ出力は、MDCを利用することで可能となる。MDCについては、|base_framework_name| のガイドライン\ `MDCの使用 <https://macchinetta.github.io/server-guideline/1.6.0.RELEASE/ja/ArchitectureInDetail/GeneralFuncDetail/Logging.html#mdc>`_\に詳しい利用法が記されている為、参照されたい。
 
 MDCを用いてメッセージIDをログに埋め込む例を以下に示す。
 

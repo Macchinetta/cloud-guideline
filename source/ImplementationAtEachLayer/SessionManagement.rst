@@ -21,7 +21,7 @@ Overview
 セッション外部管理方式
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-セッション外部管理を行うために、\ `Spring Session with Redis <http://docs.spring.io/spring-session/docs/1.3.1.RELEASE/reference/html5/#httpsession-redis>`_\を利用した方式を以下に示す。
+セッション外部管理を行うために、\ `Spring Session with Redis <https://docs.spring.io/spring-session/docs/2.0.5.RELEASE/reference/html5/#httpsession-redis>`_\を利用した方式を以下に示す。
 Redis構成は、ユーザ数（同時セッション数）が後々スケールできるようシャーディングを用いた構成で紹介している。
 
 
@@ -41,19 +41,11 @@ Redis構成は、ユーザ数（同時セッション数）が後々スケール
  * - | (2)
    - | \ ``SessionRepositoryFilter``\はセッションをラップする。
  * - | (3)
-   - | \ `Apache Tiles <https://tiles.apache.org/>`_\ と \ `Tomcat <https://tomcat.apache.org/index.html>`_\ の組み合わせを使用している場合は、\ ``SessionEnforcerFilter``\を使用する必要がある。\ ``SessionEnforcerFilter``\はセッションが存在しない場合は、セッションを作成してリクエストURLにリダイレクトする。セッションが存在する場合は何も実施しない。また、セッションが存在しない場合は、リダイレクトが強制的に発生するため、URLパターンを適切に設定する必要がある。
-     | \ `spring-session/issues/571 <https://github.com/spring-projects/spring-session/issues/571>`_\対応
- * - | (4)
    - | アプリケーションで作成したコントローラからgetSessionメソッドなどで、セッションへのアクセスを行った場合に、ラップ済みのセッションを通じてセッションを取得する。
- * - | (5)
+ * - | (4)
    - | ラップ済みのセッションは、ローカルサーバのキャッシュにセッション情報が存在しない時はRedisから取得する。一度アクセスを行うと、そのリクエストの間はローカルにセッション情報をキャッシュする。シャーディングされたRedisからの取得は、データに対してkeyのhashを計算して、該当するhash slotにアクセスして取得する。
- * - | (6)
+ * - | (5)
    - | レスポンスがコミットされたタイミングでRedisにセッション情報を格納する。
-
-|
-
-.. warning::
-   本ガイドラインで採用しているSpring Session 1.3.1.RELEASEを使用する場合、デフォルトではCookieを用いてセッションIDを参照する\ `CookieHttpSessionStrategy`\ が使用されるが、当該バージョンにはセッションIDを設定したCookieが複数ある場合に、いずれか一つしか採用されない不具合が存在する。そのため、path属性を用いて複数のセッションIDを使い分けるような使い方はできない。詳細はSpring Sessionのissue \ `CookieHttpSessionStrategy should look at all cookies not just the first <https://github.com/spring-projects/spring-session/issues/275>`_\ を参照されたい。
 
 |
 
@@ -93,10 +85,12 @@ Redisへ永続化を行うタイミングで各リクエストで行ったセッ
 
 |
 
+.. _limit_session_management:
+
 制約事項
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
- * セッションの外部管理を行った場合は、「\ `同一セッション内のリクエストの同期化 <https://macchinetta.github.io/server-guideline/1.5.1.RELEASE/ja/ArchitectureInDetail/WebApplicationDetail/SessionManagement.html#id25>`_\ 」のような方法でリクエストを同期化することができないため、セッション情報の完全な同期が必要なケースは、セッションで情報を管理しないこと。
+ * セッションの外部管理を行った場合は、「\ `同一セッション内のリクエストの同期化 <https://macchinetta.github.io/server-guideline/1.6.0.RELEASE/ja/ArchitectureInDetail/WebApplicationDetail/SessionManagement.html#id25>`_\ 」のような方法でリクエストを同期化することができないため、セッション情報の完全な同期が必要なケースは、セッションで情報を管理しないこと。
 
     .. note::
      二重送信防止で、セッションを利用したトランザクショントークンチェックは、トランザクショントークンの変更が即座に同期されないため、リクエストのタイミングに因っては、意図した動作をしないケースが存在する。
@@ -108,11 +102,11 @@ Redisへ永続化を行うタイミングで各リクエストで行ったセッ
  * Spring Session with Redisは、Keyspace Notificationsを使用してセッション生成・破棄イベントをアプリケーションに通知することが出来る。
    イベント通知は全てのアプリケーションサーバに対して行われ、各サーバにおいて\ ``HttpSessionListener``\が実行されるため、\ ``HttpSessionListener``\は冪等に実装する必要がある。
    また、RedisはKeyspace NotificationsがOFFになっているので、破棄イベントを実装する場合はKeyspace NotificationsをONに設定する必要がある。
-   詳細は、\ `SessionDeletedEvent and SessionExpiredEvent <http://docs.spring.io/spring-session/docs/1.3.1.RELEASE/reference/html5/#api-redisoperationssessionrepository-sessiondestroyedevent>`_\ を参照されたい。
+   詳細は、\ `SessionDeletedEvent and SessionExpiredEvent <https://docs.spring.io/spring-session/docs/2.0.5.RELEASE/reference/html5/#api-redisoperationssessionrepository-sessiondestroyedevent>`_\ を参照されたい。
 
 
  * Servlet仕様では、セッションIDを示すHTTP Cookieの名称は、「JSESSIONID」だが、Spring Sessionを使用した場合のデフォルトは「SESSION」となる。
-   変更方法は、\ `Spring Session - Custom Cookie <http://docs.spring.io/spring-session/docs/1.3.1.RELEASE/reference/html5/guides/custom-cookie.html>`_\を参照されたい。
+   変更方法は、\ `Spring Session - Custom Cookie <https://docs.spring.io/spring-session/docs/2.0.5.RELEASE/reference/html5/guides/java-custom-cookie.html>`_\を参照されたい。
 
 |
 
@@ -138,14 +132,14 @@ Redis Clusterを使用したセッションの外部管理を行う場合は、�
 How to use
 --------------------------------------------------------------------------------
 
-\ `Spring Session with Redis <http://docs.spring.io/spring-session/docs/1.3.1.RELEASE/reference/html5/#httpsession-redis>`_\の利用方法を示す。
+\ `Spring Session with Redis <https://docs.spring.io/spring-session/docs/2.0.5.RELEASE/reference/html5/#httpsession-redis>`_\の利用方法を示す。
 
 |
 
 依存ライブラリの追加
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-セッション外部管理では、\ `Spring Session with Redis <http://docs.spring.io/spring-session/docs/1.3.1.RELEASE/reference/html5/#httpsession-redis>`_\を使用するための依存ライブラリを追加する必要がある。
+セッション外部管理では、\ `Spring Session with Redis <https://docs.spring.io/spring-session/docs/2.0.5.RELEASE/reference/html5/#httpsession-redis>`_\を使用するための依存ライブラリを追加する必要がある。
 定義方法は、以下を参照されたい。
 
 - :file:`pom.xml`
@@ -156,12 +150,18 @@ How to use
            <!-- (1) -->
            <dependency>
                    <groupId>org.springframework.session</groupId>
-                   <artifactId>spring-session</artifactId>
+                   <artifactId>spring-session-data-redis</artifactId>
            </dependency>
            <!-- (2) -->
            <dependency>
-                   <groupId>org.springframework.boot</groupId>
-                   <artifactId>spring-boot-starter-data-redis</artifactId>
+                   <groupId>org.springframework.session</groupId>
+                   <artifactId>spring-session-core</artifactId>
+                   <version>2.1.1.RELEASE</version>
+           </dependency>
+           <!-- (3) -->
+           <dependency>
+                   <groupId>redis.clients</groupId>
+                   <artifactId>jedis</artifactId>
            </dependency>
    </dependencies>
 
@@ -174,18 +174,27 @@ How to use
    * - 項番
      - 説明
    * - | (1)
-     - | 依存ライブラリに\ ``spring-session``\を追加する。
+     - | 依存ライブラリに\ ``spring-session-data-redis``\を追加する。
    * - | (2)
-     - | 依存ライブラリに\ ``spring-boot-starter-data-redis``\を追加する。
+     - | 依存ライブラリに\ ``spring-session-core``\を追加する。
+
+       .. note::
+
+        \ ``spring-session-data-redis``\に含まれる\ ``spring-session-core``\の \ ``2.0.5.RELEASE``\には、\ ``spring-security``\と併用した場合に
+        セッションタイムアウトを検知できないバグ が存在しているためバージョンを\ ``2.1.1.RELEASE``\に指定する。
+        詳細については、Spring Sessionの\ `issues#1229 <https://github.com/spring-projects/spring-session/issues/1229>`_\を参照されたい。
+
+   * - | (3)
+     - | 依存ライブラリに\ ``jedis``\を追加する。
 
 |
 
 .. _springSessionRepositoryFilter-label:
 
-Spring Sessionの設定
+Spring Session with Redisの設定
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-セッション外部管理を行うために、\ `Spring Session with Redis <http://docs.spring.io/spring-session/docs/1.3.1.RELEASE/reference/html5/#httpsession-redis>`_\を利用する。
+セッション外部管理を行うために、\ `Spring Session with Redis <https://docs.spring.io/spring-session/docs/2.0.5.RELEASE/reference/html5/#httpsession-redis>`_\を利用する。
 
 - :file:`application.yml`
 
@@ -310,7 +319,7 @@ Spring Sessionの設定
    * - 項番
      - 説明
    * - | (1)
-     - | \ ``DelegatingFilterProxy``\を使用して\ ``springSessionRepositoryFilter``\を登録する。また、セッションが存在しない状態でフィルタを通過する前にエラーが発生した場合にも\ ``springSessionRepositoryFilter``\ が適用されるよう、\ ``dispatcher``\ に\ ``ERROR``\ も設定する。設定については、\ `XML Servlet Container Initialization <http://docs.spring.io/spring-session/docs/1.3.1.RELEASE/reference/html5/guides/httpsession-xml.html#xml-servlet-container-initialization>`_\を参照されたい。
+     - | \ ``DelegatingFilterProxy``\を使用して\ ``springSessionRepositoryFilter``\を登録する。また、セッションが存在しない状態でフィルタを通過する前にエラーが発生した場合にも\ ``springSessionRepositoryFilter``\ が適用されるよう、\ ``dispatcher``\ に\ ``ERROR``\ も設定する。設定については、\ `XML Servlet Container Initialization <https://docs.spring.io/spring-session/docs/2.0.5.RELEASE/reference/html5/guides/xml-jdbc.html#xml-servlet-container-initialization>`_\を参照されたい。
    * - | (2)
      - | セッションタイムアウトの時間は、\ ``RedisHttpSessionConfiguration``\で設定しているので、 \ ``web.xml``\ に \ ``session-timeout``\ 項目があれば、削除する。
 
@@ -326,171 +335,12 @@ Spring Sessionの設定
 
 |
 
-Apache TilesとTomcatの組み合わせでレスポンスにCookieが設定されない問題の対応
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-| Spring Sessionを使用する際に、\ `Apache Tiles <https://tiles.apache.org/>`_\ と \ `Tomcat <https://tomcat.apache.org/index.html>`_\ の組み合わせでアプリケーションを作成している場合に、レスポンスにCookieが設定されない問題に対応する必要がある。
-| この問題に対する詳細は、\ `spring-session/issues/571 <https://github.com/spring-projects/spring-session/issues/571>`_\を参照されたい。
-
-
-
-|
-
-SessionEnforcerFilter の作成および設定
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-SessionEnforcerFilter の作成および設定方法を以下に示す。
-
-- :file:`SessionEnforcerFilter.java`
-
- .. code-block:: java
-
-   public class SessionEnforcerFilter extends OncePerRequestFilter {
-
-      ...
-      
-      private RequestMatcher excludeUseSessionRequestMathcer;
-      
-      public void setRequestMathcer(RequestMatcher excludeUseSessionRequestMathcer) { //(1)
-        this.excludeUseSessionRequestMathcer = excludeUseSessionRequestMathcer;
-      }
-
-      @Override
-      protected void doFilterInternal(HttpServletRequest request, 
-                                      HttpServletResponse response,
-                                      FilterChain chain)
-                                      throws ServletException, IOException {
-         
-         HttpServletRequest httpServletRequest = request;
-         HttpServletResponse httpServletResponse = response;
-
-         if (this.excludeRequestMatcher != null
-                 && this.excludeRequestMatcher.matches(httpServletRequest)) {
-             chain.doFilter(httpServletRequest, response);
-             return;
-         }
-
-         if (httpServletRequest.getRequestedSessionId() == null
-                 && httpServletRequest.getMethod().toUpperCase().equals("GET")) {
-
-             httpServletRequest.getSession(); //(2)
-
-             StringBuilder requestURI = new StringBuilder(httpServletRequest.getRequestURI());
-             if (httpServletRequest.getQueryString() != null) {
-                 requestURI.append("?").append(httpServletRequest.getQueryString());
-             }
-
-             httpServletResponse.sendRedirect(requestURI.toString()); //(3)
-         } else {
-             chain.doFilter(httpServletRequest, response);
-         }
-
-       ...
-
-   }
-
- .. tabularcolumns:: |p{0.10\linewidth}|p{0.90\linewidth}|
- .. list-table::
-   :header-rows: 1
-   :widths: 10 90
-
-   * - 項番
-     - 説明 
-   * - | (1)
-     - | \ ``SessionEnforcerFilter``\ を適用しないpathを設定する。
-   * - | (2)
-     - | セッションIDが送信されず、HTTPリクエストがGETの場合に、 \ ``HttpSession``\を強制的に作成する。セッションIDが不正な場合や、タイムアウトしたセッションは、後続のフィルターで適切な処理を別途行う必要がある。 詳細は、:ref:`Warning <session-management-session-enforcerfilter-label>` を参照されたい。
-   * - | (3)
-     - | リクエストを受け付けたパスでリダイレクト実施する。
-
-|
-
-- :file:`application-context.xml`
-
- .. code-block:: xml
-
-   <!-- (1) -->
-   <bean id="sessionEnforcerFilter"
-       class="com.example.xxx.app.common.session.SessionEnforcerFilter">
-       <!-- (2) -->
-       <property name="excludeRequestMatcher" ref="excludeEnforceSessionRequestMatcher"/>
-   </bean>
-   
-   <!-- (3) -->
-   <bean id="excludeEnforceSessionRequestMatcher"
-       class="org.springframework.security.web.util.matcher.AntPathRequestMatcher">
-       <constructor-arg value="/health/**"/>
-   </bean>
-
-
- .. tabularcolumns:: |p{0.10\linewidth}|p{0.90\linewidth}|
- .. list-table::
-   :header-rows: 1
-   :widths: 10 90
-
-   * - 項番
-     - 説明
-   * - | (1)
-     - | \ ``sessionEnforcerFilter``\を Bean定義する。
-   * - | (2)
-     - | \ ``sessionEnforcerFilter``\ を適用しないパス設定を行ったBeanを\ ``sessionEnforcerFilter``\に設定する。
-   * - | (3)
-     - | \ ``sessionEnforcerFilter``\ を適用しないパス設定をBean定義する。設定例では、 :doc:`./HealthCheck` と併用時に、リダイレクトによって死活監視が正常に実施できなくなることを防止するため、ヘルスチェックURL以外にフィルタを適用する為のURLパターンを設定している。
-
-|
-
-- :file:`web.xml`
-
- .. code-block:: xml
-
-   <!-- (1) -->
-    <filter>
-        <filter-name>sessionEnforcerFilter</filter-name>
-        <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
-    </filter>
-    <filter-mapping>
-        <filter-name>sessionEnforcerFilter</filter-name>
-        <url-pattern>/*</url-pattern>
-        <dispatcher>REQUEST</dispatcher>
-        <dispatcher>ERROR</dispatcher>
-    </filter-mapping>
-
-
- .. tabularcolumns:: |p{0.10\linewidth}|p{0.90\linewidth}|
- .. list-table::
-   :header-rows: 1
-   :widths: 10 90
-
-   * - 項番
-     - 説明
-   * - | (1)
-     - | \ ``sessionEnforcerFilter``\を :ref:`springSessionRepositoryFilter-label` で登録した\ ``springSessionRepositoryFilter``\の直後に登録する。
-     
-|
-
-    .. note::
-
-      本ガイドラインで紹介している\ ``SessionEnforcerFilter``\はセッションが存在しない場合に、セッションを作成してリクエストURLにリダイレクトする実装を行うことで問題に対応している。
-      リダイレクトを強制的に発生させているため、システム要件に応じて使用するURLパターンとリダイレクト先のURL不整合が生じないよう留意する必要がある。
-    
-    .. _session-management-session-enforcerfilter-label:
-
-    .. warning::
-     \ ``SessionEnforcerFilter``\を使用する場合は、セッションIDが不正の場合や、セッションがタイムアウトしている可能性があるため、Spring Securityなどで別途セッションタイムアウト検知、CSRF対策を行うことが必要である。Spring Securityでセッションタイムアウト検知を行う設定方法は、 `無効なセッションを使ったリクエストの検知 <https://macchinetta.github.io/server-guideline/1.5.1.RELEASE/ja/Security/SessionManagement.html#springsecuritysessiondetectinvalidsession>`_ 、CSRF対策を行う設定方法は、`CSRF対策 <https://macchinetta.github.io/server-guideline/1.5.1.RELEASE/ja/Security/CSRF.html>`_ を参照されたい。
-
-.. _spring-data-redis-setting-label:
-
-Spring Data Redisの設定
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-\ ``spring-boot-starter-data-redis``\を使用している為、基本的な設定はAutoConfigurationにて行われる。
-詳細な設定については、Spring Boot Reference Guideの \ `Common application properties <https://docs.spring.io/spring-boot/docs/1.5.7.RELEASE/reference/html/common-application-properties.html#common-application-properties>`_\ の# REDIS (RedisProperties)を参照されたい。
-
-|
-
 .. _session-management-endpoint-label:
 
 エンドポイントの設定
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 エンドポイント設定は、Spring Data Redisの設定にて定義する。
-詳細は、\ `Redis Cluster <http://docs.spring.io/spring-data/redis/docs/1.8.7.RELEASE/reference/html/#cluster>`_\を参照されたい。
+詳細は、\ `Redis Cluster <https://docs.spring.io/spring-data/redis/docs/2.0.9.RELEASE/reference/html/#cluster>`_\を参照されたい。
 
 
 - :file:`application.yml`
@@ -517,7 +367,7 @@ Spring Data Redisの設定
      - 説明
    * - | (1)
      - | \ ``spring.redis.cluster.nodes``\にすべてのノードを追加する。
-         詳細は、\ `Enabling Redis Cluster <http://docs.spring.io/spring-data/redis/docs/1.8.7.RELEASE/reference/html/#_enabling_redis_cluster>`_\を参照されたい。
+         詳細は、\ `Enabling Redis Cluster <https://docs.spring.io/spring-data/redis/docs/2.0.9.RELEASE/reference/html/#_enabling_redis_cluster>`_\を参照されたい。
 
 
 |
@@ -583,7 +433,7 @@ How to extend
 
 HttpSessionListenerを利用する場合の設定方法
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-HttpSessionListenerを使用する場合の設定方法を以下に示す。詳細は、\ `HttpSessionListener <http://docs.spring.io/spring-session/docs/1.3.1.RELEASE/reference/html5/#httpsession-httpsessionlistener>`_\を参照されたい。
+HttpSessionListenerを使用する場合の設定方法を以下に示す。詳細は、\ `HttpSessionListener <https://docs.spring.io/spring-session/docs/2.0.5.RELEASE/reference/html5/#httpsession-httpsessionlistener>`_\を参照されたい。
 
 - :file:`applicationContext.xml`
 
@@ -610,7 +460,7 @@ HttpSessionListenerを使用する場合の設定方法を以下に示す。詳�
 
 TransactionTokenの拡張方法
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-|base_framework_name| Development Guideline `4.5. 二重送信防止 <https://macchinetta.github.io/server-guideline/1.5.1.RELEASE/ja/ArchitectureInDetail/WebApplicationDetail/DoubleSubmitProtection.html#id1>`_ にて説明しているトランザクショントークンチェックについて、共通ライブラリから提供しているトランザクショントークンチェック機能はトークン情報の格納先をセッションとしている。
+|base_framework_name| Development Guideline `4.5. 二重送信防止 <https://macchinetta.github.io/server-guideline/1.6.0.RELEASE/ja/ArchitectureInDetail/WebApplicationDetail/DoubleSubmitProtection.html#id1>`_ にて説明しているトランザクショントークンチェックについて、共通ライブラリから提供しているトランザクショントークンチェック機能はトークン情報の格納先をセッションとしている。
 そのため、Spring Sessionによるセッションの外部管理を行う場合、セッションの同期化を行うことができないことにより二重送信を防止できないケースがある。
 本ガイドラインでは、MyBatis3を使用してトークン情報の格納先をデータベースへ変更する拡張方法について説明する。
 
@@ -811,7 +661,7 @@ TransactionTokenStoreの実装
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 トークン情報の格納を行う\ ``TransactionTokenStore``\インターフェースの実装クラスを作成する。
-実装する各メソッドの役割については、\ `TransactionTokenStore <https://github.com/terasolunaorg/terasoluna-gfw/blob/release/5.4.1.RELEASE/terasoluna-gfw-common-libraries/terasoluna-gfw-web/src/main/java/org/terasoluna/gfw/web/token/transaction/TransactionTokenStore.java>`_\インターフェースを参照のこと。
+実装する各メソッドの役割については、\ `TransactionTokenStore <https://github.com/terasolunaorg/terasoluna-gfw/blob/release/5.5.0.RC7/terasoluna-gfw-common-libraries/terasoluna-gfw-web/src/main/java/org/terasoluna/gfw/web/token/transaction/TransactionTokenStore.java>`_\インターフェースを参照のこと。
 
 - :file:`MyBatisTransactionTokenStore.java`
 
@@ -967,11 +817,11 @@ HttpSessionListenerの実装
 
 アプリケーションでの利用方法
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-本ガイドラインで紹介する拡張方法を使用した場合においても、ControllerやJSPからの利用方法は同一である。詳細は、`トランザクショントークンチェックのControllerでの利用方法 <https://macchinetta.github.io/server-guideline/1.5.1.RELEASE/ja/ArchitectureInDetail/WebApplicationDetail/DoubleSubmitProtection.html#controller>`_ および `トランザクショントークンチェックのView(JSP)での利用方法 <https://macchinetta.github.io/server-guideline/1.5.1.RELEASE/ja/ArchitectureInDetail/WebApplicationDetail/DoubleSubmitProtection.html#view-jsp>`_ を参照されたい。
+本ガイドラインで紹介する拡張方法を使用した場合においても、ControllerやJSPからの利用方法は同一である。詳細は、`トランザクショントークンチェックのControllerでの利用方法 <https://macchinetta.github.io/server-guideline/1.6.0.RELEASE/ja/ArchitectureInDetail/WebApplicationDetail/DoubleSubmitProtection.html#controller>`_ および `トランザクショントークンチェックのView(JSP)での利用方法 <https://macchinetta.github.io/server-guideline/1.6.0.RELEASE/ja/ArchitectureInDetail/WebApplicationDetail/DoubleSubmitProtection.html#view-jsp>`_ を参照されたい。
 
 本ガイドラインでは、アプリケーションから利用するためのBean定義方法について説明する。
 
-|base_framework_name| Development Guideline `4.5.2.3.5. トランザクショントークンチェックを使用するための設定 <https://macchinetta.github.io/server-guideline/1.5.1.RELEASE/ja/ArchitectureInDetail/WebApplicationDetail/DoubleSubmitProtection.html#setting>`_ にて説明している、\ ``HandlerInterceptor``\の設定について、\ ``TransactionTokenInterceptor``\で使用される\ ``TransactionTokenStore``\の実装クラスが作成した\ ``MyBatisTransactionTokenStore``\となるようBean定義を行う。
+|base_framework_name| Development Guideline `4.5.2.3.5. トランザクショントークンチェックを使用するための設定 <https://macchinetta.github.io/server-guideline/1.6.0.RELEASE/ja/ArchitectureInDetail/WebApplicationDetail/DoubleSubmitProtection.html#setting>`_ にて説明している、\ ``HandlerInterceptor``\の設定について、\ ``TransactionTokenInterceptor``\で使用される\ ``TransactionTokenStore``\の実装クラスが作成した\ ``MyBatisTransactionTokenStore``\となるようBean定義を行う。
 
 - :file:`spring-mvc.xml`
 

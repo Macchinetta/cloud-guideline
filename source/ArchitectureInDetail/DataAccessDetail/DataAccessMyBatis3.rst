@@ -159,8 +159,8 @@ How to use
       - データソースの共通情報を設定する(任意設定)。ここで設定した値は、シャードの個別情報の設定値で上書きされる。
 
         全シャード共通のデータソース情報の基本となる設定値。
-        データソースのプロパティキーを設定する。この例では、データソースに Tomcat 8.5 JDBC Connection Pool を使用した場合の設定例を示している。
-        詳細は、`公式サイト <https://tomcat.apache.org/tomcat-8.5-doc/jdbc-pool.html#Common_Attributes>`_ を参照されたい。
+        データソースのプロパティキーを設定する。この例では、データソースに Tomcat 9.0 JDBC Connection Pool を使用した場合の設定例を示している。
+        詳細は、`公式サイト <https://tomcat.apache.org/tomcat-9.0-doc/jdbc-pool.html#Common_Attributes>`_ を参照されたい。
     * - | (2)
       - |default-shard-name| (デフォルトスキーマ)を指定するキーを設定する。(必須)
     * - | (3)
@@ -174,8 +174,8 @@ How to use
     * - | (5)
       - データソースの設定値。
 
-        データソースのプロパティキーを設定する。この例では、データソースに Tomcat 8.5 JDBC Connection Pool を使用した場合の設定例を示している。
-        詳細は、`公式サイト <https://tomcat.apache.org/tomcat-8.5-doc/jdbc-pool.html#Common_Attributes>`_ を参照されたい。
+        データソースのプロパティキーを設定する。この例では、データソースに Tomcat 9.0 JDBC Connection Pool を使用した場合の設定例を示している。
+        詳細は、`公式サイト <https://tomcat.apache.org/tomcat-9.0-doc/jdbc-pool.html#Common_Attributes>`_ を参照されたい。
     * - | (6)
       - maxActiveを30に個別設定する。
 
@@ -1005,11 +1005,11 @@ How to use
             String account = shardAccountHelper.getAccountValue(invocation);
             if (null != account) {
                 // (9)
-                ShardingAccount shardingAccount = accountShardKeyRepository
-                        .findOne(account);
+                Optional<ShardingAccount> shardingAccount = accountShardKeyRepository
+                        .findById(acccount);
                 if (shardingAccount != null) {
                     // (10)
-                    dataSourceKey = shardingAccount.getDataSourceKey();
+                    dataSourceKey = shardingAccount.get().getDataSourceKey();
                 }
             }
             // (11)
@@ -1223,7 +1223,7 @@ How to use
           // (3)
           ShardingAccount shardingAccount = new ShardingAccount();
           // (4)
-          shardingAccount.setUserId(member.getCustomerNo());
+          shardingAccount.setId(member.getCustomerNo());
           // (5)
           shardingAccount.setDataSourceKey(shardKeyResolver.resolveShardKey(member.getCustomerNo()));
           // (6)

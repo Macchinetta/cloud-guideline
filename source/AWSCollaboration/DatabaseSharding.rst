@@ -97,7 +97,7 @@ Spring Data module for DynamoDBの詳細については、 `Spring Data DynamoDB
     <properties>
       ・・・
       <!-- (2) -->
-      <org.springframework.data.dynamodb-dependencies.version>4.5.0</org.springframework.data.dynamodb-dependencies.version>
+      <org.springframework.data.dynamodb-dependencies.version>5.0.3</org.springframework.data.dynamodb-dependencies.version>
       ・・・
     </properties>
 
@@ -255,8 +255,6 @@ Spring Data module for DynamoDBの詳細については、 `Spring Data DynamoDB
 DynamoDBへアクセスする為には、テーブルデータに対応したエンティティクラスとシャードキーリポジトリクラスを作成する。
 以下に、DynamoDBのエンティティクラス\ ``ShardingAccount``\とシャードキーリポジトリクラス\ ``AccountShardKeyRepository``\の実装例を示す。
 
-Spring DataのRepositoryの詳細については、`Spring Data JPA <http://terasolunaorg.github.io/guideline/5.4.1.RELEASE/ja/ArchitectureInDetail/DataAccessDetail/DataAccessJpa.html#repository>`_ を参照されたい。
-
 - エンティティクラス\ ``ShardingAccount``\
 
 .. code-block:: java
@@ -275,7 +273,7 @@ Spring DataのRepositoryの詳細については、`Spring Data JPA <http://tera
     private static final long serialVersionUID = 1L;
     // (2)
     @DynamoDBHashKey(attributeName = "user_id")
-    private String userId;
+    private String id;
     // (3)
     @DynamoDBAttribute(attributeName = "data_source_key")
     private String dataSourceKey;
@@ -317,7 +315,7 @@ Spring DataのRepositoryの詳細については、`Spring Data JPA <http://tera
     // (3)
     @Override
     @Cacheable(key = "'shardid/' + #a0")
-    ShardingAccount findOne(String id);
+    Optional<ShardingAccount> findById(String id);
   }
 
 .. tabularcolumns:: |p{0.10\linewidth}|p{0.90\linewidth}|

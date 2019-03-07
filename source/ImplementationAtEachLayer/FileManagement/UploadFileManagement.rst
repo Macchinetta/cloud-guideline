@@ -15,7 +15,7 @@ Overview
 
     本ガイドラインでは、クラウド環境を利用する場合の留意点のみを説明し、ファイルアップロードを行う機能そのものの実装方法については説明しない。
     
-    ファイルアップロードを行う機能の実装方法については |base_framework_name| Development Guideline `ファイルアップロード <https://macchinetta.github.io/server-guideline/1.5.1.RELEASE/ja/ArchitectureInDetail/WebApplicationDetail/FileUpload.html>`_  を参照されたい。
+    ファイルアップロードを行う機能の実装方法については |base_framework_name| Development Guideline `ファイルアップロード <https://macchinetta.github.io/server-guideline/1.6.0.RELEASE/ja/ArchitectureInDetail/WebApplicationDetail/FileUpload.html>`_  を参照されたい。
 
 仮アップロードファイルの保存
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

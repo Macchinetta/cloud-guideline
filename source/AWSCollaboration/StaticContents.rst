@@ -721,19 +721,6 @@ CDNを使用してプライベートコンテンツを供給する場合に有�
      * - | (1)
        - | CloudFrontの署名付きCookieを生成時に指定してドメイン、及びパスを指定して削除する。
 
-.. note:: **Cookieの削除**
-
-   本ガイドラインでは説明を割愛するが、 \ ``<sec:logout>``\ タグには、ログアウト時に指定したCookieを削除するための\ ``delete-cookies``\ 属性が存在する。
-   ただし、この属性を使用しても正常にCookieが削除できないケースが報告されている。
-
-   詳細はSpring Securityの以下のJIRAを参照されたい。
-
-   * https://jira.spring.io/browse/SEC-2091
-
-   また、サブドメインに対して設定したCookieについても削除ができないため独自のCookieを削除する仕組みを実装する必要がある。
-
-|
-
 
 * CloudFrontの署名付きCookieを生成する為の設定を定義する
 
@@ -753,7 +740,7 @@ CDNを使用してプライベートコンテンツを供給する場合に有�
          # (4)
          cookiePath: /prcd
          # (5)
-         distributionDomain: www.tera-ci.net
+         distributionDomain: www.xxxxxx.net
          # (6)
          privateKeyFilePath: ${user.home}/private-key.der
          # (7)

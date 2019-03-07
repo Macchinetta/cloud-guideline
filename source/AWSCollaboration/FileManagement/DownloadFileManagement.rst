@@ -530,7 +530,7 @@ STSからの認証情報取得
   <head>
   <!-- ommited -->
   <script type="text/javascript"
-      src="${pageContext.request.contextPath}/resources/webjars/jquery/2.1.1/jquery.js"></script>
+      src="${pageContext.request.contextPath}/resources/webjars/jquery/jquery.js"></script>
   </head>
   <body>
   <h1>ダウンロード</h1>
@@ -551,22 +551,20 @@ STSからの認証情報取得
 続いて、JavaScript にて `key` というclass属性にクリックイベントを設定する。
 
  .. code-block:: javascript
- 
+
   $(".key").click(function() { // (1)
       var key = $(this).text(); // (2)
       $.ajax({
           url: '${pageContext.request.contextPath}/download/url?key=' + key, // (2)
-          type: 'GET',
-          success: function(data, status, xhr) { // (2)
-              var url = data.presignedUrl; // (3)
-              var a = document.createElement('a'); // (3)
-              a.download = key;
-              a.href = url;
-              a.click(); // (3)
-          },
-          error: function(xhr, status, error) { // (4)
-              // ommited
-          }
+          type: 'GET'
+      }).then(function(data) { // (2)
+          var url = data.presignedUrl; // (3)
+          var a = document.createElement('a'); // (3)
+          a.download = key;
+          a.href = url;
+          a.click(); // (3)
+      }).catch(function(xhr, status, error) { // (4)
+          // ommited
       });
   });
 

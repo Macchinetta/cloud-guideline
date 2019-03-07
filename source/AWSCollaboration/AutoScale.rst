@@ -106,8 +106,8 @@ How to extend
        @Value("${spring.application.name:autoScalingGroupName}")
        String autoScalingGroupName;
 
-       @Inject
-       CloudWatchMetricProperties cloudWatchMetricProperties;
+       @Value("${cloud.aws.cloudwatch.namespace:}")
+       String namespace;
 
        private AmazonCloudWatch amazonCloudWatch;
 
@@ -151,7 +151,7 @@ How to extend
 
            // (7)
            PutMetricDataRequest request = new PutMetricDataRequest()
-                   .withNamespace(cloudWatchMetricProperties.getNamespace())
+                   .withNamespace(namespace)
                    .withMetricData(
                    // Used
                            new MetricDatum().withDimensions(InstanceIdDimension,

@@ -51,17 +51,19 @@ Overview
 実装方針
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 - レプリカDBへのデータのレプリケーションはRDSのリードレプリカを使用する
+- レプリカDBはマルチAZ配置で構成し、リードレプリカの使用不可時のフェイルオーバーに対応する
 - \ ``spring-cloud-aws-jdbc``\ の仕組みを使用し、トランザクション単位でマスタDBとレプリカDBのデータソースを切り替える
 - レプリカDBにアクセスする場合は、Springの\ ``@Transactional``\アノテーションの属性\ ``readOnly``\を\ ``true``\に設定する
 
 RDSのリードレプリカの詳細は `AWS 公式サイト <https://aws.amazon.com/jp/rds/details/read-replicas/>`_ 、
-Spring Cloud AWSの詳細は `Spring 公式サイト <http://cloud.spring.io/spring-cloud-static/spring-cloud-aws/1.2.1.RELEASE/#_read_replica_configuration>`_ を参照されたい。
+マルチAZ配置によるフェイルオーバーについては `AWS ユーザーガイド <https://docs.aws.amazon.com/ja_jp/AmazonRDS/latest/UserGuide/Concepts.MultiAZ.html>`_、
+Spring Cloud AWSの詳細は `Spring 公式サイト <http://cloud.spring.io/spring-cloud-static/spring-cloud-aws/2.0.0.RELEASE/single/spring-cloud-aws.html#_read_replica_configuration>`_ を参照されたい。
 
 .. warning::
 
-    本ガイドの実装例は障害発生したレプリカDBのデータソースを選択する可能性を回避できない実装になっている。
-    そのため、レプリカDBに障害が発生した場合に障害を回避することができない。
-    本ガイドの実装例を利用する場合、レプリカDBの障害に対して運用面での対処（リードレプリカ復旧手順）を検討する必要がある。
+   本ガイドでは、障害発生時にはマルチAZ配置によるフェイルオーバーにより可用性の確保を行う。
+   マルチAZ配置を行わない場合、フェイルオーバーが発生しないため、障害発生したレプリカDBのデータソースを選択する可能性を回避できない実装になっている。
+   マルチAZ配置を行わない場合には、レプリカDBの障害に対して運用面での対処（リードレプリカ復旧手順）を検討する必要がある。
 
 .. _drr_restrictions:
 
@@ -111,7 +113,7 @@ Spring Cloud AWSを利用してRDSへのアクセスを行うための依存ラ�
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Spring Cloud AWS JDBCを利用してRDSへのアクセスを行うためのBean定義を行う。
-Bean定義の詳細については、 Spring Cloud AWS `Data Access with JDBC <http://cloud.spring.io/spring-cloud-static/spring-cloud-aws/1.2.1.RELEASE/#_data_access_with_jdbc>`_ を参照されたい。
+Bean定義の詳細については、 Spring Cloud AWS `Data Access with JDBC <http://cloud.spring.io/spring-cloud-static/spring-cloud-aws/2.0.0.RELEASE/single/spring-cloud-aws.html#_data_access_with_jdbc>`_ を参照されたい。
 
 - xxx-domain.xml
 
@@ -159,12 +161,12 @@ Bean定義の詳細については、 Spring Cloud AWS `Data Access with JDBC <h
       - | リードレプリカを使用するかどうかを設定する。\ ``true``\ を指定した場合、読み取り専用トランザクションはレプリカDBにルーティングされ、書き込み操作時にはマスタDBにルーティングされる。
     * - | (3)
       - | \ ``jdbc:pool-attributes``\
-      - | データソースのコネクションプールのプロパティを設定することができる。詳細はSpring公式サイト\ `Data source pool configuration <http://cloud.spring.io/spring-cloud-static/spring-cloud-aws/1.2.1.RELEASE/#_data_source_pool_configuration>`_\ を参照されたい。
+      - | データソースのコネクションプールのプロパティを設定することができる。詳細はSpring公式サイト\ `Data source pool configuration <http://cloud.spring.io/spring-cloud-static/spring-cloud-aws/2.0.0.RELEASE/single/spring-cloud-aws.html#_data_source_pool_configuration>`_\ を参照されたい。
 
   .. note::
       \ ``jdbc:data-source``\ 内の設定値はプロパティファイルに書き出して読み込ませることができない。
       環境によって設定値を変更する場合Springのプロファイルの仕組みを使って実現することができる。
-      詳細はSpring公式サイト\ `XML bean definition profiles <https://docs.spring.io/spring/docs/4.3.14.RELEASE/spring-framework-reference/html/beans.html#beans-definition-profiles-xml>`_\ を参照されたい。
+      詳細はSpring公式サイト\ `XML bean definition profiles <https://docs.spring.io/spring/docs/5.0.8.RELEASE/spring-framework-reference/core.html#beans-definition-profiles-xml>`_\ を参照されたい。
 
 .. _rdd_settings_for_using_datasource:
 
