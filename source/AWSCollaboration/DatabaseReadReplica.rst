@@ -57,7 +57,7 @@ Overview
 
 RDSのリードレプリカの詳細は `AWS 公式サイト <https://aws.amazon.com/jp/rds/details/read-replicas/>`_ 、
 マルチAZ配置によるフェイルオーバーについては `AWS ユーザーガイド <https://docs.aws.amazon.com/ja_jp/AmazonRDS/latest/UserGuide/Concepts.MultiAZ.html>`_、
-Spring Cloud AWSの詳細は `Spring 公式サイト <http://cloud.spring.io/spring-cloud-static/spring-cloud-aws/2.0.0.RELEASE/single/spring-cloud-aws.html#_read_replica_configuration>`_ を参照されたい。
+Spring Cloud AWSの詳細は `Spring 公式サイト <https://cloud.spring.io/spring-cloud-static/spring-cloud-aws/2.1.0.RELEASE/single/spring-cloud-aws.html#_read_replica_configuration>`_ を参照されたい。
 
 .. warning::
 
@@ -113,7 +113,7 @@ Spring Cloud AWSを利用してRDSへのアクセスを行うための依存ラ�
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Spring Cloud AWS JDBCを利用してRDSへのアクセスを行うためのBean定義を行う。
-Bean定義の詳細については、 Spring Cloud AWS `Data Access with JDBC <http://cloud.spring.io/spring-cloud-static/spring-cloud-aws/2.0.0.RELEASE/single/spring-cloud-aws.html#_data_access_with_jdbc>`_ を参照されたい。
+Bean定義の詳細については、 Spring Cloud AWS `Data Access with JDBC <https://cloud.spring.io/spring-cloud-static/spring-cloud-aws/2.1.0.RELEASE/single/spring-cloud-aws.html#_data_access_with_jdbc>`_ を参照されたい。
 
 - xxx-domain.xml
 
@@ -161,12 +161,12 @@ Bean定義の詳細については、 Spring Cloud AWS `Data Access with JDBC <h
       - | リードレプリカを使用するかどうかを設定する。\ ``true``\ を指定した場合、読み取り専用トランザクションはレプリカDBにルーティングされ、書き込み操作時にはマスタDBにルーティングされる。
     * - | (3)
       - | \ ``jdbc:pool-attributes``\
-      - | データソースのコネクションプールのプロパティを設定することができる。詳細はSpring公式サイト\ `Data source pool configuration <http://cloud.spring.io/spring-cloud-static/spring-cloud-aws/2.0.0.RELEASE/single/spring-cloud-aws.html#_data_source_pool_configuration>`_\ を参照されたい。
+      - | データソースのコネクションプールのプロパティを設定することができる。詳細はSpring公式サイト\ `Data source pool configuration <https://cloud.spring.io/spring-cloud-static/spring-cloud-aws/2.1.0.RELEASE/single/spring-cloud-aws.html#_data_source_pool_configuration>`_\ を参照されたい。
 
   .. note::
       \ ``jdbc:data-source``\ 内の設定値はプロパティファイルに書き出して読み込ませることができない。
       環境によって設定値を変更する場合Springのプロファイルの仕組みを使って実現することができる。
-      詳細はSpring公式サイト\ `XML bean definition profiles <https://docs.spring.io/spring/docs/5.0.8.RELEASE/spring-framework-reference/core.html#beans-definition-profiles-xml>`_\ を参照されたい。
+      詳細はSpring公式サイト\ `XML bean definition profiles <https://docs.spring.io/spring/docs/5.1.4.RELEASE/spring-framework-reference/core.html#beans-definition-profiles-xml>`_\ を参照されたい。
 
 .. _rdd_settings_for_using_datasource:
 

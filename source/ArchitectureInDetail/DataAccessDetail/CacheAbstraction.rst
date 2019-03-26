@@ -15,7 +15,7 @@ Overview
 
 セッションを外部管理化するためにキャッシュを利用する方法については、 :doc:`../../AWSCollaboration/SessionManagement` を参照されたい。
 
-Springのガイドについては、 `Spring Cache Abstraction <https://docs.spring.io/spring/docs/5.0.8.RELEASE/spring-framework-reference/integration.html#cache>`_ を参照されたい。
+Springのガイドについては、 `Spring Cache Abstraction <https://docs.spring.io/spring/docs/5.1.4.RELEASE/spring-framework-reference/integration.html#cache>`_ を参照されたい。
 
 .. _cache-local-heap:
 
@@ -110,8 +110,8 @@ Spring Cache Abstractionの設定
 ローカルヒープを使用したキャッシュの設定
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-キャッシュの機能を有効にするには、キャッシュマネージャーの設定が必要になる。
-以下に、ローカルヒープを使用したキャッシュマネージャーの設定例を示す。
+キャッシュの機能を有効にするには、キャッシュマネージャの設定が必要になる。
+以下に、ローカルヒープを使用したキャッシュマネージャの設定例を示す。
 
   .. code-block:: xml
 
@@ -143,7 +143,7 @@ Spring Cache Abstractionの設定
     * - | (1)
       - アノテーションでのキャッシュを有効にする。
 
-        キャッシュデータの管理をするため\ ``order="-1"``\を設定し、キャッシュインタセプターがトランザクションインタセプターより先に動作する設定とする。これにより、キャッシュデータの参照はトランザクション開始前に、登録と削除はトランザクションの終了後に行う。
+        キャッシュデータの管理をするため\ ``order="-1"``\を設定し、キャッシュインターセプタがトランザクションインターセプタより先に動作する設定とする。これにより、キャッシュデータの参照はトランザクション開始前に、登録と削除はトランザクションの終了後に行う。
     * - | (2)
       - キャッシュデータの格納場所にローカルヒープ領域を使用する場合は、Springが提供する\ ``SimpleCacheManager``\をキャッシュマネージャとして使用する。
     * - | (3)
@@ -151,14 +151,14 @@ Spring Cache Abstractionの設定
 
   .. note::
       ローカルヒープ領域における「入れ物」の実装は、\ ``ConcurrentMapCacheFactoryBean``\以外のものもSpringに用意されている。
-      詳細は `Springのリファレンス Configuring the cache storage <https://docs.spring.io/spring/docs/5.0.8.RELEASE/spring-framework-reference/integration.html#cache-store-configuration>`_ を参照されたい。
+      詳細は `Springのリファレンス Configuring the cache storage <https://docs.spring.io/spring/docs/5.1.4.RELEASE/spring-framework-reference/integration.html#cache-store-configuration>`_ を参照されたい。
 
 .. _cache-redis-setting:
 
 Redisを使用したキャッシュの設定
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-以下に、Redisを使用したキャッシュマネージャーの設定例を示す。
+以下に、Redisを使用したキャッシュマネージャの設定例を示す。
 
 - :file:`pom.xml`
 
@@ -224,7 +224,7 @@ Redisを使用したキャッシュの設定
       - アノテーションでのキャッシュを有効にする。ローカルヒープを使用したキャッシュと同様に\ ``order="-1"``\を設定する。
     * - | (2)
       - キャッシュデータの格納場所にRedisを使用する場合は、Spring Data Redisが提供する\ ``RedisCacheManager``\をキャッシュマネージャとして使用する。
-        \ ``RedisCacheManager``\の設定方法は `Support for the Spring Cache Abstraction <https://docs.spring.io/spring-data/redis/docs/2.0.9.RELEASE/reference/html/#redis:support:cache-abstraction>`_ を参照されたい。
+        \ ``RedisCacheManager``\の設定方法は `Support for the Spring Cache Abstraction <https://docs.spring.io/spring-data/redis/docs/2.1.4.RELEASE/reference/html/#redis:support:cache-abstraction>`_ を参照されたい。
     * - | (3)
       - キャッシュマネージャで利用する\ ``redisConnectionFactory``\を設定する。
 
@@ -324,7 +324,7 @@ Spring Cache Abstractionでは、メソッドにアノテーションを定義�
         * - | (1)
           - \ ``Cacheable``\アノテーションの属性\ ``key``\で設定している、\ ``#a0``\がメソッド\ ``findById``\の引数0番目(id)を指定している。
 
-            詳細は `Springのリファレンス Available caching SpEL evaluation context <https://docs.spring.io/spring/docs/5.0.8.RELEASE/spring-framework-reference/integration.html#cache-spel-context>`_ を参照されたい。
+            詳細は `Springのリファレンス Available caching SpEL evaluation context <https://docs.spring.io/spring/docs/5.1.4.RELEASE/spring-framework-reference/integration.html#cache-spel-context>`_ を参照されたい。
 
 キャッシュしたデータの削除
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -475,14 +475,14 @@ How to extend
         .. note::
 
          \ `JedisConnectionFactory`\のコンストラクタに\ `RedisClusterConfiguration`\を指定する場合、接続先のRedisはクラスタ構成であることが必須となる。スタンドアローン構成のRedisに接続する場合は\ `JedisConnectionFactory`\に直接接続先のServerとPortを指定すること。
-         指定方法については、`Spring Data Redisのリファレンス <https://docs.spring.io/spring-data/redis/docs/2.0.9.RELEASE/reference/html/#redis:connectors:jedis>`_ を参照されたい。
+         指定方法については、`Spring Data Redisのリファレンス <https://docs.spring.io/spring-data/redis/docs/2.1.4.RELEASE/reference/html/#redis:connectors:jedis>`_ を参照されたい。
 
     * - | (3)
       - \ `RedisClusterConfiguration`\のBean定義を行う。コンストラクタの引数に接続先のノードを指定する。
     * - | (4)
       - \ `JedisPoolConfig`\のBean定義を行う。
     * - | (5)
-      - \ `RedisConnectionFactory`\インターフェースの実装クラスをBean定義すると、AutoConfigurationによる\ `RedisConnectionFactory`\のBean定義が無効となる。そのため、Spring Sessionがセッション情報をRedisに格納するために使用する\ `JedisConnectionFactory`\のBean定義を行う。\ `primary="true"`\を指定し、Spring Sessionが\ `RedisTemplate`\を生成する際に優先的に使用させる。
+      - \ `RedisConnectionFactory`\インタフェースの実装クラスをBean定義すると、AutoConfigurationによる\ `RedisConnectionFactory`\のBean定義が無効となる。そのため、Spring Sessionがセッション情報をRedisに格納するために使用する\ `JedisConnectionFactory`\のBean定義を行う。\ `primary="true"`\を指定し、Spring Sessionが\ `RedisTemplate`\を生成する際に優先的に使用させる。
 
   プロパティキーに対応する値の設定を行う。
 
@@ -540,7 +540,7 @@ How to extend
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Spring Cache Abstractionでは、複数のキャッシュマネージャを別のBean名で定義しておき、\ `@Cacheable`\アノテーションの\ `cacheManager`\属性に指定することで、キャッシュ対象データ毎に使用するキャッシュマネージャを指定することが可能である。
-詳細は、`Custom cache resolution <Custom cache resolution <https://docs.spring.io/spring/docs/5.0.8.RELEASE/spring-framework-reference/integration.html#cache-annotations-cacheable-cache-resolver>`_ を参照されたい。
+詳細は、`Custom cache resolution <Custom cache resolution <https://docs.spring.io/spring/docs/5.1.4.RELEASE/spring-framework-reference/integration.html#cache-annotations-cacheable-cache-resolver>`_ を参照されたい。
 
 .. raw:: latex
 

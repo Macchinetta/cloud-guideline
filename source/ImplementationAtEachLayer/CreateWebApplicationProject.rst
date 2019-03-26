@@ -22,7 +22,7 @@
 --------------------------------------------------------------------------------
 
 開発プロジェクトの作成方法は、
-|base_framework_name| Development Guideline `開発プロジェクトの作成 <https://macchinetta.github.io/server-guideline/1.6.0.RELEASE/ja/ImplementationAtEachLayer/CreateWebApplicationProject.html#createwebapplicationproject>`_
+|base_framework_name| Development Guideline `開発プロジェクトの作成 <https://macchinetta.github.io/server-guideline/1.6.1.RELEASE/ja/ImplementationAtEachLayer/CreateWebApplicationProject.html#createwebapplicationproject>`_
 を参照されたい。
 
 .. _create_project_customize:
@@ -49,12 +49,12 @@ Spring Bootの利用
 Spring Bootを使用すると、プロジェクトのアーカイブ方式として「実行可能jarファイル」と「デプロイ可能warファイル」が選択できるが、
 本ガイドラインでは、|base_framework_name| のノウハウを活用するため、**デプロイ可能warファイル** を採用する。
 Spring Bootを使用したデプロイ可能warファイルの作成方法の詳細はSpring Bootの公式リファレンス
-`Traditional deployment <http://docs.spring.io/spring-boot/docs/2.0.4.RELEASE/reference/html/howto-traditional-deployment.html>`_
+`Traditional deployment <https://docs.spring.io/spring-boot/docs/2.1.2.RELEASE/reference/html/howto-traditional-deployment.html>`_
 を参照されたい。
 
 Spring Bootを使用するとBean定義など多くの設定が自動で行われる。
 このような自動設定の仕組みのことを\ ``Spring Boot Auto-configuration``\ といい、アプリケーション開発者は最小限の設定を行うだけでアプリケーションを構築することができる。
-詳しくはSpring Bootの公式リファレンス `Auto-configuration <http://docs.spring.io/spring-boot/docs/2.0.4.RELEASE/reference/html/using-boot-auto-configuration.html>`_ を参照されたい。
+詳しくはSpring Bootの公式リファレンス `Auto-configuration <https://docs.spring.io/spring-boot/docs/2.1.2.RELEASE/reference/html/using-boot-auto-configuration.html>`_ を参照されたい。
 
 .. _create_project_adding_dependencies:
 
@@ -70,7 +70,7 @@ Spring Bootを使用するとBean定義など多くの設定が自動で行わ�
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-dependencies</artifactId>
-            <version>Finchley.SR1</version>
+            <version>Greenwich.RELEASE</version>
             <type>pom</type>
             <scope>import</scope>
         </dependency>
@@ -121,7 +121,7 @@ Spring Bootを使用するとBean定義など多くの設定が自動で行わ�
      - \ ``spring-boot-configuration-processor``\ の依存ライブラリを追加することで、
        Spring Bootの\ ``@ConfigurationProperties``\ アノテーションを使用して定義したプロパティのメタデータを生成することができる。
        詳細については、Spring Boot公式リファレンス
-       `Generating your own meta-data using the annotation processor <http://docs.spring.io/spring-boot/docs/2.0.4.RELEASE/reference/html/configuration-metadata.html#configuration-metadata-annotation-processor>`_
+       `Generating your own meta-data using the annotation processor <https://docs.spring.io/spring-boot/docs/2.1.2.RELEASE/reference/html/configuration-metadata.html#configuration-metadata-annotation-processor>`_
        を参照されたい。
    * - | (4)
      - \ ``spring-cloud-config-client``\
@@ -149,6 +149,7 @@ Spring Bootを利用して、デプロイ可能なwarファイルを作成する
     import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
     import org.springframework.context.annotation.ImportResource;
     import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
+    import org.springframework.boot.actuate.autoconfigure.security.servlet.ManagementWebSecurityAutoConfiguration;
     import org.springframework.boot.actuate.autoconfigure.metrics.web.servlet.WebMvcMetricsAutoConfiguration;
 
     //(1)
@@ -157,7 +158,8 @@ Spring Bootを利用して、デプロイ可能なwarファイルを作成する
     //(3)
     @EnableAutoConfiguration(exclude = { DataSourceAutoConfiguration.class,
                                           JmxAutoConfiguration.class, WebMvcAutoConfiguration.class,
-                                          SecurityAutoConfiguration.class, WebMvcMetricsAutoConfiguration.class })
+                                          SecurityAutoConfiguration.class, ManagementWebSecurityAutoConfiguration.class,
+                                          WebMvcMetricsAutoConfiguration.class })
     //(4)
     public class Bootstrap extends SpringBootServletInitializer {
 
@@ -187,7 +189,7 @@ Spring Bootを利用して、デプロイ可能なwarファイルを作成する
     * - | (3)
       - \ ``@EnableAutoConfiguration``\ の \ ``exclude``\ 属性を使用することで、特定のコンフィギュレーションクラスをAuto-configurationの適用対象から除外できる。
         本ガイドラインで作成するプロジェクトでは、
-        \ ``DataSourceAutoConfiguration``、\ ``JmxAutoConfiguration``、\ ``WebMvcAutoConfiguration``\、\ ``SecurityAutoConfiguration``\、\ ``WebMvcMetricsAutoConfiguration``\ を除外する必要がある。
+        \ ``DataSourceAutoConfiguration``、\ ``JmxAutoConfiguration``、\ ``WebMvcAutoConfiguration``\、\ ``SecurityAutoConfiguration``\、\ ``ManagementWebSecurityAutoConfiguration``\、\ ``WebMvcMetricsAutoConfiguration``\ を除外する必要がある。
     * - | (4) (5)
       - デプロイ可能なwarファイルを作成するために\ ``SpringBootServletInitializer``\ を継承したクラスを作成し、\ ``configure``\ メソッドをオーバーライドする。
         この実装を行うことで、通常はSpringが提供する\ ``ContextLoaderListener``\ が行っているサーブレットコンテキストの構築がSpring Bootによって行われる。
@@ -212,7 +214,7 @@ Spring Bootを利用して、デプロイ可能なwarファイルを作成する
            これを回避するには\ ``DataSourceAutoConfiguration``\ をAuto-configurationから除外するか、
            データソースの１つに\ ``primary=true``\ を設定する必要がある。
            このクラスを除外せずに複数のデータソースを定義する方法は、Spring Boot公式リファレンス
-           `Configure Two DataSource <http://docs.spring.io/spring-boot/docs/2.0.4.RELEASE/reference/htmlsingle/#howto-two-datasources>`_ を参照されたい。
+           `Configure Two DataSource <https://docs.spring.io/spring-boot/docs/2.1.2.RELEASE/reference/htmlsingle/#howto-two-datasources>`_ を参照されたい。
        * - | \ ``JmxAutoConfiguration``\
          - JMXを設定するAuto-configurationクラス。デフォルトでは同一サーバに複数のAPを起動した場合、
            JMXのドメインが重複してBeanが登録できず\ ``UnableToRegisterMBeanException``\ が発生するため除外する。
@@ -226,6 +228,10 @@ Spring Bootを利用して、デプロイ可能なwarファイルを作成する
            \ ``DefaultConfigurerAdapter``\ をBean生成する際に必要となる\ ``ObjectPostProcessor``\ がないために\ ``NoSuchBeanDefinitionException``\ が発生する。
            事象を回避する実装として\ ``SecurityAutoConfiguration``\ をAuto-configurationから除外する。
            他にもSecurityConfigurationクラスに\ ``@EnableWebSecurity``\ を付与する実装もあるが、本ガイドラインでは :ref:`usexmlconfig` に則る。
+       * - | \ ``ManagementWebSecurityAutoConfiguration``\
+         - Spring Securityを設定するAuto-configurationクラス。
+           :doc:`../ImplementationAtEachLayer/HealthCheck` にて導入する\ ``Spring Boot Actuator``\ が有効である場合、\ ``SecurityAutoConfiguration``\ に加え、\ ``ManagementWebSecurityAutoConfiguration``\ も有効化され、\ ``SecurityAutoConfiguration``\ と同様の事象が発生する。
+           事象を回避する実装として\ ``ManagementWebSecurityAutoConfiguration``\ をAuto-configurationから除外する。
        * - | \ ``WebMvcMetricsAutoConfiguration``\
          - WebMvcMetricsFilterを設定するAuto-configurationクラス。
            :doc:`../ImplementationAtEachLayer/HealthCheck` にて導入する\ ``Spring Boot Actuator``\ が有効である場合、\ ``CharacterEncodingFilter``\ よりも先に\ ``WebMvcMetricsFilter``\ が適用されてしまい正しくエンコードできない不具合が発生する。
@@ -280,6 +286,28 @@ Spring Bootを利用して、デプロイ可能なwarファイルを作成する
         また、自分でダミーファイルをデフォルト指定(\ ``WEB-INF/appServlet-servlet.xml``\ )に
         作成することで、``contextConfigLocation``\ 属性を削除しても例外が発生しなくなる。
 
+* application.yml
+
+エントリポイントの作成にともなって、application.ymlに下記変更を加える。
+
+.. code-block:: yaml
+
+   spring:
+     main:
+       # (1)
+       allow-bean-definition-overriding: true
+
+
+.. tabularcolumns:: |p{0.10\linewidth}|p{0.90\linewidth}|
+.. list-table::
+    :header-rows: 1
+    :widths: 10 90
+
+    * - 項番
+      - 説明
+    * - | (1)
+      - | Spring BootのAutoConfigurationで自動生成されるBeanに対しXML等で定義したBeanで上書きを許容するかの設定。本ガイドラインではXMLによるBean定義で上書きするため\ ``allow-bean-definition-overriding: true``\のプロパティを設定する。
+
 .. _create_project_constrait:
 
 オンライン版クラウド拡張開発プロジェクトで考慮すべき点・制約事項
@@ -306,17 +334,17 @@ Spring BootではLogbackの拡張を行っており追加の設定を行うこ�
 
 この拡張を利用するには、Spring Bootではデフォルトのファイル名ではなく、\ ``-spring``\ のサフィックスを付けた\ ``logback-spring.xml``\ を使用する必要がある。
 
-詳細は、Spring Bootの公式リファレンス `Custom log configuration <http://docs.spring.io/spring-boot/docs/2.0.4.RELEASE/reference/html/boot-features-logging.html#boot-features-custom-log-configuration>`_
+詳細は、Spring Bootの公式リファレンス `Custom log configuration <https://docs.spring.io/spring-boot/docs/2.1.2.RELEASE/reference/html/boot-features-logging.html#boot-features-custom-log-configuration>`_
 を参照されたい。
 
 また、Logbackの設定例は |base_framework_name| Development Guideline
-`Logbackの設定 <https://macchinetta.github.io/server-guideline/1.6.0.RELEASE/ja/ArchitectureInDetail/GeneralFuncDetail/Logging.html#id5>`_
+`Logbackの設定 <https://macchinetta.github.io/server-guideline/1.6.1.RELEASE/ja/ArchitectureInDetail/GeneralFuncDetail/Logging.html#id5>`_
 を参照されたい。
 
 .. warning::
 
    Spring Cloud Configを利用し\ ``logging.path``\ の設定値をConfigサーバに持たせる場合、Configサーバからプロパティを取得まするまでの間のログが意図しないディレクトリに出力されてしまう。
-   これは\ `Custom log configuration <http://docs.spring.io/spring-boot/docs/2.0.4.RELEASE/reference/html/boot-features-logging.html#boot-features-custom-log-configuration>`_\
+   これは\ `Custom log configuration <https://docs.spring.io/spring-boot/docs/2.1.2.RELEASE/reference/html/boot-features-logging.html#boot-features-custom-log-configuration>`_\
    に記載されているような設定ファイル名が存在するとSpring Bootが自動で読み込んでしまうが、\ ``logging.path``\ が未解決のためログの出力先を制御することができないため発生する。
    logbackを利用する場合、\ ``logback.xml``\ と\ ``logback-spring.xml``\ 以外の名前を利用すれば良い。
    設定ファイル名をSpring Bootが読み込みに行かない独自のファイル名に設定し、\ ``logging.config``\ のプロパティを設定することで意図しないログ出力を制御することができる。
@@ -369,7 +397,7 @@ Spring Bootではエントリポイントで、\ ``ContextLoaderListener``\ を�
 トランザクショントークンチェックを使用するための設定方法が異なる
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-|base_framework_name| Development Guideline `トランザクショントークンチェックを使用するための設定 <https://macchinetta.github.io/server-guideline/1.6.0.RELEASE/ja/ArchitectureInDetail/WebApplicationDetail/DoubleSubmitProtection.html#setting>`_
+|base_framework_name| Development Guideline `トランザクショントークンチェックを使用するための設定 <https://macchinetta.github.io/server-guideline/1.6.1.RELEASE/ja/ArchitectureInDetail/WebApplicationDetail/DoubleSubmitProtection.html#setting>`_
 に記載されている設定方法を使用してもトランザクショントークンチェックが正常に動作しない。
 これは、組み込みTomcatを使用しない場合にSpring BootによるrequestDataValueProcessorの
 上書きが行われることにより、JSPにトランザクショントークンが埋め込まれないためである。
@@ -449,7 +477,7 @@ Spring Boot Actuatorのエンドポイントのポートが変更できない
 
 組み込みTomcatを使用しない場合、Spring Boot Actuatorのエンドポイントが使用するポートを
 アプリケーションが使用するポートと別に設定することができない。
-そのため、クラウドベンダーが提供するロードバランサの機能を使用してエンドポイントのURLへの外部アクセスを遮断する必要がある。
+そのため、クラウドベンダが提供するロードバランサの機能を使用してエンドポイントのURLへの外部アクセスを遮断する必要がある。
 
 詳細については、 :doc:`../ImplementationAtEachLayer/HealthCheck` を参照されたい。
 
@@ -546,7 +574,7 @@ Spring BootのAuto-configurationにより設定される\ ``WebMvcAutoConfigurat
 ViewResolverが上書きされViewの解決ができない
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-|base_framework_name| Development Guideline `HTMLを応答する <https://macchinetta.github.io/server-guideline/1.6.0.RELEASE/ja/ImplementationAtEachLayer/ApplicationLayer.html#html>`_
+|base_framework_name| Development Guideline `HTMLを応答する <https://macchinetta.github.io/server-guideline/1.6.1.RELEASE/ja/ImplementationAtEachLayer/ApplicationLayer.html#html>`_
 に従いTilesの連携におけるBean定義\ ``<mvc:view-resolvers>``\ を使用していると、Viewの解決ができなくなる不具合が発生する。
 
 これは、Spring Bootを非組み込みTomcatで使用する場合に、``<mvc:view-resolvers>``\ で定義した

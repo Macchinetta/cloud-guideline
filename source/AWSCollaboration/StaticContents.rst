@@ -247,7 +247,7 @@ Amazon CloudFront利用時のAmazon S3上のコンテンツの更新
 
 コンテンツバージョン管理方式
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-コンテンツバージョン管理方式はクラウドベンダーに依存しない方式であるため、実装方法は :ref:`impl_sc_cdn_update_how_to_use_contents_version` を参照されたい。
+コンテンツバージョン管理方式はクラウドベンダに依存しない方式であるため、実装方法は :ref:`impl_sc_cdn_update_how_to_use_contents_version` を参照されたい。
 
 Amazon CloudFrontのキャッシュクリア方式
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -283,7 +283,7 @@ AWS WAFによる制限
 Amazonが提供するウェブアプリケーションファイアウォールである\ `AWS WAF <https://aws.amazon.com/jp/waf/>`_\ を使用することで、
 定義した条件（IP アドレス、HTTP ヘッダー、HTTP 本文、URI 文字列...etc）に基づき、CloudFrontに対するウェブリクエストを許可、ブロックすることができる。
 
-IP アドレスによる制限が可能なので、開発中等でまだ公開したくない場合や、特定のユーザーにのみ公開したい場合などに有効な制限方法である。
+IP アドレスによる制限が可能なので、開発中等でまだ公開したくない場合や、特定のユーザにのみ公開したい場合などに有効な制限方法である。
 
 WAFに定義可能な制限項目の詳細はAWS公式ドキュメント\ `What is AWS WAF and AWS Shield Advanced? <http://docs.aws.amazon.com/ja_jp/waf/latest/developerguide/what-is-aws-waf.html>`_\
 を、WAFとCloudFrontを組み合わせた際の振る舞いは\ `How AWS WAF Works with Amazon CloudFront Features <http://docs.aws.amazon.com/ja_jp/waf/latest/developerguide/cloudfront-features.html>`_\
@@ -305,7 +305,7 @@ CDNを使用してプライベートコンテンツを供給する場合に有�
 .. note::
 
   署名付き URL や署名付き Cookie を作成するために、有効なCloudFront キーペアが必要となる。
-  IAM ユーザーでは CloudFront キーペアを作成することができず、AWS アカウントのルート認証情報を使用してキーペアを作成する必要があるので注意されたい。
+  IAM ユーザでは CloudFront キーペアを作成することができず、AWS アカウントのルート認証情報を使用してキーペアを作成する必要があるので注意されたい。
   詳細は\ `信頼された署名者の CloudFront キーペアを作成する <http://docs.aws.amazon.com/ja_jp/AmazonCloudFront/latest/DeveloperGuide/private-content-trusted-signers.html#private-content-creating-cloudfront-key-pairs>`_\ を参照されたい。
 
 .. _sc_signed-cookies:
@@ -740,7 +740,7 @@ CDNを使用してプライベートコンテンツを供給する場合に有�
          # (4)
          cookiePath: /prcd
          # (5)
-         distributionDomain: www.xxxxxx.net
+         distributionDomain: www.xxxxxxx.net
          # (6)
          privateKeyFilePath: ${user.home}/private-key.der
          # (7)

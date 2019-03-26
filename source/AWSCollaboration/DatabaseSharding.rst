@@ -97,7 +97,7 @@ Spring Data module for DynamoDBの詳細については、 `Spring Data DynamoDB
     <properties>
       ・・・
       <!-- (2) -->
-      <org.springframework.data.dynamodb-dependencies.version>5.0.3</org.springframework.data.dynamodb-dependencies.version>
+      <org.springframework.data.dynamodb-dependencies.version>5.0.4</org.springframework.data.dynamodb-dependencies.version>
       ・・・
     </properties>
 
@@ -141,7 +141,7 @@ Spring Data module for DynamoDBの詳細については、 `Spring Data DynamoDB
 
 以下に、DynamoDBのリージョンとシャードキーリポジトリインタフェースの設定例を示す。
 
-- \ ``xxx-web/src/java/resources/application-local.yml``\にDynamoDBのリージョンを設定
+- \ ``xxx-env/src/main/resources/application-local.yml``\にDynamoDBのリージョンを設定
 
 .. code-block:: yaml
 

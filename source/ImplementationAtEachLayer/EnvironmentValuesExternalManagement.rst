@@ -81,7 +81,7 @@ How to use
 Config Serverの構築
 """"""""""""""""""""""""""""""""
 Spring Frameworkから提供されている「Spring Cloud Config Server」機能を使用した、環境依存値の一元管理方法について説明する。
-「Spring Cloud Config Server」の構築の詳細については、\ `公式リファレンスの"Spring Cloud Config Server" <http://cloud.spring.io/spring-cloud-static/spring-cloud-config/2.0.1.RELEASE/single/spring-cloud-config.html>`_\ を参照されたい。
+「Spring Cloud Config Server」の構築の詳細については、\ `公式リファレンスの"Spring Cloud Config Server" <https://cloud.spring.io/spring-cloud-static/spring-cloud-config/2.1.0.RELEASE/single/spring-cloud-config.html>`_\ を参照されたい。
 
 pom.xmlで必要なjarを設定する。
 
@@ -370,9 +370,9 @@ How to extend
   また、DIコンテナの再起動が発生するリスタート機能も同様に無効となる。
 
 
-クラウドベンダー連携
+クラウドベンダ連携
 """"""""""""""""""""
-Spring Cloud Config Serverの環境リポジトリに、クラウドベンダーのクラウドストレージを指定する場合の拡張方法を示す。
+Spring Cloud Config Serverの環境リポジトリに、クラウドベンダのクラウドストレージを指定する場合の拡張方法を示す。
 実装例として、環境リポジトリにAWSのS3を利用する場合の拡張例を紹介する。
 
 .. note::
@@ -590,7 +590,7 @@ configプロジェクトの作成
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 configプロジェクトの構成について説明する。
-Spring Bootプロジェクトについては、\ `公式リファレンスの"Using Spring Boot" <https://docs.spring.io/spring-boot/docs/2.0.4.RELEASE/reference/htmlsingle/#using-boot>`_\ を参照されたい。
+Spring Bootプロジェクトについては、\ `公式リファレンスの"Using Spring Boot" <https://docs.spring.io/spring-boot/docs/2.1.2.RELEASE/reference/htmlsingle/#using-boot>`_\ を参照されたい。
 
 .. code-block:: console
 

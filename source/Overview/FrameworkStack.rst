@@ -10,9 +10,9 @@
 |framework_name| 概要
 --------------------------------------------------------------------------------
 
-本ガイドラインで使用するSoftware Frameworkは、|base_framework_name| で使用するものに加えて、クラウドベンダーが提供するサービスと連携するためのOSSを組み合わせたものである。
+本ガイドラインで使用するSoftware Frameworkは、|base_framework_name| で使用するものに加えて、クラウドベンダが提供するサービスと連携するためのOSSを組み合わせたものである。
 
-|base_framework_name| で使用するSoftware Frameworkについては、 |base_framework_name| `Development Guideline <https://macchinetta.github.io/server-guideline/1.6.0.RELEASE/ja/Overview/FrameworkStack.html>`_  を参照されたい。
+|base_framework_name| で使用するSoftware Frameworkについては、 |base_framework_name| `Development Guideline <https://macchinetta.github.io/server-guideline/1.6.1.RELEASE/ja/Overview/FrameworkStack.html>`_  を参照されたい。
 
 Software Frameworkの主な構成要素
 --------------------------------------------------------------------------------
@@ -29,9 +29,9 @@ Software Frameworkの主な構成要素
 
 * `Spring Cloud Config <https://cloud.spring.io/spring-cloud-config/>`_
 
-クラウドベンダー連携
+クラウドベンダ連携
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-クラウドベンダー連携を行うライブラリとして以下を利用する。
+クラウドベンダ連携を行うライブラリとして以下を利用する。
 
 Spring Boot
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -39,7 +39,7 @@ Spring Boot
 以下の目的でSpring Bootを導入している。
 
 * `Spring Cloud <https://spring.io/projects/spring-cloud/>`_ の利用
-* `Spring Boot Actuator <https://docs.spring.io/spring-boot/docs/2.0.4.RELEASE/reference/htmlsingle/#production-ready-enabling>`_ の利用
+* `Spring Boot Actuator <https://docs.spring.io/spring-boot/docs/2.1.2.RELEASE/reference/htmlsingle/#production-ready-enabling>`_ の利用
 
 .. note::
 
@@ -62,7 +62,7 @@ Amazon Web Serviceとの連携を行うフレームワークとして以下を�
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Redisを使用したセッションの管理を行うフレームワークとして、Spring Session with Redisを利用する。
 
-* `Spring Session with Redis <https://docs.spring.io/spring-session/docs/2.0.5.RELEASE/reference/html5/#httpsession-redis>`_
+* `Spring Session with Redis <https://docs.spring.io/spring-session/docs/2.1.3.RELEASE/reference/html5/#httpsession-redis>`_
 
 キャッシュの管理
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -79,15 +79,15 @@ Redisを使用したキャッシュの管理を行うフレームワークとし
 --------------------------------------------------------------------------------
 
 |framework_name| |framework_version| で利用するOSSの一覧を以下に示す。
-|base_framework_name| Development Guideline `利用するOSSのバージョン <https://macchinetta.github.io/server-guideline/1.6.0.RELEASE/ja/Overview/FrameworkStack.html#oss>`_ において説明済みのOSSについては記載しない。
+|base_framework_name| Development Guideline `利用するOSSのバージョン <https://macchinetta.github.io/server-guideline/1.6.1.RELEASE/ja/Overview/FrameworkStack.html#oss>`_ において説明済みのOSSについては記載しない。
 
 |framework_name| と |base_framework_name| のバージョンの対応関係は、:ref:`cloud_native_application_framework_relation` を参照されたい。
 
 .. tip::
 
-    |base_framework_name| と同様に、 `Spring IO platform <https://spring.io/projects/platform/>`_\ にて依存関係を解決可能なライブラリについては原則として、Spring IO platformの定義に準じている。使用するSpring IO platformのバージョンは |base_framework_name| に準じる。
+    |base_framework_name| と同様に、 `Spring Boot Dependencies <https://spring.io/projects/spring-boot>`_\ にて依存関係を解決可能なライブラリについては原則として、\ ``spring-boot-dependencies``\ の定義に準じている。使用する\ ``spring-boot-dependencies``\ のバージョンは |base_framework_name| に準じる。
 
-    `Spring Cloud <https://spring.io/projects/spring-cloud/>`_\ 関連のライブラリについては、\ ``spring-cloud-dependencies``\ による定義に準じている。使用する\ ``spring-cloud-dependencies``\ のバージョンは、依存関係を解決されるライブラリのバージョンが可能な限りSpring IO platformと同一となるようバージョンを選定し、Finchley.SR1としている。
+    `Spring Cloud <https://spring.io/projects/spring-cloud/>`_\ 関連のライブラリについては、\ ``spring-cloud-dependencies``\ による定義に準じている。使用する\ ``spring-cloud-dependencies``\ のバージョンは、`Release Notes <https://github.com/spring-projects/spring-cloud/wiki/Spring-Cloud-Greenwich-Release-Notes#greenwichrelease>`_\ に記載されているベースのSpring Bootバージョンが\ ``spring-boot-dependencies``\ のベースと同一となるバージョンを選定し、Greenwich.RELEASEとしている。
 
     上記に該当しないライブラリについては、個別にバージョンを指定している。
 
@@ -101,362 +101,170 @@ Redisを使用したキャッシュの管理を行うフレームワークとし
       - GroupId
       - ArtifactId
       - Version
-      - Spring IO platform
+      - Spring Boot Dependencies
       - Spring Cloud
       - Remarks
     * - Spring Boot
       - org.springframework.boot
-      - spring-boot
-      - 2.0.4.RELEASE
+      - spring-boot-configuration-processor
+      - 2.1.2.RELEASE
       - \*
-      - \*
-      - \*1
-    * - Spring Boot
-      - org.springframework.boot
-      - spring-boot-actuator
-      - 2.0.4.RELEASE
-      - \*
-      - \*
-      - \*1
-    * - Spring Boot
-      - org.springframework.boot
-      - spring-boot-autoconfigure
-      - 2.0.4.RELEASE
-      - \*
-      - \*
-      - \*1
+      -
+      -
     * - Spring Boot
       - org.springframework.boot
       - spring-boot-starter
-      - 2.0.4.RELEASE
+      - 2.1.2.RELEASE
       - \*
-      - \*
-      - \*1
+      -
+      -
     * - Spring Boot
       - org.springframework.boot
       - spring-boot-starter-actuator
-      - 2.0.4.RELEASE
-      - \*
-      - \*
-      - \*1
-    * - Spring Boot
-      - org.springframework.boot
-      - spring-boot-starter-logging
-      - 2.0.4.RELEASE
-      - \*
-      - \*
-      - \*1
-    * - Spring Boot
-      - org.slf4j
-      - jul-to-slf4j
-      - 1.7.25
+      - 2.1.2.RELEASE
       - \*
       -
       -
-    * - Spring Boot
-      - org.yaml
-      - snakeyaml
-      - 1.19
-      - \*
+    * - 環境依存値の外部管理
+      - javax.inject
+      - javax.inject
+      - 1
       -
       -
-    * - Spring Boot
-      - org.slf4j
-      - log4j-over-slf4j
-      - 1.7.25
-      - \*
-      -
-      -
-    * - 環境依存値外部管理
-      - org.springframework.cloud
-      - spring-cloud-commons
-      - 2.0.1.RELEASE
-      -
-      - \*
-      -
-    * - 環境依存値外部管理
-      - org.springframework.cloud
-      - spring-cloud-config-client
-      - 2.0.1.RELEASE
-      -
-      - \*
-      -
-    * - 環境依存値外部管理
-      - org.springframework.cloud
-      - spring-cloud-context
-      - 2.0.1.RELEASE
-      -
-      - \*
-      -
-    * - クラウドベンダー連携
-      - org.springframework.cloud
-      - spring-cloud-aws-actuator
-      - 2.0.0.RELEASE
-      -
-      - \*
-      -
-    * - クラウドベンダー連携
-      - org.springframework.cloud
-      - spring-cloud-aws-autoconfigure
-      - 2.0.0.RELEASE
-      -
-      - \*
-      -
-    * - クラウドベンダー連携
-      - org.springframework.cloud
-      - spring-cloud-aws-context
-      - 2.0.0.RELEASE
-      -
-      - \*
-      -
-    * - クラウドベンダー連携
-      - org.springframework.cloud
-      - spring-cloud-aws-core
-      - 2.0.0.RELEASE
-      -
-      - \*
-      -
-    * - クラウドベンダー連携
-      - org.springframework.cloud
-      - spring-cloud-aws-jdbc
-      - 2.0.0.RELEASE
-      -
-      - \*
-      -
-    * - クラウドベンダー連携
-      - org.springframework.cloud
-      - spring-cloud-aws-messaging
-      - 2.0.0.RELEASE
-      -
-      - \*
-      -
-    * - クラウドベンダー連携
-      - org.springframework.cloud
-      - spring-cloud-starter-aws
-      - 2.0.0.RELEASE
-      -
-      - \*
-      -
-    * - クラウドベンダー連携
-      - com.amazonaws
-      - aws-java-sdk-cloudformation
-      - 1.11.336
-      -
-      - \*
-      -
-    * - クラウドベンダー連携
-      - com.amazonaws
-      - aws-java-sdk-cloudwatch
-      - 1.11.336
-      -
-      - \*
-      -
-    * - クラウドベンダー連携
-      - com.amazonaws
-      - aws-java-sdk-core
-      - 1.11.336
-      -
-      - \*
-      -
-    * - クラウドベンダー連携
-      - com.amazonaws
-      - aws-java-sdk-ec2
-      - 1.11.336
-      -
-      - \*
-      -
-    * - クラウドベンダー連携
-      - com.amazonaws
-      - aws-java-sdk-iam
-      - 1.11.336
-      -
-      - \*
-      -
-    * - クラウドベンダー連携
-      - com.amazonaws
-      - aws-java-sdk-kms
-      - 1.11.336
-      -
-      - \*
-      -
-    * - クラウドベンダー連携
-      - com.amazonaws
-      - aws-java-sdk-rds
-      - 1.11.336
-      -
-      - \*
-      -
-    * - クラウドベンダー連携
-      - com.amazonaws
-      - aws-java-sdk-s3
-      - 1.11.336
-      -
-      - \*
-      -
-    * - クラウドベンダー連携
-      - com.amazonaws
-      - aws-java-sdk-ses
-      - 1.11.336
-      -
-      - \*
-      -
-    * - クラウドベンダー連携
-      - com.amazonaws
-      - jmespath-java
-      - 1.11.336
-      -
-      - \*
-      - \*2
-    * - クラウドベンダー連携
-      - com.amazonaws
-      - aws-java-sdk-sns
-      - 1.11.336
-      -
-      - \*
-      -
-    * - クラウドベンダー連携
-      - com.amazonaws
-      - aws-java-sdk-sqs
-      - 1.11.336
-      -
-      - \*
-      -
-    * - クラウドベンダー連携
-      - org.apache.tomcat
-      - tomcat-jdbc
-      - 9.0.10
-      - \*
-      - \*
-      - \*4 \*6
-    * - クラウドベンダー連携
-      - org.apache.tomcat
-      - tomcat-juli
-      - 9.0.10
-      -
-      - \*
-      - \*6
-    * - クラウドベンダー連携
-      - org.apache.commons
-      - commons-codec
-      - 1.11
-      - \*
-      - \*
-      - \*2 \*3
-    * - クラウドベンダー連携
-      - org.apache.commons
-      - commons-logging
-      - 1.2
-      - \*
-      - \*
-      - \*2 \*3
-    * - クラウドベンダー連携
-      - org.apache.httpcomponents
-      - httpclient
-      - 4.5.6
-      - \*
-      - \*
-      - \*2 \*4
-    * - クラウドベンダー連携
-      - org.apache.httpcomponents
-      - httpcore
-      - 4.4.10
-      - \*
-      - \*
-      - \*2 \*4
-    * - クラウドベンダー連携
-      - com.fasterxml.jackson.dataformat
-      - jackson-dataformat-cbor
-      - 2.9.6
-      - \*
-      - \*
-      - \*2 \*3
-    * - クラウドベンダー連携
-      - com.sun.mail
-      - javax.mail
-      - 1.6.1
-      - \*
-      - \*
-      - \*5
-    * - クラウドベンダー連携
-      - com.amazonaws
-      - amazon-sqs-java-messaging-lib
-      - 1.0.1
-      -
-      -
-      - \*5
-    * - クラウドベンダー連携
-      - org.apache.geronimo.specs
-      - geronimo-jms_1.1_spec
-      - 1.1.1
-      -
-      -
-      - \*5
-    * - クラウドベンダー連携
-      - com.github.derjust
-      - spring-data-dynamodb
-      - 5.0.3
-      -
-      -
-      - \*5
-    * - クラウドベンダー連携
-      - com.amazonaws
-      - aws-java-sdk-dynamodb
-      - 1.11.336
-      -
-      -
-      - \*5
-    * - クラウドベンダー連携
-      - software.amazon.ion
-      - ion-java
-      - 1.0.2
-      -
-      -
-      - \*2
-    * - セッション管理
-      - org.springframework.session
-      - spring-session-core
-      - 2.1.1.RELEASE
-      -
-      -
-      - \*6
-    * - セッション管理
-      - org.springframework.session
-      - spring-session-data-redis
-      - 2.0.5.RELEASE
-      - \*
-      -
-      -
-    * - セッション管理
-      - redis.clients
-      - jedis
-      - 2.9.0
-      - \*
-      -
-      -
+      - \*4
     * - キャッシュ管理
       - org.springframework.data
       - spring-data-keyvalue
-      - 2.0.9.RELEASE
+      - 2.1.4.RELEASE
       - \*
       -
       -
     * - キャッシュ管理
       - org.springframework.data
       - spring-data-redis
-      - 2.0.9.RELEASE
+      - 2.1.4.RELEASE
+      - \*
+      -
+      -
+    * - キューイング活用
+      - org.springframework
+      - spring-jms
+      - 4.3.21.RELEASE
+      -
+      -
+      - \*3
+    * - クラウドベンダ連携
+      - com.amazonaws
+      - amazon-sqs-java-messaging-lib
+      - 1.0.4
+      -
+      -
+      - \*2
+    * - クラウドベンダ連携
+      - com.amazonaws
+      - aws-java-sdk-dynamodb
+      - 1.11.415
+      -
+      -
+      - \*2
+    * - クラウドベンダ連携
+      - com.amazonaws
+      - aws-java-sdk-iam
+      - 1.11.415
+      -
+      - \*
+      -
+    * - クラウドベンダ連携
+      - com.amazonaws
+      - aws-java-sdk-ses
+      - 1.11.415
+      -
+      - \*
+      -
+    * - クラウドベンダ連携
+      - com.amazonaws
+      - aws-java-sdk-sts
+      - 1.11.415
+      -
+      - \*
+      -
+    * - クラウドベンダ連携
+      - com.sun.mail
+      - javax.mail
+      - 1.6.2
+      - \*
+      -
+      -
+    * - クラウドベンダ連携
+      - org.apache.tomcat
+      - tomcat-jdbc
+      - 9.0.10
+      - \*
+      -
+      - \*1
+    * - クラウドベンダ連携
+      - org.springframework.cloud
+      - spring-cloud-aws-context
+      - 2.1.0.RELEASE
+      -
+      - \*
+      -
+    * - クラウドベンダ連携
+      - org.springframework.cloud
+      - spring-cloud-aws-jdbc
+      - 2.1.0.RELEASE
+      -
+      - \*
+      -
+    * - クラウドベンダ連携
+      - org.springframework.cloud
+      - spring-cloud-config-client
+      - 2.1.0.RELEASE
+      -
+      - \*
+      -
+    * - クラウドベンダ連携
+      - org.springframework.cloud
+      - spring-cloud-config-server
+      - 2.1.0.RELEASE
+      -
+      - \*
+      -
+    * - クラウドベンダ連携
+      - org.springframework.cloud
+      - spring-cloud-starter-aws
+      - 2.1.0.RELEASE
+      -
+      - \*
+      -
+    * - クラウドベンダ連携
+      - com.github.derjust
+      - spring-data-dynamodb
+      - 5.0.4
+      -
+      -
+      - \*2
+    * - セッション管理
+      - org.springframework.session
+      - spring-session-data-redis
+      - 2.1.3.RELEASE
+      - \*
+      -
+      -
+    * - セッション管理
+      - redis.clients
+      - jedis
+      - 2.9.1
       - \*
       -
       -
 
-#. | Spring IO platformにより定義しているバージョンを優先しているライブラリ
-#. | Spring Cloud for Amazon Web ServicesまたはAWS SDK for Javaが個別に依存しているライブラリ
-#. | Spring IO platformと\ ``spring-cloud-dependencies``\ のバージョン定義が同一であるライブラリ
-#. | Spring IO platformによりバージョンが定義されているが、\ ``spring-cloud-dependencies``\ によるバージョン定義を優先しているライブラリ
-#. | クラウドベンダー連携のために個別に導入するライブラリ
-#. | Spring IO platformによりバージョンが定義されているが、個別にバージョン定義を更新しているライブラリ
+#. | Spring Boot Dependenciesによりバージョンが定義されているが、TERASOLUNA Server Framework 5.5.1.RELEASEによるバージョン定義を優先しているライブラリ
+#. | クラウドベンダ連携のために個別に導入するライブラリ
+#. | Spring Boot Dependenciesによりバージョンが定義されているが、個別にバージョン定義を更新しているライブラリ
+#. | TERASOLUNA Server Framework 5.5.1.RELEASEによりバージョンが定義されているライブラリ
 
- * \ ``spring-session-core``\ の詳細は :doc:`../ImplementationAtEachLayer/SessionManagement` を参照のこと。
- * \ ``tomcat-jdbc``\、\ ``tomcat-juli``\ の詳細は :doc:`../Introduction/Introduction` を参照のこと。
+ * \ ``tomcat-jdbc``\ の詳細は :doc:`../Introduction/Introduction` を参照のこと。
 
 .. raw:: latex
 

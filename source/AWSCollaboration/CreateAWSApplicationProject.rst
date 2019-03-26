@@ -21,7 +21,7 @@ AWSの各機能を利用する際の機能毎の設定については、 :doc:`.
 開発プロジェクトの作成
 --------------------------------------------------------------------------------
 
-本ガイドラインでは、オンライン版クラウド拡張開発プロジェクトに対してクラウドベンダーとしてAWSを利用する場合の設定を追加する。
+本ガイドラインでは、オンライン版クラウド拡張開発プロジェクトに対してクラウドベンダとしてAWSを利用する場合の設定を追加する。
 
 ベースとなる開発プロジェクトの作成は
 :doc:`../ImplementationAtEachLayer/CreateWebApplicationProject`
@@ -78,7 +78,7 @@ AWS利用する場合、AWSの機能毎にカスタマイズが必要な箇所�
 
 スタックの自動検出の無効化
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Amazon Elastic Compute Cloud(以後、EC2)上でアプリケーションを起動するためには、スタックの自動検出を無効化する必要がある。
+アプリケーションを起動するためには、スタックの自動検出を無効化する必要がある。
 事象についての詳細は :ref:`create_aws_project_constrait_amazon_service_exception` を参照されたい。
 
 スタックの自動検出を無効にする設定例を以下に示す。
@@ -96,7 +96,7 @@ Amazon Elastic Compute Cloud(以後、EC2)上でアプリケーションを起�
 
 Auto-Configurationの無効化
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-EC2上でアプリケーションを起動するためには、\ ``ElastiCacheAutoConfiguration``\ をAuto-configurationから除外する必要がある。
+Amazon Elastic Compute Cloud(以後、EC2)上でアプリケーションを起動するためには、\ ``ElastiCacheAutoConfiguration``\ をAuto-configurationから除外する必要がある。
 事象についての詳細は :ref:`create_aws_project_constrait_cannot_find_cache` を参照されたい。
 
 \ ``ElastiCacheAutoConfiguration``\ を無効にする設定例を以下に示す。
@@ -143,7 +143,7 @@ AWSの公式ドキュメントでは、下記のどちらかにアクセスキ�
 * 環境変数
 
 詳細は
-`IAM ユーザーのアクセスキーを適切に管理する <http://docs.aws.amazon.com/ja_jp/general/latest/gr/aws-access-keys-best-practices.html#iam-user-access-keys>`_
+`IAM ユーザのアクセスキーを適切に管理する <http://docs.aws.amazon.com/ja_jp/general/latest/gr/aws-access-keys-best-practices.html#iam-user-access-keys>`_
 を参照されたい。
 
 .. note::
@@ -157,7 +157,7 @@ AWSの公式ドキュメントでは、下記のどちらかにアクセスキ�
   * AWSインスタンスプロファイルの認証情報
 
   詳細はSpring Cloud AWSの公式リファレンス
-  `SDK credentials configuration <http://cloud.spring.io/spring-cloud-static/spring-cloud-aws/2.0.0.RELEASE/single/spring-cloud-aws.html#_sdk_credentials_configuration>`_
+  `SDK credentials configuration <https://cloud.spring.io/spring-cloud-static/spring-cloud-aws/2.1.0.RELEASE/single/spring-cloud-aws.html#_sdk_credentials_configuration>`_
   を参照されたい。
 
 .. warning::
@@ -257,13 +257,13 @@ S3 Management ConsoleもしくはAWS CLIから設定することでアクセス�
 
 .. _create_aws_project_constrait_amazon_service_exception:
 
-Amazon EC2上でAPを起動するとAmazonServiceExceptionが発生する
+アプリケーションを起動するとAmazonServiceExceptionが発生する
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-EC2上でアプリケーションを起動しようとすると、
+アプリケーションを起動しようとすると、
 \ ``Caused by: com.amazonaws.AmazonServiceException: Stack for i-xxxxx does not exist...``\ が発生する。
 Spring Cloud AWSのAuto-configurationである\ ``ContextStackAutoConfiguration``\ によって、
 アプリケーションのスタック名自動検出が有効になり、AWS CloudFormationのスタックが見つからない場合、
-\ ``AmazonServiceException``\ が発生しAPが起動しない。
+\ ``AmazonServiceException``\ が発生しアプリケーションが起動しない。
 
 \ ``cloud.aws.stack.auto = false``\ を設定し、スタックの自動検出を無効化することで回避することができる。
 
@@ -274,7 +274,7 @@ Spring Cloud AWSのAuto-configurationである\ ``ContextStackAutoConfiguration`
 Amazon EC2上でElastiCache Redis使用時の注意
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 EC2上でアプリケーションを起動しようとすると、\ ``Spring Boot: java.lang.IllegalArgumentException: Cannot find cache named 'xxx' for CacheableOperation``\が発生する。
-Spring Cloud AWSのAuto-configurationである\ ``ElastiCacheAutoConfiguration``\ によって、ElastiCacheの自動設定が有効になり、AWS ElastiCacheに\ ``cache named``\の設定がされていない場合、\ ``IllegalArgumentException``\ が発生しAPが起動しない。
+Spring Cloud AWSのAuto-configurationである\ ``ElastiCacheAutoConfiguration``\ によって、ElastiCacheの自動設定が有効になり、AWS ElastiCacheに\ ``cache named``\の設定がされていない場合、\ ``IllegalArgumentException``\ が発生しアプリケーションが起動しない。
 そのため、\ ``ElastiCacheAutoConfiguration``\の自動設定を除外する。
 
 設定例は :ref:`create_aws_project_autoconfiguration` を参照されたい。

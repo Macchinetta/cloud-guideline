@@ -115,7 +115,7 @@ How to use
 
 データソース情報の定義には、1つの共通情報と複数の個別情報があり、それぞれを定義する。
 
-  以下に、\ ``xxx-web/src/java/resources/application-local.yml``\での設定を示す。
+  以下に、\ ``xxx-env/src/main/resources/application-local.yml``\での設定を示す。
 
   .. code-block:: yaml
 
@@ -579,7 +579,7 @@ How to use
 ルーティングデータソースクラス
 """""""""""""""""""""""""""""""""""""""""""""""""""""
 
-  \ ``RoutingDataSource``\は、Springが提供する、複数のデータソースを定義し動的に切り替えを行う仕組みである。簡単な使用方法は `こちら <https://macchinetta.github.io/server-guideline/1.5.1.RELEASE/ja/ArchitectureInDetail/DataAccessDetail/DataAccessCommon.html#data-access-common-todo-multiple-datasource-howtoextends>`_ を参照すること。
+  \ ``RoutingDataSource``\は、Springが提供する、複数のデータソースを定義し動的に切り替えを行う仕組みである。簡単な使用方法は `こちら <https://macchinetta.github.io/server-guideline/1.6.1.RELEASE/ja/ArchitectureInDetail/DataAccessDetail/DataAccessCommon.html#data-access-common-todo-multiple-datasource-howtoextends>`_ を参照すること。
 
   以下に、ルーティングデータソースクラス\ ``RoutingDataSource``\のBean定義例を示す。
 
@@ -933,10 +933,10 @@ How to use
 
 .. _sharding-interceptor-label:
 
-シャーディングインタセプタークラス
+シャーディングインターセプタクラス
 """""""""""""""""""""""""""""""""""""""""""""""""""""
 
-  以下に、シャーディングインタセプタークラス \ ``AccountShardInterceptor``\のBean定義例を示す。
+  以下に、シャーディングインターセプタクラス \ ``AccountShardInterceptor``\のBean定義例を示す。
 
   .. code-block:: xml
 
@@ -967,11 +967,11 @@ How to use
     * - | (2)
       - AOPの設定をする。
 
-        ここでは、\ :ref:`shard-with-account-annotaition-label`\が付与されたメソッド呼び出し時にシャーディングインタセプタークラスが動作する設定にしている。また、トランザクション開始前にシャードキーを取得するため、\ ``order="-1"``\を設定しトランザクションインタセプターより先に動作する設定とする。
+        ここでは、\ :ref:`shard-with-account-annotaition-label`\が付与されたメソッド呼び出し時にシャーディングインターセプタクラスが動作する設定にしている。また、トランザクション開始前にシャードキーを取得するため、\ ``order="-1"``\を設定しトランザクションインターセプタより先に動作する設定とする。
 
 |
 
-  以下に、シャーディングインタセプタークラス\ ``AccountShardInterceptor``\の実装例を示す。
+  以下に、シャーディングインターセプタクラス\ ``AccountShardInterceptor``\の実装例を示す。
 
   .. code-block:: java
 
@@ -1038,7 +1038,7 @@ How to use
     * - 項番
       - 説明
     * - | (1)
-      - シャーディングインタセプタークラスは、\ ``MethodInterceptor``\と\ ``InitializingBean``\の実装クラスとして作成する。
+      - シャーディングインターセプタクラスは、\ ``MethodInterceptor``\と\ ``InitializingBean``\の実装クラスとして作成する。
     * - | (2)
       - コンストラクタで設定される、シャードキーリポジトリクラスを保持するフィールドを定義する。
     * - | (3)

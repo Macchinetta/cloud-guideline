@@ -53,7 +53,7 @@ CloudWatch Logsについては、\ `Amazon CloudWatch Logs の概念 <https://do
 
 How to use
 --------------------------------------------------------------------------------
-AWS環境での使用方法を示す。AWSのログ収集の仕組みは、ファイルシステムに出力されたログを別プロセスであるエージェントが監視収集する方法である。ゆえに、ログ出力の方法自体は |base_framework_name| Development Guidelineの「\ `ロギング <https://macchinetta.github.io/server-guideline/1.6.0.RELEASE/ja/ArchitectureInDetail/GeneralFuncDetail/Logging.html>`_\」に記載している方法をそのまま使用できる。
+AWS環境での使用方法を示す。AWSのログ収集の仕組みは、ファイルシステムに出力されたログを別プロセスであるエージェントが監視収集する方法である。ゆえに、ログ出力の方法自体は |base_framework_name| Development Guidelineの「\ `ロギング <https://macchinetta.github.io/server-guideline/1.6.1.RELEASE/ja/ArchitectureInDetail/GeneralFuncDetail/Logging.html>`_\」に記載している方法をそのまま使用できる。
 
 |
 

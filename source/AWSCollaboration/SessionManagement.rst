@@ -25,8 +25,8 @@ AWS上での構成
    :width: 100%
 
  .. note::
-  上記は、\ `クラスター化された Redis <https://docs.aws.amazon.com/ja_jp/AmazonElastiCache/latest/UserGuide/Replication.Redis.Groups.html#Replication.Redis.Groups.Cluster>`_\
-  を使用した構成のサンプルを示している。Redis構成の比較については、\ `従来の Redis と クラスター化された Redis <https://docs.aws.amazon.com/ja_jp/AmazonElastiCache/latest/UserGuide/Replication.Redis-RedisCluster.html>`_\
+  上記は、\ `クラスタ化された Redis <https://docs.aws.amazon.com/ja_jp/AmazonElastiCache/latest/UserGuide/Replication.Redis.Groups.html#Replication.Redis.Groups.Cluster>`_\
+  を使用した構成のサンプルを示している。Redis構成の比較については、\ `従来の Redis と クラスタ化された Redis <https://docs.aws.amazon.com/ja_jp/AmazonElastiCache/latest/UserGuide/Replication.Redis-RedisCluster.html>`_\
   を参照されたい。
 
 |
@@ -43,8 +43,8 @@ How to use
 エンドポイントの検索
 """"""""""""""""""""""""""""""""""""""""""""""""
 
-\ `クラスター化された Redis <https://docs.aws.amazon.com/ja_jp/AmazonElastiCache/latest/UserGuide/Replication.Redis.Groups.html#Replication.Redis.Groups.Cluster>`_\
-を使用した場合のエンドポイントは、\ `クラスター化された Redis クラスターのエンドポイントの検索 <https://docs.aws.amazon.com/ja_jp/AmazonElastiCache/latest/UserGuide/Endpoints.html#Endpoints.Find.RedisCluster>`_\
+\ `クラスタ化された Redis <https://docs.aws.amazon.com/ja_jp/AmazonElastiCache/latest/UserGuide/Replication.Redis.Groups.html#Replication.Redis.Groups.Cluster>`_\
+を使用した場合のエンドポイントは、\ `クラスタ化された Redis クラスタのエンドポイントの検索 <https://docs.aws.amazon.com/ja_jp/AmazonElastiCache/latest/UserGuide/Endpoints.html#Endpoints.Find.RedisCluster>`_\
 を参照されたい。
 
 | 設定方法については、:ref:`session-management-endpoint-label` を参照されたい。
@@ -55,10 +55,10 @@ How to use
 AWS環境での固有設定
 """"""""""""""""""""""""""""""""""""""""""""""""
 
-\ `Spring Session with Redis <https://docs.spring.io/spring-session/docs/2.0.5.RELEASE/reference/html5/#httpsession-redis>`_\
+\ `Spring Session with Redis <https://docs.spring.io/spring-session/docs/2.1.3.RELEASE/reference/html5/#httpsession-redis>`_\
 は、Redisのconfigコマンドを使用して初期化時に自動で設定を実施するが、ElastiCacheのようなマネージドサービスでは
 configコマンドが無効化されていてエラーになってしまうため、以下の設定が必要となる。
-詳細については、\ `SessionDeletedEvent and SessionExpiredEvent <https://docs.spring.io/spring-session/docs/2.0.5.RELEASE/reference/html5/#api-redisoperationssessionrepository-sessiondestroyedevent>`_\ を参照されたい。
+詳細については、\ `SessionDeletedEvent and SessionExpiredEvent <https://docs.spring.io/spring-session/docs/2.1.3.RELEASE/reference/html5/#api-redisoperationssessionrepository-sessiondestroyedevent>`_\ を参照されたい。
 
 
 - :file:`application-context.xml`
@@ -78,7 +78,7 @@ configコマンドが無効化されていてエラーになってしまうた�
    * - 項番
      - 説明
    * - | (1)
-     - | \ `Spring Session with Redis <https://docs.spring.io/spring-session/docs/2.0.5.RELEASE/reference/html5/#httpsession-redis>`_\の自動設定を無効化する設定を定義。
+     - | \ `Spring Session with Redis <https://docs.spring.io/spring-session/docs/2.1.3.RELEASE/reference/html5/#httpsession-redis>`_\の自動設定を無効化する設定を定義。
 
 
 
