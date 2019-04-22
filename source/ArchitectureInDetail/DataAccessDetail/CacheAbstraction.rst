@@ -15,7 +15,7 @@ Overview
 
 セッションを外部管理化するためにキャッシュを利用する方法については、 :doc:`../../AWSCollaboration/SessionManagement` を参照されたい。
 
-Springのガイドについては、 `Spring Cache Abstraction <http://docs.spring.io/spring/docs/4.3.14.RELEASE/spring-framework-reference/html/cache.html>`_ を参照されたい。
+Springのガイドについては、 `Spring Cache Abstraction <http://docs.spring.io/spring/docs/4.3.23.RELEASE/spring-framework-reference/html/cache.html>`_ を参照されたい。
 
 .. _cache-local-heap:
 
@@ -110,8 +110,8 @@ Spring Cache Abstractionの設定
 ローカルヒープを使用したキャッシュの設定
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-キャッシュの機能を有効にするには、キャッシュマネージャーの設定が必要になる。
-以下に、ローカルヒープを使用したキャッシュマネージャーの設定例を示す。
+キャッシュの機能を有効にするには、キャッシュマネージャの設定が必要になる。
+以下に、ローカルヒープを使用したキャッシュマネージャの設定例を示す。
 
   .. code-block:: xml
 
@@ -143,7 +143,7 @@ Spring Cache Abstractionの設定
     * - | (1)
       - アノテーションでのキャッシュを有効にする。
 
-        キャッシュデータの管理をするため\ ``order="-1"``\を設定し、キャッシュインタセプターがトランザクションインタセプターより先に動作する設定とする。これにより、キャッシュデータの参照はトランザクション開始前に、登録と削除はトランザクションの終了後に行う。
+        キャッシュデータの管理をするため\ ``order="-1"``\を設定し、キャッシュインターセプタがトランザクションインターセプタより先に動作する設定とする。これにより、キャッシュデータの参照はトランザクション開始前に、登録と削除はトランザクションの終了後に行う。
     * - | (2)
       - キャッシュデータの格納場所にローカルヒープ領域を使用する場合は、Springが提供する\ ``SimpleCacheManager``\をキャッシュマネージャとして使用する。
     * - | (3)
@@ -151,14 +151,14 @@ Spring Cache Abstractionの設定
 
   .. note::
       ローカルヒープ領域における「入れ物」の実装は、\ ``ConcurrentMapCacheFactoryBean``\以外のものもSpringに用意されている。
-      詳細は `Springのリファレンス Configuring the cache storage <https://docs.spring.io/spring/docs/4.3.14.RELEASE/spring-framework-reference/htmlsingle/#cache-store-configuration>`_ を参照されたい。
+      詳細は `Springのリファレンス Configuring the cache storage <https://docs.spring.io/spring/docs/4.3.23.RELEASE/spring-framework-reference/htmlsingle/#cache-store-configuration>`_ を参照されたい。
 
 .. _cache-redis-setting:
 
 Redisを使用したキャッシュの設定
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-以下に、Redisを使用したキャッシュマネージャーの設定例を示す。
+以下に、Redisを使用したキャッシュマネージャの設定例を示す。
 RedisへのアクセスはSpring Data Redisを使用するが、:doc:`../../ImplementationAtEachLayer/SessionManagement` で説明した\ ``spring-boot-starter-data-redis``\への依存関係が追加されていることが前提となる。
 
   .. code-block:: xml
@@ -258,7 +258,7 @@ Spring Cache Abstractionでは、メソッドにアノテーションを定義�
         * - | (1)
           - \ ``Cacheable``\アノテーションの属性\ ``key``\で設定している、\ ``#a0``\がメソッド\ ``findOne``\の引数0番目(id)を指定している。
 
-            詳細は `Springのリファレンス Available caching SpEL evaluation context <https://docs.spring.io/spring/docs/4.3.14.RELEASE/spring-framework-reference/html/cache.html#cache-spel-context>`_ を参照されたい。
+            詳細は `Springのリファレンス Available caching SpEL evaluation context <https://docs.spring.io/spring/docs/4.3.23.RELEASE/spring-framework-reference/html/cache.html#cache-spel-context>`_ を参照されたい。
 
 キャッシュしたデータの削除
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -332,7 +332,7 @@ How to extend
 以下に、キャッシュ格納用のRedisをSpring Bootデフォルトのプロパティキーによる指定とは別に設定する方法を示す。
 Spring Data Redisを使用してRedisへのアクセスを行う場合、通常ではSpring Bootデフォルトのプロパティキーを使用して接続情報を指定するが、キャッシュ格納用のRedisを別に指定する場合はここで紹介する方法で接続設定を行うことが可能である。
 
-Spring Bootデフォルトのプロパティキーについては、Spring Boot Reference Guideの \ `Common application properties <https://docs.spring.io/spring-boot/docs/1.5.7.RELEASE/reference/html/common-application-properties.html#common-application-properties>`_\ の# REDIS (RedisProperties)を参照されたい。
+Spring Bootデフォルトのプロパティキーについては、Spring Boot Reference Guideの \ `Common application properties <https://docs.spring.io/spring-boot/docs/1.5.20.RELEASE/reference/html/common-application-properties.html#common-application-properties>`_\ の# REDIS (RedisProperties)を参照されたい。
 
   .. code-block:: xml
 
@@ -414,7 +414,7 @@ Spring Bootデフォルトのプロパティキーについては、Spring Boot 
         .. note::
 
          \ `JedisConnectionFactory`\のコンストラクタに\ `RedisClusterConfiguration`\を指定する場合、接続先のRedisはクラスタ構成であることが必須となる。スタンドアローン構成のRedisに接続する場合は\ `JedisConnectionFactory`\に直接接続先のServerとPortを指定すること。
-         指定方法については、`Spring Data Redisのリファレンス <https://docs.spring.io/spring-data/redis/docs/1.8.7.RELEASE/reference/html/#redis:connectors:jedis>`_ を参照されたい。
+         指定方法については、`Spring Data Redisのリファレンス <https://docs.spring.io/spring-data/redis/docs/1.8.20.RELEASE/reference/html/#redis:connectors:jedis>`_ を参照されたい。
 
     * - | (4)
       - \ `RedisClusterConfiguration`\のBean定義を行う。コンストラクタの引数に接続先のノードを指定する。
@@ -427,7 +427,7 @@ Spring Bootデフォルトのプロパティキーについては、Spring Boot 
         * min-idle : spring.redis.pool.minIdle
 
     * - | (6)
-      - \ `RedisConnectionFactory`\インターフェースの実装クラスをBean定義すると、AutoConfigurationによる\ `RedisConnectionFactory`\のBean定義が無効となる。そのため、Spring Sessionがセッション情報をRedisに格納するために使用する\ `JedisConnectionFactory`\のBean定義を行う。\ `primary="true"`\を指定し、Spring Sessionが\ `RedisTemplate`\を生成する際に優先的に使用させる。
+      - \ `RedisConnectionFactory`\インタフェースの実装クラスをBean定義すると、AutoConfigurationによる\ `RedisConnectionFactory`\のBean定義が無効となる。そのため、Spring Sessionがセッション情報をRedisに格納するために使用する\ `JedisConnectionFactory`\のBean定義を行う。\ `primary="true"`\を指定し、Spring Sessionが\ `RedisTemplate`\を生成する際に優先的に使用させる。
 
   プロパティキーに対応する値の設定を行う。
 
@@ -480,7 +480,7 @@ Spring Bootデフォルトのプロパティキーについては、Spring Boot 
       - セッションを格納するRedisの\ `JedisPoolConfig`\に設定するプロパティを指定する。
 
 .. note::
-  本ガイドラインでは、Spring Bootデフォルトのプロパティキーとは別に設定する方法について、一部のプロパティについて紹介した。より詳細なカスタマイズを行いたい場合は、 `RedisProperties <https://github.com/spring-projects/spring-boot/blob/1.4.x/spring-boot-autoconfigure/src/main/java/org/springframework/boot/autoconfigure/data/redis/RedisProperties.java>`_ および `RedisAutoConfiguration <https://github.com/spring-projects/spring-boot/blob/1.4.x/spring-boot-autoconfigure/src/main/java/org/springframework/boot/autoconfigure/data/redis/RedisAutoConfiguration.java>`_ の実装を参照し、設定を検討されたい。
+  本ガイドラインでは、Spring Bootデフォルトのプロパティキーとは別に設定する方法について、一部のプロパティについて紹介した。より詳細なカスタマイズを行いたい場合は、 `RedisProperties <https://github.com/spring-projects/spring-boot/blob/1.5.x/spring-boot-autoconfigure/src/main/java/org/springframework/boot/autoconfigure/data/redis/RedisProperties.java>`_ および `RedisAutoConfiguration <https://github.com/spring-projects/spring-boot/blob/1.5.x/spring-boot-autoconfigure/src/main/java/org/springframework/boot/autoconfigure/data/redis/RedisAutoConfiguration.java>`_ の実装を参照し、設定を検討されたい。
 
 .. _muiti-cache-manager:
 
@@ -488,7 +488,7 @@ Spring Bootデフォルトのプロパティキーについては、Spring Boot 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Spring Cache Abstractionでは、複数のキャッシュマネージャを別のBean名で定義しておき、\ `@Cacheable`\アノテーションの\ `cacheManager`\属性に指定することで、キャッシュ対象データ毎に使用するキャッシュマネージャを指定することが可能である。
-詳細は、`Custom cache resolution <https://docs.spring.io/spring/docs/4.3.14.RELEASE/spring-framework-reference/html/cache.html#cache-annotations-cacheable-cache-resolver>`_ を参照されたい。
+詳細は、`Custom cache resolution <https://docs.spring.io/spring/docs/4.3.23.RELEASE/spring-framework-reference/html/cache.html#cache-annotations-cacheable-cache-resolver>`_ を参照されたい。
 
 .. raw:: latex
 

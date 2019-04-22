@@ -339,7 +339,7 @@ Springを開発、提供しているPivotal社が提示している
 
 共通ライブラリ
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-|base_framework_name| が提供する\ `共通ライブラリ <https://macchinetta.github.io/server-guideline/1.5.1.RELEASE/ja/Overview/FrameworkStack.html#frameworkstack-common-library>`_\ の対応状況は以下の通り。
+|base_framework_name| が提供する\ `共通ライブラリ <https://macchinetta.github.io/server-guideline/1.5.2.RELEASE/ja/Overview/FrameworkStack.html#frameworkstack-common-library>`_\ の対応状況は以下の通り。
 
 .. tabularcolumns:: |p{0.15\linewidth}|p{0.25\linewidth}|p{0.40\linewidth}|p{0.25\linewidth}|
 .. list-table::
@@ -471,11 +471,11 @@ Springを開発、提供しているPivotal社が提示している
     - | 認証ユーザ名格納用サーブレットフィルタ
     - | 検証済み
 
-#. 二重送信防止に関する制約の内容については、:doc:`../ImplementationAtEachLayer/CreateWebApplicationProject` を参照されたい。
+#. 二重送信防止に関する制約の内容については、:ref:`limit_session_management` を参照されたい。
 
 提供機能
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-|base_framework_name| \ `Development Guideline <https://macchinetta.github.io/server-guideline/1.5.1.RELEASE/ja/index.html>`_\ が提供する機能の対応状況は以下の通り。
+|base_framework_name| \ `Development Guideline <https://macchinetta.github.io/server-guideline/1.5.2.RELEASE/ja/index.html>`_\ が提供する機能の対応状況は以下の通り。
 
 .. tabularcolumns:: |p{0.33\linewidth}|p{0.33\linewidth}|p{0.33\linewidth}|
 .. list-table::
@@ -543,9 +543,6 @@ Springを開発、提供しているPivotal社が提示している
     - | データベースアクセス（MyBatis3編）
     - | 検証済み（拡張有り）
   * - |
-    - | データベースアクセス（JPA編）
-    - | 未検証
-  * - |
     - | 排他制御
     - | 検証済み
   * - | アプリケーション形態に依存しない汎用機能
@@ -599,9 +596,12 @@ Springを開発、提供しているPivotal社が提示している
   * - |
     - | 暗号化
     - | 未検証
+  * - |
+    - | OAuth
+    - | 未検証
 
-#. 二重送信防止に関する制約の内容については、:doc:`../ImplementationAtEachLayer/CreateWebApplicationProject` を参照されたい。
-#. Tilesによる画面レイアウトに関する制約の内容については、:doc:`../ImplementationAtEachLayer/SessionManagement` を参照されたい。
+#. 二重送信防止に関する制約の内容については、:ref:`limit_session_management` を参照されたい。
+#. Tilesによる画面レイアウトに関する制約の内容については、:ref:`create_project_constrait_webmvc_tiles` を参照されたい。
 
 .. raw:: latex
 

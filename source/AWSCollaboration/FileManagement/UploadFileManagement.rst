@@ -16,7 +16,7 @@ Overview
 
     本ガイドラインでは、アップロードファイルをS3のストレージに保存する方法および留意点のみを説明する。
 
-    AWS環境におけるファイルアップロードの実装方法は |base_framework_name| Development Guideline `ファイルアップロード <https://macchinetta.github.io/server-guideline/1.5.1.RELEASE/ja/ArchitectureInDetail/WebApplicationDetail/FileUpload.html>`_  に記載の内容と基本的に同様であり、アップロードファイルの保存先をAWSが提供するストレージサービスであるS3に保存する点のみが異なる。
+    AWS環境におけるファイルアップロードの実装方法は |base_framework_name| Development Guideline `ファイルアップロード <https://macchinetta.github.io/server-guideline/1.5.2.RELEASE/ja/ArchitectureInDetail/WebApplicationDetail/FileUpload.html>`_  に記載の内容と基本的に同様であり、アップロードファイルの保存先をAWSが提供するストレージサービスであるS3に保存する点のみが異なる。
 
 .. note::
 
@@ -65,9 +65,9 @@ How to use
 
 S3へのアクセスはSpring Cloud AWSまたはAmazon SDK for Javaを使用することで実装可能であるが、両者の使い分けについて説明する。
 
-Spring Cloud AWSによる実装では、Spring Frameworkが提供する\ ``Resource``\ インターフェースによるリソースアクセスの抽象化が利用可能である。
+Spring Cloud AWSによる実装では、Spring Frameworkが提供する\ ``Resource``\ インタフェースによるリソースアクセスの抽象化が利用可能である。
 そのため、実装の標準化の観点からSpring Cloud AWSを使用して実装可能な機能については同ライブラリを使用して実装することが望ましい。
-\ ``Resource``\ インターフェースの詳細については、Spring Framework Reference Documentation `Resources <http://docs.spring.io/spring/docs/4.3.14.RELEASE/spring-framework-reference/htmlsingle/#resources>`_ を参照されたい。
+\ ``Resource``\ インタフェースの詳細については、Spring Framework Reference Documentation `Resources <http://docs.spring.io/spring/docs/4.3.23.RELEASE/spring-framework-reference/htmlsingle/#resources>`_ を参照されたい。
 
 ただし、Spring Cloud AWSでは以下のオブジェクト操作のみ実装可能である。
 
@@ -126,7 +126,7 @@ Spring Cloud AWSを利用したS3へのアクセスを行うための依存ラ�
 アプリケーションの設定
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-Spring Frameworkの\ ``Resource``\ インターフェースを利用したS3へのアクセスを行うためのBean定義を行う。
+Spring Frameworkの\ ``Resource``\ インタフェースを利用したS3へのアクセスを行うためのBean定義を行う。
 Bean定義の詳細については、 Spring Cloud AWS `Resource handling <http://cloud.spring.io/spring-cloud-static/spring-cloud-aws/1.2.1.RELEASE/#_resource_handling>`_ を参照されたい。
 
 - :file:`xxx-domain/src/main/resources/META-INF/spring/xxx-domain.xml`
@@ -161,7 +161,7 @@ Bean定義の詳細については、 Spring Cloud AWS `Resource handling <http:
         | 値に\ ``http://www.springframework.org/schema/cloud/aws/context``\ と\ ``http://www.springframework.org/schema/cloud/aws/context/spring-cloud-aws-context.xsd``\ を追加する。
     * - | (2)
       - | -
-      - | \ ``<aws-context:context-resource-loader/>``\ を利用して\ ``ResourceLoader``\ インターフェースを利用したS3へのアクセスを有効化する。
+      - | \ ``<aws-context:context-resource-loader/>``\ を利用して\ ``ResourceLoader``\ インタフェースを利用したS3へのアクセスを有効化する。
 
 .. note::
 
@@ -322,7 +322,7 @@ S3のマルチパートアップロードについては Amazon Simple Storage S
 
  .. note::
 
-    S3から取得したファイルをユーザにダウンロードさせる方法については、 |base_framework_name| Development Guideline `ファイルダウンロード <https://macchinetta.github.io/server-guideline/1.5.1.RELEASE/ja/ArchitectureInDetail/WebApplicationDetail/FileDownload.html>`_  を参照されたい。
+    S3から取得したファイルをユーザにダウンロードさせる方法については、 |base_framework_name| Development Guideline `ファイルダウンロード <https://macchinetta.github.io/server-guideline/1.5.2.RELEASE/ja/ArchitectureInDetail/WebApplicationDetail/FileDownload.html>`_  を参照されたい。
 
 - S3上の単一ファイル削除【Amazon SDK for Javaを使用】
 
@@ -347,7 +347,7 @@ S3のマルチパートアップロードについては Amazon Simple Storage S
       - 説明
     * - | (1)
       - | \ ``AmazonS3``\ のインジェクションを行う。
-        | \ ``ResourceLoader``\ インターフェースを利用するために\ ``<aws-context:context-resource-loader/>``\ を有効にしている場合、\ ``ContextResourceLoaderBeanDefinitionParser``\ によりBean定義された\ ``AmazonS3Client``\ が使用される。
+        | \ ``ResourceLoader``\ インタフェースを利用するために\ ``<aws-context:context-resource-loader/>``\ を有効にしている場合、\ ``ContextResourceLoaderBeanDefinitionParser``\ によりBean定義された\ ``AmazonS3Client``\ が使用される。
     * - | (2)
       - | バケット名、オブジェクトキーを指定してファイルの削除を行う。
 
@@ -381,7 +381,7 @@ How to extend
       - 説明
     * - | (1)
       - | \ ``ResourcePatternResolver``\ のインジェクションを行う。
-        | \ ``ResourceLoader``\ インターフェースを利用するために\ ``<aws-context:context-resource-loader/>``\ を有効にしている場合、\ ``ContextResourceLoaderBeanDefinitionParser``\ によりBean定義された\ ``ResourcePatternResolver``\ が使用される。
+        | \ ``ResourceLoader``\ インタフェースを利用するために\ ``<aws-context:context-resource-loader/>``\ を有効にしている場合、\ ``ContextResourceLoaderBeanDefinitionParser``\ によりBean定義された\ ``ResourcePatternResolver``\ が使用される。
     * - | (2)
       - | S3のパスを指定し、\ ``Resource``\ を配列形式で取得する。
         | 検索に使用する文字列はAntパターンで指定する。
@@ -451,7 +451,7 @@ S3では、バケット内のオブジェクトに対してライフサイクル
 
 .. note::
 
-    ライフサイクル管理でHousekeepingの要件を満たせない場合は、オブジェクトの削除機能を実装する必要がある。実装方法については |base_framework_name| Development Guideline `仮アップロード時の不要ファイルのHousekeeping <https://macchinetta.github.io/server-guideline/1.5.1.RELEASE/ja/ArchitectureInDetail/WebApplicationDetail/FileUpload.html#housekeeping>`_  を参照されたい。
+    ライフサイクル管理でHousekeepingの要件を満たせない場合は、オブジェクトの削除機能を実装する必要がある。実装方法については |base_framework_name| Development Guideline `仮アップロード時の不要ファイルのHousekeeping <https://macchinetta.github.io/server-guideline/1.5.2.RELEASE/ja/ArchitectureInDetail/WebApplicationDetail/FileUpload.html#housekeeping>`_  を参照されたい。
 
 Appendix
 --------------------------------------------------------------------------------

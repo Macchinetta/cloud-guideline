@@ -85,10 +85,10 @@
       - 検証時期
 
     * - AWS
-      - Red Hat Enterprise Linux (64bit) 7.3
-      - Apache Tomcat 8.5
+      - CentOS 7.4
+      - Apache Tomcat 8.5.40
       - RDS(PostgreSQL 9.6)
-      - 2018/2
+      - 2019/4
 
 商標について
 ================================================================================

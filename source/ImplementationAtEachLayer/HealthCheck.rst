@@ -19,12 +19,12 @@ Overview
 ロードバランサの負荷分散と縮退運転
 """"""""""""""""""""""""""""""""""
 
-「ロードバランサの負荷分散と縮退運転」の詳細については、 |base_framework_name| Development Guidelineの\ `ロードバランサの負荷分散と縮退運転 <https://macchinetta.github.io/server-guideline/1.5.1.RELEASE/ja/ArchitectureInDetail/WebApplicationDetail/HealthCheck.html#healthcheckoverview-loadbalancer>`_\ を参照されたい。
+「ロードバランサの負荷分散と縮退運転」の詳細については、 |base_framework_name| Development Guidelineの\ `ロードバランサの負荷分散と縮退運転 <https://macchinetta.github.io/server-guideline/1.5.2.RELEASE/ja/ArchitectureInDetail/WebApplicationDetail/HealthCheck.html#healthcheckoverview-loadbalancer>`_\ を参照されたい。
 
 ヘルスチェックの種類
 """"""""""""""""""""
 
-「ヘルスチェックの種類」の詳細については、 |base_framework_name| Development Guidelineの\ `ヘルスチェックの種類 <https://macchinetta.github.io/server-guideline/1.5.1.RELEASE/ja/ArchitectureInDetail/WebApplicationDetail/HealthCheck.html#id4>`_\ を参照されたい。
+「ヘルスチェックの種類」の詳細については、 |base_framework_name| Development Guidelineの\ `ヘルスチェックの種類 <https://macchinetta.github.io/server-guideline/1.5.2.RELEASE/ja/ArchitectureInDetail/WebApplicationDetail/HealthCheck.html#id4>`_\ を参照されたい。
 
 本ガイドラインで示すヘルスチェックの構成
 """"""""""""""""""""""""""""""""""""""""
@@ -46,7 +46,7 @@ Overview
    * - 項番
      - 説明
    * - | (1)
-     - | LBからのリクエストを受け、各ヘルスチェックを実行する。エンドポイントはSpring Boot Actuatorの仕様により、/healthになる。詳細については、\ `Endpoints <http://docs.spring.io/spring-boot/docs/1.5.7.RELEASE/reference/html/production-ready-endpoints.html#production-ready-endpoints>`_\ を参照されたい。
+     - | LBからのリクエストを受け、各ヘルスチェックを実行する。エンドポイントはSpring Boot Actuatorの仕様により、/healthになる。詳細については、\ `Endpoints <http://docs.spring.io/spring-boot/docs/1.5.20.RELEASE/reference/html/production-ready-endpoints.html#production-ready-endpoints>`_\ を参照されたい。
    * - | (2)
      - | 各ヘルスチェックは、使用ミドルウェアなどの接続・稼動確認を実施する。例では、DataSourceHealthIndicatorからSQLを発行し、データベースが稼動していることを確認している。
        | これは、データベースアクセスを伴うアプリケーションの場合、アプリケーションが稼動していても、データベースに異常がある場合は正常に業務を行うことができないためである。
@@ -71,7 +71,7 @@ Overview
      - | 503(異常)
      - | JSON形式で\ ``"status": "DOWN"``\
 
-「Spring Boot Actuatorの処理結果ステータス」の詳細については、\ `Writing custom HealthIndicators <http://docs.spring.io/spring-boot/docs/1.5.7.RELEASE/reference/htmlsingle/#_writing_custom_healthindicators>`_\ を参照されたい。
+「Spring Boot Actuatorの処理結果ステータス」の詳細については、\ `Writing custom HealthIndicators <http://docs.spring.io/spring-boot/docs/1.5.20.RELEASE/reference/htmlsingle/#_writing_custom_healthindicators>`_\ を参照されたい。
 
 
 
@@ -160,7 +160,7 @@ Spring Boot ActuatorのヘルスチェックのエンドポイントのURLは、
 ヘルスチェック対象
 """"""""""""""""""
 
-Spring Boot Actuatorがサポートしているヘルスチェック対象は、\ `Auto-configured HealthIndicators <https://docs.spring.io/spring-boot/docs/1.5.7.RELEASE/reference/htmlsingle/#_auto_configured_healthindicators>`_\ を参照されたい。
+Spring Boot Actuatorがサポートしているヘルスチェック対象は、\ `Auto-configured HealthIndicators <https://docs.spring.io/spring-boot/docs/1.5.20.RELEASE/reference/htmlsingle/#_auto_configured_healthindicators>`_\ を参照されたい。
 
 
 
@@ -184,7 +184,7 @@ Spring Boot Actuatorのエンドポイントは、外部に公開するべきで
 
 .. note::
 
-    Spring Bootに内包されたTomcatを使用する場合は、アプリケーションとSpring Boot Actuator機能でポートを分けることができるため、ロードバランサで対象のポートを保護する。また、「Spring Boot Actuator自体のアクセス保護機能」については、\ `Security with HealthIndicators <https://docs.spring.io/spring-boot/docs/1.5.7.RELEASE/reference/htmlsingle/#_security_with_healthindicators>`_\ を参照されたい。
+    Spring Bootに内包されたTomcatを使用する場合は、アプリケーションとSpring Boot Actuator機能でポートを分けることができるため、ロードバランサで対象のポートを保護する。また、「Spring Boot Actuator自体のアクセス保護機能」については、\ `Security with HealthIndicators <https://docs.spring.io/spring-boot/docs/1.5.20.RELEASE/reference/htmlsingle/#_security_with_healthindicators>`_\ を参照されたい。
 
 
 How to extend
@@ -194,7 +194,7 @@ How to extend
 """"""""""""""""""""
 Spring Boot Actuatorが用意しているデフォルトのヘルスインジケータのみでヘルスチェックを実現できない場合は、カスタムヘルスチェックインジケータを登録することができる。
 カスタムヘルスチェックインジケータは、\ ``HealthIndicator``\インタフェースの実装に、\ ``@Component``\を付与することで登録される。
-「Spring Bootを使用したコンポーネントスキャンの定義方法」については、\ `Structuring your code <http://docs.spring.io/spring-boot/docs/1.5.7.RELEASE/reference/html/using-boot-structuring-your-code.html>`_\ を参照されたい。
+「Spring Bootを使用したコンポーネントスキャンの定義方法」については、\ `Structuring your code <http://docs.spring.io/spring-boot/docs/1.5.20.RELEASE/reference/html/using-boot-structuring-your-code.html>`_\ を参照されたい。
 
 
 
@@ -259,7 +259,7 @@ Appendix
 Spring Boot Actuatorが提供するエンドポイント
 """""""""""""""""""""""""""""""""""""""""""""
 
-「Spring Boot Actuatorが提供するエンドポイント」の詳細については、\ `Endpoints <http://docs.spring.io/spring-boot/docs/1.5.7.RELEASE/reference/html/production-ready-endpoints.html#production-ready-endpoints>`_\ を参照されたい。
+「Spring Boot Actuatorが提供するエンドポイント」の詳細については、\ `Endpoints <http://docs.spring.io/spring-boot/docs/1.5.20.RELEASE/reference/html/production-ready-endpoints.html#production-ready-endpoints>`_\ を参照されたい。
 
 
 .. raw:: latex

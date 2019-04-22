@@ -20,7 +20,7 @@ Overview
 
 | KVSにはAWSの提供するDynamoDBを利用し、ファイルの検索情報としてオブジェクトキーおよびメタデータ（作成日、作成者、サイズなど）を登録する。
 | また、S3へのファイル登録とDynamoDBへの検索情報登録を一連の処理として実行する必要があるため、S3の更新をトリガーとしてDynamoDBの登録処理を実行する仕組みが必要となる。
-| この仕組みはS3の更新イベントを受信してDynamoDBへの検索情報登録を行うイベントリスナーを作成することで実現する。
+| この仕組みはS3の更新イベントを受信してDynamoDBへの検索情報登録を行うイベントリスナを作成することで実現する。
 | イベントの連携にはAWSの提供するSQS（Simple Queue Service）を利用する。
 
 
@@ -41,7 +41,7 @@ Overview
     * - | (2)
       - | Createイベント（またはDeleteイベント）がイベントメッセージとしてSQSへ通知される。
     * - | (3)
-      - | イベントリスナーがイベントメッセージを受信する。
+      - | イベントリスナがイベントメッセージを受信する。
     * - | (4)
       - | イベントメッセージから更新対象のファイル情報を取得する。
         | Createイベントを受信した場合はファイル情報をDynamoDBへ検索情報として登録する。
@@ -92,7 +92,7 @@ How to use
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 | DynamoDBへのアクセスはspring-data-dynamodbまたはAmazon SDK for Javaを使用することで実装可能であるが、両者の使い分けについて説明する。
-| spring-data-dynamodbによる実装では、Spring Framework が提供する\ ``CrudRepository``\ インターフェースにより、Spring Data と親和性のあるリソースアクセスの抽象化が可能である。
+| spring-data-dynamodbによる実装では、Spring Framework が提供する\ ``CrudRepository``\ インタフェースにより、Spring Data と親和性のあるリソースアクセスの抽象化が可能である。
 | 一方で Spring Data 仕様に寄せられていることにより、DynamoDBアクセス固有の機能についてはいくつか制限がある。
 | spring-data-dynamodbの詳細については、 `Spring Data DynamoDB# <https://github.com/michaellavelle/spring-data-dynamodb>`_ を参照されたい。
 | 対してAmazon SDK for JavaではDynamoDB用の高レベルプログラミングインターフェイス\ ``DynamoDBMapper``\ を利用することにより、参照・更新の都度\ ``DynamoDBMapperConfig.ConsistentReads``\、\ ``DynamoDBMapperConfig.SaveBehavior``\によるきめ細かいオプションを指定することができる。
@@ -246,9 +246,9 @@ S3イベントメッセージの受信
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 SQSキューに通知されるS3のイベントメッセージを受信する。
 :doc:`../Queuing/AsynchronousProcessing`
-に従って、SQSキューからイベントメッセージを受信するリスナークラスを作成する。
+に従って、SQSキューからイベントメッセージを受信するリスナクラスを作成する。
 
-リスナークラスではイベントメッセージの受信と同時に後述するメタデータの登録も行うため、実装例は :ref:`storage-file-search-metadata-label` を参照されたい。
+リスナクラスではイベントメッセージの受信と同時に後述するメタデータの登録も行うため、実装例は :ref:`storage-file-search-metadata-label` を参照されたい。
 
 
 .. _storage-file-search-metadata-label:
@@ -475,7 +475,7 @@ SQSキューに通知されるS3のイベントメッセージを受信する。
   * - | (2)
     - | 非同期受信用のメソッドに対し\ ``@JmsListener``\ アノテーションを設定する。
       | \ ``destination``\ 属性には、受信先のキュー名を指定する。
-      | \ ``concurrency``\ 属性には、リスナーメソッドの並列数の上限を指定する。
+      | \ ``concurrency``\ 属性には、リスナメソッドの並列数の上限を指定する。
       | DynamoDBに登録済の既存データを検索する処理とそのデータの更新処理までの一連を排他的に実行したいため、並列数の上限を\ ``1``\ に設定する。
   * - | (3)
     - | \ ``S3EventNotification#parseJson``\ を利用したJSON->Java変換を実行する。

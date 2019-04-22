@@ -141,7 +141,7 @@ Spring Data module for DynamoDBの詳細については、 `Spring Data DynamoDB
 
 以下に、DynamoDBのリージョンとシャードキーリポジトリインタフェースの設定例を示す。
 
-- \ ``xxx-web/src/java/resources/application-local.yml``\にDynamoDBのリージョンを設定
+- \ ``xxx-env/src/main/resources/application-local.yml``\にDynamoDBのリージョンを設定
 
 .. code-block:: yaml
 
@@ -255,7 +255,7 @@ Spring Data module for DynamoDBの詳細については、 `Spring Data DynamoDB
 DynamoDBへアクセスする為には、テーブルデータに対応したエンティティクラスとシャードキーリポジトリクラスを作成する。
 以下に、DynamoDBのエンティティクラス\ ``ShardingAccount``\とシャードキーリポジトリクラス\ ``AccountShardKeyRepository``\の実装例を示す。
 
-Spring DataのRepositoryの詳細については、`Spring Data JPA <http://terasolunaorg.github.io/guideline/5.4.1.RELEASE/ja/ArchitectureInDetail/DataAccessDetail/DataAccessJpa.html#repository>`_ を参照されたい。
+Spring DataのRepositoryの詳細については、`Spring Data JPA <http://terasolunaorg.github.io/guideline/5.4.2.RELEASE/ja/ArchitectureInDetail/DataAccessDetail/DataAccessJpa.html#repository>`_ を参照されたい。
 
 - エンティティクラス\ ``ShardingAccount``\
 

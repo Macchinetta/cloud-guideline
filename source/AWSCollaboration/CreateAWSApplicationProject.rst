@@ -21,7 +21,7 @@ AWSの各機能を利用する際の機能毎の設定については、 :doc:`.
 開発プロジェクトの作成
 --------------------------------------------------------------------------------
 
-本ガイドラインでは、オンライン版クラウド拡張開発プロジェクトに対してクラウドベンダーとしてAWSを利用する場合の設定を追加する。
+本ガイドラインでは、オンライン版クラウド拡張開発プロジェクトに対してクラウドベンダとしてAWSを利用する場合の設定を追加する。
 
 ベースとなる開発プロジェクトの作成は
 :doc:`../ImplementationAtEachLayer/CreateWebApplicationProject`
@@ -143,7 +143,7 @@ AWSの公式ドキュメントでは、下記のどちらかにアクセスキ�
 * 環境変数
 
 詳細は
-`IAM ユーザーのアクセスキーを適切に管理する <http://docs.aws.amazon.com/ja_jp/general/latest/gr/aws-access-keys-best-practices.html#iam-user-access-keys>`_
+`IAM ユーザのアクセスキーを適切に管理する <http://docs.aws.amazon.com/ja_jp/general/latest/gr/aws-access-keys-best-practices.html#iam-user-access-keys>`_
 を参照されたい。
 
 .. note::

@@ -10,7 +10,7 @@
 Overview
 --------------------------------------------------------------------------------
 
-| 本ガイドラインでは、クラウド環境における非同期実行について、クラウドベンダーに依存しない共通的な事項を説明する。
+| 本ガイドラインでは、クラウド環境における非同期実行について、クラウドベンダに依存しない共通的な事項を説明する。
 |
 | システムによっては、特定のタイミングで大量のトラフィックが発生し、リソースへの負荷が増大するような場合が存在する。
 | 航空チケット予約システムを例に挙げると、大型連休等の高需要な日程のチケットの予約開始日などは、一時的に大量の予約注文が発生する事が想定される。
@@ -68,14 +68,13 @@ Overview
 メッセージ送信
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-| フロントサーバからバックサーバへの処理要求は、クラウドベンダーが提供するメッセージングサービスのキューを介して行う。
+| フロントサーバからバックサーバへの処理要求は、クラウドベンダが提供するメッセージングサービスのキューを介して行う。
 |
 | フロントサーバは、キューに対してメッセージを同期送信する。
 | 送信完了後、クライアントに処理を受け付けた旨のレスポンスを返却する。
 |
-| 本ガイドラインでは、メッセージ送信のインタフェースにSpring Frameworkが提供するインタフェースを使用する事を前提としている。実装には、クラウドベンダーが提供するライブラリを利用する。
-| なお、クラウドベンダーがJMS互換のメッセージングをサポートしている場合は、|base_framework_name| のメッセージング連携のノウハウを活用できる為、|base_framework_name| Development Guideline `メッセージを同期送信する場合 <https://macchinetta.github.io/server-guideline/1.5.1.RELEASE/ja/ArchitectureInDetail/MessagingDetail/JMS.html#jmsoverviewsyncsend>`_ を参照されたい。
-
+| 本ガイドラインでは、メッセージ送信のインタフェースにSpring Frameworkが提供するインタフェースを使用する事を前提としている。実装には、クラウドベンダが提供するライブラリを利用する。
+| なお、クラウドベンダがJMS互換のメッセージングをサポートしている場合は、|base_framework_name| のメッセージング連携のノウハウを活用できる為、|base_framework_name| Development Guideline `メッセージを同期送信する場合 <https://macchinetta.github.io/server-guideline/1.5.2.RELEASE/ja/ArchitectureInDetail/MessagingDetail/JMS.html#jmsoverviewsyncsend>`_ を参照されたい。
 
 メッセージに持たせる情報
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -132,22 +131,21 @@ Overview
 
   Amazon Web Serviceが提供するAmazon SQSの\ `標準キュー <http://docs.aws.amazon.com/ja_jp/AWSSimpleQueueService/latest/SQSDeveloperGuide/standard-queues.html>`_\のように、メッセージングサービスによっては順序性を担保していない。厳密な順序性が求められる場合は注意されたい。
 
-| 本ガイドラインでは、メッセージ非同期受信のインタフェースにSpring Frameworkが提供するインタフェースを使用する事を前提としている。実装には、クラウドベンダーが提供するライブラリを利用する。
-| なお、クラウドベンダーがJMS互換のメッセージングをサポートしている場合は、|base_framework_name| のメッセージング連携のノウハウを活用できる為、|base_framework_name| Development Guideline `メッセージを非同期受信する場合 <https://macchinetta.github.io/server-guideline/1.5.1.RELEASE/ja/ArchitectureInDetail/MessagingDetail/JMS.html#jmsoverviewasyncreceive>`_ を参照されたい。
-
+| 本ガイドラインでは、メッセージ非同期受信のインタフェースにSpring Frameworkが提供するインタフェースを使用する事を前提としている。実装には、クラウドベンダが提供するライブラリを利用する。
+| なお、クラウドベンダがJMS互換のメッセージングをサポートしている場合は、|base_framework_name| のメッセージング連携のノウハウを活用できる為、|base_framework_name| Development Guideline `メッセージを非同期受信する場合 <https://macchinetta.github.io/server-guideline/1.5.2.RELEASE/ja/ArchitectureInDetail/MessagingDetail/JMS.html#jmsoverviewasyncreceive>`_ を参照されたい。
 
 メッセージのトレース
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 メッセージのトレーサビリティ向上のために、各ログにリクエスト単位で一意なメッセージID等をTrackIDとして出力させることを推奨する。
-TrackIDは、logbackのMDCを利用してログ出力する事ができる。TrackIDの利用方については、|base_framework_name| Development Guideline `ログの出力内容 <https://macchinetta.github.io/server-guideline/1.5.1.RELEASE/ja/ArchitectureInDetail/GeneralFuncDetail/Logging.html#id3>`_ を参照されたい。
+TrackIDは、logbackのMDCを利用してログ出力する事ができる。TrackIDの利用方については、|base_framework_name| Development Guideline `ログの出力内容 <https://macchinetta.github.io/server-guideline/1.5.2.RELEASE/ja/ArchitectureInDetail/GeneralFuncDetail/Logging.html#id3>`_ を参照されたい。
 
 処理完了通知
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 | 非同期に実行した主処理が完了した後、処理の完了をクライアントに通知する。
 | 通知先が個人ユーザであれば、メールやモバイル端末へのSMS、プッシュ通知等を用いる。システム向けであれば、HTTPやメッセージング等が選択肢となる。
-| 必要に応じて、クラウドベンダーが提供するサービスを利用して通知すると良い。
+| 必要に応じて、クラウドベンダが提供するサービスを利用して通知すると良い。
 
 .. note::
 
@@ -168,7 +166,7 @@ TrackIDは、logbackのMDCを利用してログ出力する事ができる。Tra
 
    本来フロントサーバで行っていた業務処理のうち、高負荷が想定される処理をバックサーバに切り出す場合について、
    フロントサーバ、バックサーバの両方でデータ更新が行われていると、エラー発生時にデータの不整合が発生する。
-   必要に応じて戻し処理や運用対処でのデータ修正等を検討されたい。また、採用するクラウドベンダーがメッセージのトランザクション機能を提供している場合もある為、併せて検討されたい。
+   必要に応じて戻し処理や運用対処でのデータ修正等を検討されたい。また、採用するクラウドベンダがメッセージのトランザクション機能を提供している場合もある為、併せて検討されたい。
 
 How to use
 --------------------------------------------------------------------------------
@@ -176,12 +174,12 @@ How to use
 メッセージングサービスの利用
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-クラウドベンダーが提供するメッセージングサービスを利用し、非同期処理を実装する。
+クラウドベンダが提供するメッセージングサービスを利用し、非同期処理を実装する。
 
 Amazon Web Service
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-クラウドベンダーとしてAWSを使用する場合の非同期処理の実装例については、
+クラウドベンダとしてAWSを使用する場合の非同期処理の実装例については、
 :doc:`../../AWSCollaboration/Queuing/AsynchronousProcessing`
 を参照されたい。
 

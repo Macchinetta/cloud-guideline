@@ -94,9 +94,16 @@ pom.xmlで必要なjarを設定する。
    <dependency>
        <groupId>org.springframework.cloud</groupId>
        <artifactId>spring-cloud-config-server</artifactId>
+       <version>1.4.6.RELEASE</version>
    </dependency>
 
+ .. note::
 
+    \ ``spring-cloud-dependencies``\ に含まれる \ ``spring-cloud-config-server``\ の \ ``1.3.4.RELEASE``\ には
+    ディレクトリトラバーサル攻撃への脆弱性が存在しているためバージョンを \ ``1.4.6.RELEASE``\ に指定する。
+    詳細については、 \ `CVE-2019-3799 - Directory Traversal with spring-cloud-config-server <https://pivotal.io/security/cve-2019-3799>`_\ を
+    参照されたい。なお、 \ ``spring-cloud-config-client``\ を利用する場合は \ ``spring-cloud-config-server``\ と
+    同様にバージョンを \ ``1.4.6.RELEASE``\ に指定する。
 
 Spring Bootの起動クラスを作成する。
 
@@ -223,7 +230,7 @@ Config Clientとなるアプリケーションに、以下の設定を行う。
 
     # upload directories
       upload:
-        bucketName: xxx.upload.private.dev #(1)
+        bucketName: xxx-upload-private-dev #(1)
         temporaryDirectory: tmp/
         saveDirectory: save/
 
@@ -234,7 +241,7 @@ Config Clientとなるアプリケーションに、以下の設定を行う。
 
     # upload directories
       upload:
-        bucketName: xxx.upload.private.production #(2)
+        bucketName: xxx-upload-private-production #(2)
         temporaryDirectory: tmp/
         saveDirectory: save/
 
@@ -370,9 +377,9 @@ How to extend
   また、DIコンテナの再起動が発生するリスタート機能も同様に無効となる。
 
 
-クラウドベンダー連携
+クラウドベンダ連携
 """"""""""""""""""""
-Spring Cloud Config Serverの環境リポジトリに、クラウドベンダーのクラウドストレージを指定する場合の拡張方法を示す。
+Spring Cloud Config Serverの環境リポジトリに、クラウドベンダのクラウドストレージを指定する場合の拡張方法を示す。
 実装例として、環境リポジトリにAWSのS3を利用する場合の拡張例を紹介する。
 
 .. note::
@@ -590,7 +597,7 @@ configプロジェクトの作成
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 configプロジェクトの構成について説明する。
-Spring Bootプロジェクトについては、\ `公式リファレンスの"Using Spring Boot" <http://docs.spring.io/spring-boot/docs/1.5.7.RELEASE/reference/htmlsingle/#using-boot>`_\ を参照されたい。
+Spring Bootプロジェクトについては、\ `公式リファレンスの"Using Spring Boot" <http://docs.spring.io/spring-boot/docs/1.5.20.RELEASE/reference/htmlsingle/#using-boot>`_\ を参照されたい。
 
 .. code-block:: console
 
@@ -658,7 +665,6 @@ Spring Bootプロジェクトについては、\ `公式リファレンスの"Us
            <dependency>
                <groupId>org.springframework.cloud</groupId>
                <artifactId>spring-cloud-config-server</artifactId>
-               <version>1.2.3.RELEASE</version>
            </dependency>
            <dependency>
                <groupId>org.springframework.boot</groupId>
