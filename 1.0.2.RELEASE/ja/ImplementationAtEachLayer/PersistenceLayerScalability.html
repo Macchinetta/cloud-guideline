@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>3.6. データ永続層のスケール性の確保 &#8212; Macchinetta Server Framework Cloud Extension Development Guideline 1.0.2.RELEASE documentation</title>
+    <link rel="stylesheet" href="../_static/solar.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.0.2.RELEASE',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="3.7. キューイング活用" href="Queuing/index.html" />
+    <link rel="prev" title="3.5. 静的コンテンツの配信" href="StaticContents.html" /><script src="../_static/jquery.treeview.js" type="text/javascript"></script>
+<!-- <link href='http://fonts.googleapis.com/css?family=Source+Code+Pro|Open+Sans:300italic,400italic,700italic,400,300,700' rel='stylesheet' type='text/css'> -->
+<link href="../_static/solarized-dark.css" rel="stylesheet">
+<link href="../_static/jquery.treeview.css" rel="stylesheet">
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="Queuing/index.html" title="3.7. キューイング活用"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="StaticContents.html" title="3.5. 静的コンテンツの配信"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Macchinetta Server Framework Cloud Extension Development Guideline 1.0.2.RELEASE documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">3. アプリケーション開発</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><label><input id="scroll" type="checkbox" checked> scroll sidebar</label>
+
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">3.6. データ永続層のスケール性の確保</a><ul>
+<li><a class="reference internal" href="#overview">3.6.1. Overview</a><ul>
+<li><a class="reference internal" href="#id3">3.6.1.1. キャッシュ方式</a><ul>
+<li><a class="reference internal" href="#id4">3.6.1.1.1. 想定する要件</a></li>
+<li><a class="reference internal" href="#id5">3.6.1.1.2. 制約</a></li>
+<li><a class="reference internal" href="#id6">3.6.1.1.3. キャッシュ方式のイメージ</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id7">3.6.1.2. シャーディング方式</a><ul>
+<li><a class="reference internal" href="#id8">3.6.1.2.1. 想定する要件</a></li>
+<li><a class="reference internal" href="#id9">3.6.1.2.2. 制約</a></li>
+<li><a class="reference internal" href="#id10">3.6.1.2.3. シャードキーおよびシャードの決定方針</a></li>
+<li><a class="reference internal" href="#shardkey-management-policy">3.6.1.2.4. シャードキーの管理方針</a></li>
+<li><a class="reference internal" href="#sharding-method-image-label">3.6.1.2.5. シャーディング方式のイメージ</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#read-replica-method-image-label">3.6.1.3. リードレプリカ方式</a><ul>
+<li><a class="reference internal" href="#id14">3.6.1.3.1. 想定する要件</a></li>
+<li><a class="reference internal" href="#id15">3.6.1.3.2. 制約</a></li>
+<li><a class="reference internal" href="#db">3.6.1.3.3. リードレプリカDBの決定方針</a></li>
+<li><a class="reference internal" href="#id16">3.6.1.3.4. リードレプリカ方式のイメージ</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#how-to-use">3.6.2. How to use</a><ul>
+<li><a class="reference internal" href="#id17">3.6.2.1. クラウドベンダの利用</a><ul>
+<li><a class="reference internal" href="#amazon-web-service">3.6.2.1.1. Amazon Web Service</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="StaticContents.html"
+                        title="previous chapter">3.5. 静的コンテンツの配信</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="Queuing/index.html"
+                        title="next chapter">3.7. キューイング活用</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/ImplementationAtEachLayer/PersistenceLayerScalability.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="id1">
+<h1>3.6. データ永続層のスケール性の確保<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h1>
+<div class="contents local topic" id="id2">
+<p class="topic-title first">目次</p>
+<ul class="simple">
+<li><a class="reference internal" href="#overview" id="id18">Overview</a><ul>
+<li><a class="reference internal" href="#id3" id="id19">キャッシュ方式</a><ul>
+<li><a class="reference internal" href="#id4" id="id20">想定する要件</a></li>
+<li><a class="reference internal" href="#id5" id="id21">制約</a></li>
+<li><a class="reference internal" href="#id6" id="id22">キャッシュ方式のイメージ</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id7" id="id23">シャーディング方式</a><ul>
+<li><a class="reference internal" href="#id8" id="id24">想定する要件</a></li>
+<li><a class="reference internal" href="#id9" id="id25">制約</a></li>
+<li><a class="reference internal" href="#id10" id="id26">シャードキーおよびシャードの決定方針</a></li>
+<li><a class="reference internal" href="#shardkey-management-policy" id="id27">シャードキーの管理方針</a></li>
+<li><a class="reference internal" href="#sharding-method-image-label" id="id28">シャーディング方式のイメージ</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#read-replica-method-image-label" id="id29">リードレプリカ方式</a><ul>
+<li><a class="reference internal" href="#id14" id="id30">想定する要件</a></li>
+<li><a class="reference internal" href="#id15" id="id31">制約</a></li>
+<li><a class="reference internal" href="#db" id="id32">リードレプリカDBの決定方針</a></li>
+<li><a class="reference internal" href="#id16" id="id33">リードレプリカ方式のイメージ</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#how-to-use" id="id34">How to use</a><ul>
+<li><a class="reference internal" href="#id17" id="id35">クラウドベンダの利用</a><ul>
+<li><a class="reference internal" href="#amazon-web-service" id="id36">Amazon Web Service</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="overview">
+<h2><a class="toc-backref" href="#id18">3.6.1. Overview</a><a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>データベースにRDBを使う場合は、RDBがスケール性を阻害する要素となる可能性がある。</p>
+<p>本ガイドラインではその阻害を軽減する手法である、データのキャッシュ方式、シャーディング方式、リードレプリカ方式の概念について説明する。
+キャッシュ方式とシャーディング方式の実装編については、<a class="reference internal" href="../ArchitectureInDetail/DataAccessDetail/index.html"><span class="doc">データアクセス</span></a> を参照されたい。</p>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="20%" />
+<col width="80%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">方式名</th>
+<th class="head">概要</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">キャッシュ</div>
+</div>
+</td>
+<td><p class="first">対象データの使用頻度が高く不変、または更新頻度が少ない時に有効な方式。キャッシュの実装編は、<a class="reference internal" href="../ArchitectureInDetail/DataAccessDetail/CacheAbstraction.html"><span class="doc">キャッシュの抽象化（Cache Abstraction）</span></a> を参照されたい。</p>
+<p class="last">(コードリスト等)</p>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">シャーディング</div>
+</div>
+</td>
+<td><p class="first">対象データがシャードキーで一意に特定される時に有効な方式。シャーディングの実装編は、<a class="reference internal" href="../ArchitectureInDetail/DataAccessDetail/DataAccessMyBatis3.html"><span class="doc">データベースシャーディング</span></a> を参照されたい。</p>
+<p class="last">(キー項目・特定日付等の完全一致検索を頻繁に行うシステム)</p>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">リードレプリカ</div>
+</div>
+</td>
+<td><p class="first">対象データをキー項目で特定するのが困難で大量のデータ参照が発生する時に有効な方式。リードレプリカ(参考)の実装編は、<a class="reference internal" href="../AWSCollaboration/DatabaseReadReplica.html"><span class="doc">データベースリードレプリカ</span></a> を参照されたい。</p>
+<p class="last">(分析・集計等の期間検索を頻繁に行うシステム)</p>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">シャードキーとは、データ固有の識別情報。例えば、ユーザ情報のユーザID等。</p>
+</div>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<div class="section" id="id3">
+<h3><a class="toc-backref" href="#id19">3.6.1.1. キャッシュ方式</a><a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<p>キャッシュ方式とは、使用頻度の高いデータを高速な記憶装置に保持することにより、都度低速な装置から読み出す無駄を省いて高速化する仕組みである。</p>
+<p>対象データの使用頻度が高く不変、または更新頻度が少なくデータ変更がシステムに影響しない時に有効な方式である。</p>
+<div class="section" id="id4">
+<h4><a class="toc-backref" href="#id20">3.6.1.1.1. 想定する要件</a><a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li>不変または更新頻度が少ないデータ（例：マスタデータ、コードリスト）</li>
+<li>読み込み頻度が高いデータ（例：ログインしているユーザ自身のデータ）</li>
+<li>キーでアクセスすることが可能であるデータ</li>
+</ul>
+</div>
+<div class="section" id="id5">
+<h4><a class="toc-backref" href="#id21">3.6.1.1.2. 制約</a><a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li>対象データの更新、削除のタイミングを明示的に宣言する必要がある。</li>
+<li>対象データの更新、削除時に永続化が別途必要になり、その際にACIDが保たれなくなる可能性がある。</li>
+<li>キー以外での検索に対応できない。</li>
+</ul>
+</div>
+<div class="section" id="id6">
+<h4><a class="toc-backref" href="#id22">3.6.1.1.3. キャッシュ方式のイメージ</a><a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h4>
+<p>以下のイメージは、 Client Application A → Client Application B  → Client Application C の順番で同一データを参照する場合を示す。</p>
+<p>キャッシュ方式では、Application で指定したキャッシュ設定に従い Cache AOP が Client Application A が要求したデータ参照の結果が Storage Device から取得出来ない場合に Application 経由で DB から結果を取得し Storage Device に保持する。
+以降の Client Application B と Client Application C が要求したデータ参照が Client Application A が要求したデータ参照と同じ場合は Cache AOP が Storage Device から結果を取得する。</p>
+<ul>
+<li><p class="first">従来</p>
+<p>参照毎に DB にアクセスするため、 DB 負荷が上がる。</p>
+<div class="figure align-center">
+<a class="reference internal image-reference" href="../_images/PersistenceLayerScalabilityOverviewWithoutCache.png"><img alt="../_images/PersistenceLayerScalabilityOverviewWithoutCache.png" src="../_images/PersistenceLayerScalabilityOverviewWithoutCache.png" style="width: 90%;" /></a>
+</div>
+</li>
+<li><p class="first">キャッシュ方式(SpringのCache抽象を使用)</p>
+<p>初回参照時のみ DB にアクセスし、２回目以降は高速な Storage Device から結果を取得する為 DB 負荷も下がる。</p>
+<div class="figure align-center">
+<a class="reference internal image-reference" href="../_images/PersistenceLayerScalabilityWithCache.png"><img alt="../_images/PersistenceLayerScalabilityWithCache.png" src="../_images/PersistenceLayerScalabilityWithCache.png" style="width: 90%;" /></a>
+</div>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="id7">
+<h3><a class="toc-backref" href="#id23">3.6.1.2. シャーディング方式</a><a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h3>
+<p>シャーディング方式とは、あるデータをキー情報などを元に複数のグループに分割し、グループ毎に異なるDBに分割して保管する方式である。
+データアクセスが複数のDBに分散することから、読み取りや書き込みのパフォーマンスが向上したり、単一DBでは実現できない大容量のデータの保管が実現できる</p>
+<p>対象データがシャードキーで一意に特定される時に有効な方式である。</p>
+<div class="section" id="id8">
+<h4><a class="toc-backref" href="#id24">3.6.1.2.1. 想定する要件</a><a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li>各データに対する処理要求に大きな偏りがない、もしくは偏りの傾向が事前予知出来る。</li>
+<li>データセットが大きく単一DBではCPUやI/Oのパフォーマンスが著しく低下する。</li>
+<li>レコード数の増大が見込まれ、単一DBでは容量面でキャパシティオーバーする可能性がある。</li>
+</ul>
+</div>
+<div class="section" id="id9">
+<h4><a class="toc-backref" href="#id25">3.6.1.2.2. 制約</a><a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li>各データへの処理要求に偏りがあった場合に、データベースの負荷が均等に分散されない。</li>
+<li>一連の処理内で複数のシャードに更新を行う場合、ACIDが担保できなくなるため、処理途中のデータの存在を意識したデータモデルや業務処理の設計が必要となる（例：例外発生時のデータの戻し処理を追加）。</li>
+<li>シャードを跨いだテーブルに対して表結合が使えなくなるため、データモデル設計が複雑になったり、それによりJava側でデータの処理が増える可能性がある。</li>
+<li>データアクセスのたびにシャードを選択する処理が必要となるため、処理のオーバヘッドが発生する。</li>
+<li>各データがどのシャードに所属するかを管理する必要があるため、運用時の手間が発生する。</li>
+<li>シャーディングが不可能なデータを、各シャードとは別のデータベースで別途管理する必要がある（「非シャード」と呼ぶ）。</li>
+</ul>
+</div>
+<div class="section" id="id10">
+<h4><a class="toc-backref" href="#id26">3.6.1.2.3. シャードキーおよびシャードの決定方針</a><a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li>シャードキーにはシステム全体で一意となる値を採用する。（例：主キー）</li>
+<li>各シャードの処理性能が均等になるような負荷分散を行えるような振り分けを行う（例えば、全データが均等に処理要求される場合はラウンドロビンで振り分けを行う、など）</li>
+</ul>
+</div>
+<div class="section" id="shardkey-management-policy">
+<span id="id11"></span><h4><a class="toc-backref" href="#id27">3.6.1.2.4. シャードキーの管理方針</a><a class="headerlink" href="#shardkey-management-policy" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li>シャードキーをインプットとし、シャードを導出可能な形式で管理する。</li>
+<li>運用上の理由により、あるデータを任意のシャード間で移動した場合に対応できるよう、シャードキーとシャードのマッピング情報の保管には不揮発性な記憶装置を使用する。</li>
+<li>シャード導出のための処理は頻繁に実行されることから、性能向上のためフロントには高速な記憶装置を使用する。</li>
+</ul>
+<p>以下に、記憶装置に格納されたデータのイメージを示す。</p>
+<blockquote>
+<div><table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="20%" />
+<col width="80%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">シャードキー (ユーザID)</th>
+<th class="head">値 (データ格納先シャード)</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">0000000001</div>
+</div>
+</td>
+<td>ShardA</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">0000000002</div>
+</div>
+</td>
+<td>ShardB</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">0000000003</div>
+</div>
+</td>
+<td>ShardC</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">・・・</div>
+</div>
+</td>
+<td>・・・</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+</div>
+<div class="section" id="sharding-method-image-label">
+<span id="id12"></span><h4><a class="toc-backref" href="#id28">3.6.1.2.5. シャーディング方式のイメージ</a><a class="headerlink" href="#sharding-method-image-label" title="Permalink to this headline">¶</a></h4>
+<p>シャーディング方式の処理の流れを具体的に説明するため、簡単な例を用いて紹介をする。</p>
+<p>多数のユーザ情報(USER)をデータベースで管理しており、このユーザ情報をシャーディング対象とすることで一定の効果を見込めることが判明したため、このデータを複数のデータベースへ均等にシャーディングを行うケースを例として紹介する。</p>
+<ul>
+<li><p class="first">従来</p>
+<p>USERが増えると DB へのQUERY発行が集中してしまう。容量がサービス最大値で頭打ちとなる。</p>
+<div class="figure align-center">
+<a class="reference internal image-reference" href="../_images/PersistenceLayerScalabilitySingleDBAccess.png"><img alt="../_images/PersistenceLayerScalabilitySingleDBAccess.png" src="../_images/PersistenceLayerScalabilitySingleDBAccess.png" style="width: 90%;" /></a>
+</div>
+</li>
+<li><p class="first">シャーディング方式</p>
+<p>USERが増えてもグループ毎にアクセスするシャード DB を決めるため、1 DB あたりの負荷が減る。</p>
+<div class="figure align-center">
+<a class="reference internal image-reference" href="../_images/PersistenceLayerScalabilityMultipleDBAccess.png"><img alt="../_images/PersistenceLayerScalabilityMultipleDBAccess.png" src="../_images/PersistenceLayerScalabilityMultipleDBAccess.png" style="width: 90%;" /></a>
+</div>
+<p>シャーディング方式を使用する場合、シャードに対してデータアクセスを行う処理のトランザクション境界が、  特定の1シャードのみのアクセスに閉じているか、複数のシャードに跨っているかで、処理設計での考慮ポイントが大きく異なる。</p>
+<p>それぞれのパターンを以下に例示し、考慮ポイントを示す。</p>
+<ul>
+<li><p class="first">1シャードのみアクセスの処理</p>
+<p>1シャードのみアクセスする場合、シャードを選択する処理は行うがシャーディング方式でない場合と同じ様に、Controllerから対象サービスのメソッドを1つだけ呼び出している。</p>
+<div class="figure align-center">
+<a class="reference internal image-reference" href="../_images/PersistenceLayerScalabilityAccseSingleShard.png"><img alt="../_images/PersistenceLayerScalabilityAccseSingleShard.png" src="../_images/PersistenceLayerScalabilityAccseSingleShard.png" style="width: 90%;" /></a>
+</div>
+</li>
+<li><p class="first">複数シャードに跨ってアクセスする処理</p>
+<p>下記、正常系の図に示すように、複数シャードに跨ってアクセスする場合はトランザクション境界でトランザクションが変わることに注意する。</p>
+<ul>
+<li><p class="first">正常系</p>
+<p>一連の処理で複数シャードへアクセスする場合は、Controllerから同一または別サービスの別メソッドを呼び出す。
+ここでは、同一サービスの別メソッドを呼び出している。</p>
+<div class="figure align-center">
+<a class="reference internal image-reference" href="../_images/PersistenceLayerScalabilityAccessMultipleShard.png"><img alt="../_images/PersistenceLayerScalabilityAccessMultipleShard.png" src="../_images/PersistenceLayerScalabilityAccessMultipleShard.png" style="width: 90%;" /></a>
+</div>
+</li>
+<li><p class="first">異常系</p>
+<p>一連の処理で複数シャードへアクセスした場合に例外が発生した場合は、Controllerで対象データ戻し処理メソッドを呼び出す。
+ここでは、Shard B の更新処理で例外が発生した為、既にコミットされているShard A のデータの戻し処理を行う。</p>
+<div class="figure align-center">
+<a class="reference internal image-reference" href="../_images/PersistenceLayerScalabilityAccessMultipleShardWithException.png"><img alt="../_images/PersistenceLayerScalabilityAccessMultipleShardWithException.png" src="../_images/PersistenceLayerScalabilityAccessMultipleShardWithException.png" style="width: 90%;" /></a>
+</div>
+<p>上記では、戻し処理を例に示している。戻し処理以外にも以下のような方法が考えられる。</p>
+<blockquote>
+<div><ul class="simple">
+<li>戻し処理を行わず、ジャーナルのような履歴等で処理状態を管理することで障害を無視させる方法</li>
+<li>全てのデータが登録されていないと、後続の処理が失敗するようなフェイルセーフな設計とする方法</li>
+</ul>
+</div></blockquote>
+<p>また、戻し処理を行う場合でも、戻し処理に失敗した場合や戻し処理前に実行した非同期処理等に考慮が必要となる。</p>
+</li>
+<li><p class="first">考慮ポイント</p>
+<ul class="simple">
+<li>Shard AとShard Bのトランザクション境界が別となるため、Shard Aのコミット後にShard Bがロールバックする可能性がある。Shard AとShard Bのデータの一貫性が担保されない状態となるため、システム要件やデータの特性に合わせ、必要に応じて整合性が正しい状態に戻す。</li>
+<li>障害有無にかかわらず、別トランザクションな時点でACIDな整合性は崩れている（同時に別スレッドでデータを読み書きした場合、処理中の状態が見えてしまう）ので、異常時だけ考慮すればよいというものではなく、そもそもACIDでなくても業務に影響がないことを考慮する必要がある。</li>
+<li>シャード対象の選定、データモデルの設計、データ処理の順序などを考慮する。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="read-replica-method-image-label">
+<span id="id13"></span><h3><a class="toc-backref" href="#id29">3.6.1.3. リードレプリカ方式</a><a class="headerlink" href="#read-replica-method-image-label" title="Permalink to this headline">¶</a></h3>
+<p>リードレプリカ方式とは、複数DBに同一データを保持し読み取りDBと書き込みDBを別にする事によりパフォーマンスを向上させる仕組みである。読み取り専用のDBをレプリカDB、書込み可能なDBをマスタDBと呼ぶ。</p>
+<p>対象データをキー項目で特定するのが困難で大量のデータ参照が発生する時に有効な方式である。</p>
+<div class="section" id="id14">
+<h4><a class="toc-backref" href="#id30">3.6.1.3.1. 想定する要件</a><a class="headerlink" href="#id14" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li>データ分析等の、レコード更新よりもレコード参照のリクエスト数が圧倒的に多い。</li>
+<li>容量面において、単一DBのキャパシティオーバーする可能性がない。</li>
+<li>データ参照時に常に最新のデータが取得できなくても業務に支障をきたさない。</li>
+</ul>
+</div>
+<div class="section" id="id15">
+<h4><a class="toc-backref" href="#id31">3.6.1.3.2. 制約</a><a class="headerlink" href="#id15" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li>一連の処理(１つのトランザクション)内で参照と更新を行う場合、レプリカDBの参照は出来ない。</li>
+<li>データベースの負荷が均等に分散されないことや、書き込んだデータがリードレプリカDBに反映されるまでに時間差がある。</li>
+<li>レプリカDBの台数は製品により上限がある</li>
+</ul>
+</div>
+<div class="section" id="db">
+<h4><a class="toc-backref" href="#id32">3.6.1.3.3. リードレプリカDBの決定方針</a><a class="headerlink" href="#db" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li>リードレプリカDBのスペックは、マスタDBのスペックと同等にする。</li>
+<li>リードレプリカDBの本数は、queryの処理時間、処理数と並列処理等を考慮して決定する。</li>
+</ul>
+</div>
+<div class="section" id="id16">
+<h4><a class="toc-backref" href="#id33">3.6.1.3.4. リードレプリカ方式のイメージ</a><a class="headerlink" href="#id16" title="Permalink to this headline">¶</a></h4>
+<ul>
+<li><p class="first">従来</p>
+<p>集計・分析等の大量レコード参照のアクセス数が増えると DB でのQUERY処理が終了せず、更新処理にも影響が及ぶ。</p>
+<div class="figure align-center">
+<a class="reference internal image-reference" href="../_images/PersistenceLayerScalabilitySingleDBQueryAccess.png"><img alt="../_images/PersistenceLayerScalabilitySingleDBQueryAccess.png" src="../_images/PersistenceLayerScalabilitySingleDBQueryAccess.png" style="width: 90%;" /></a>
+</div>
+</li>
+<li><p class="first">リードレプリカ方式</p>
+<p>集計・分析等の大量レコード参照のアクセス数が増えても READ REPLICA DB でQUERY処理が行われるため、更新処理には影響が及ばない。</p>
+<div class="figure align-center">
+<a class="reference internal image-reference" href="../_images/PersistenceLayerScalabilityMultipleDBQueryAccess.png"><img alt="../_images/PersistenceLayerScalabilityMultipleDBQueryAccess.png" src="../_images/PersistenceLayerScalabilityMultipleDBQueryAccess.png" style="width: 90%;" /></a>
+</div>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="section" id="how-to-use">
+<h2><a class="toc-backref" href="#id34">3.6.2. How to use</a><a class="headerlink" href="#how-to-use" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id17">
+<h3><a class="toc-backref" href="#id35">3.6.2.1. クラウドベンダの利用</a><a class="headerlink" href="#id17" title="Permalink to this headline">¶</a></h3>
+<p>クラウドベンダ提供のデータベースサービスを利用する場合のガイドラインについて、記載箇所を示しておく。</p>
+<div class="section" id="amazon-web-service">
+<h4><a class="toc-backref" href="#id36">3.6.2.1.1. Amazon Web Service</a><a class="headerlink" href="#amazon-web-service" title="Permalink to this headline">¶</a></h4>
+<p>クラウドベンダとしてAWSを使用する場合のデータベースシャーディングについては、
+<a class="reference internal" href="../AWSCollaboration/DatabaseSharding.html"><span class="doc">データベースシャーディング</span></a>
+を、リードレプリカについては、
+<a class="reference internal" href="../AWSCollaboration/DatabaseReadReplica.html"><span class="doc">データベースリードレプリカ</span></a>
+を参照されたい。</p>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="Queuing/index.html" title="3.7. キューイング活用"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="StaticContents.html" title="3.5. 静的コンテンツの配信"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Macchinetta Server Framework Cloud Extension Development Guideline 1.0.2.RELEASE documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >3. アプリケーション開発</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2017 NTT Corporation.
+    Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.6.3.Theme by <a href="http://github.com/vkvn">vkvn</a>
+    </div>
+    
+    <script>
+    
+    $(function() {
+    	var $sidebar	= $('.sphinxsidebar'),
+    		$window		= $(window),
+    		offset		= $sidebar.offset(),
+    		topPadding	= 3,
+    		$scroll		= $('#scroll');
+    	
+    	$window.scroll(function() {
+    		if ($scroll.is(':checked')) {
+				if ($window.scrollTop() > offset.top) {
+					$sidebar.stop().animate({
+						marginTop:$window.scrollTop() - offset.top + topPadding
+					});
+				} else {
+					$sidebar.stop().animate({
+						marginTop:0
+					});
+				}
+			}
+		});
+    	
+    	var $navList = $('ul:first', $sidebar);
+    	$('li:first', $navList).addClass('open');
+    	
+    	$navList.treeview({
+    		persist: "location",
+    		collapsed: true,
+    		unique: false
+    	});
+    	
+	});
+    </script>
+  </body>
+</html>

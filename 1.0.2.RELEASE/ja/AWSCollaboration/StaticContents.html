@@ -1,0 +1,1523 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>5.5. 静的コンテンツの配信 &#8212; Macchinetta Server Framework Cloud Extension Development Guideline 1.0.2.RELEASE documentation</title>
+    <link rel="stylesheet" href="../_static/solar.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.0.2.RELEASE',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="5.6. キューイング活用" href="Queuing/index.html" />
+    <link rel="prev" title="5.4.4. インターネットストレージ内ファイルの効率的な検索" href="FileManagement/StorageFileSearch.html" /><script src="../_static/jquery.treeview.js" type="text/javascript"></script>
+<!-- <link href='http://fonts.googleapis.com/css?family=Source+Code+Pro|Open+Sans:300italic,400italic,700italic,400,300,700' rel='stylesheet' type='text/css'> -->
+<link href="../_static/solarized-dark.css" rel="stylesheet">
+<link href="../_static/jquery.treeview.css" rel="stylesheet">
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="Queuing/index.html" title="5.6. キューイング活用"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="FileManagement/StorageFileSearch.html" title="5.4.4. インターネットストレージ内ファイルの効率的な検索"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Macchinetta Server Framework Cloud Extension Development Guideline 1.0.2.RELEASE documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">5. AWS連携</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><label><input id="scroll" type="checkbox" checked> scroll sidebar</label>
+
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">5.5. 静的コンテンツの配信</a><ul>
+<li><a class="reference internal" href="#overview">5.5.1. Overview</a><ul>
+<li><a class="reference internal" href="#awscdn">5.5.1.1. AWSを利用したCDNによる静的コンテンツの配信</a><ul>
+<li><a class="reference internal" href="#sc-cdn-image-aws">5.5.1.1.1. AWSを用いたCDNによる配信</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id4">5.5.1.2. AWSを用いたCDN利用時の静的コンテンツの更新</a><ul>
+<li><a class="reference internal" href="#id5">5.5.1.2.1. キャッシュクリア方式</a></li>
+<li><a class="reference internal" href="#id6">5.5.1.2.2. コンテンツバージョン管理方式</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#how-to-use">5.5.2. How to use</a><ul>
+<li><a class="reference internal" href="#sc-using-s3">5.5.2.1. Amazon S3の利用</a><ul>
+<li><a class="reference internal" href="#sc-using-s3-bucket">5.5.2.1.1. バケットの作成</a></li>
+<li><a class="reference internal" href="#sc-using-s3-upload">5.5.2.1.2. コンテンツのアップロード</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#amazon-s3amazon-cloudfront">5.5.2.2. Amazon S3上のコンテンツのAmazon CloudFrontによる配信</a></li>
+<li><a class="reference internal" href="#amazon-cloudfrontamazon-s3">5.5.2.3. Amazon CloudFront利用時のAmazon S3上のコンテンツの更新</a><ul>
+<li><a class="reference internal" href="#id13">5.5.2.3.1. コンテンツバージョン管理方式</a></li>
+<li><a class="reference internal" href="#id14">5.5.2.3.2. Amazon CloudFrontのキャッシュクリア方式</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#how-to-extend">5.5.3. How to extend</a><ul>
+<li><a class="reference internal" href="#sc-access-restriction">5.5.3.1. アクセス制限</a><ul>
+<li><a class="reference internal" href="#aws-waf">5.5.3.1.1. AWS WAFによる制限</a></li>
+<li><a class="reference internal" href="#sc-access-restriction-signature">5.5.3.1.2. 署名による制限</a><ul>
+<li><a class="reference internal" href="#cookie">5.5.3.1.2.1. 署名付きCookie</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#amazon-route-53dns">5.5.3.2. Amazon Route 53を利用したDNSフェイルオーバー</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="FileManagement/StorageFileSearch.html"
+                        title="previous chapter">5.4.4. インターネットストレージ内ファイルの効率的な検索</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="Queuing/index.html"
+                        title="next chapter">5.6. キューイング活用</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/AWSCollaboration/StaticContents.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="id1">
+<h1>5.5. 静的コンテンツの配信<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h1>
+<div class="contents local topic" id="id2">
+<p class="topic-title first">目次</p>
+<ul class="simple">
+<li><a class="reference internal" href="#overview" id="id23">Overview</a><ul>
+<li><a class="reference internal" href="#awscdn" id="id24">AWSを利用したCDNによる静的コンテンツの配信</a><ul>
+<li><a class="reference internal" href="#sc-cdn-image-aws" id="id25">AWSを用いたCDNによる配信</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id4" id="id26">AWSを用いたCDN利用時の静的コンテンツの更新</a><ul>
+<li><a class="reference internal" href="#id5" id="id27">キャッシュクリア方式</a></li>
+<li><a class="reference internal" href="#id6" id="id28">コンテンツバージョン管理方式</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#how-to-use" id="id29">How to use</a><ul>
+<li><a class="reference internal" href="#sc-using-s3" id="id30">Amazon S3の利用</a><ul>
+<li><a class="reference internal" href="#sc-using-s3-bucket" id="id31">バケットの作成</a></li>
+<li><a class="reference internal" href="#sc-using-s3-upload" id="id32">コンテンツのアップロード</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#amazon-s3amazon-cloudfront" id="id33">Amazon S3上のコンテンツのAmazon CloudFrontによる配信</a></li>
+<li><a class="reference internal" href="#amazon-cloudfrontamazon-s3" id="id34">Amazon CloudFront利用時のAmazon S3上のコンテンツの更新</a><ul>
+<li><a class="reference internal" href="#id13" id="id35">コンテンツバージョン管理方式</a></li>
+<li><a class="reference internal" href="#id14" id="id36">Amazon CloudFrontのキャッシュクリア方式</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#how-to-extend" id="id37">How to extend</a><ul>
+<li><a class="reference internal" href="#sc-access-restriction" id="id38">アクセス制限</a><ul>
+<li><a class="reference internal" href="#aws-waf" id="id39">AWS WAFによる制限</a></li>
+<li><a class="reference internal" href="#sc-access-restriction-signature" id="id40">署名による制限</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#amazon-route-53dns" id="id41">Amazon Route 53を利用したDNSフェイルオーバー</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="overview">
+<span id="sc-overview"></span><h2><a class="toc-backref" href="#id23">5.5.1. Overview</a><a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>本ガイドラインでは、AWSサービスを使用した静的コンテンツ（画像、 CSS、JavaScript…etc)の配信について説明する。</p>
+<div class="section" id="awscdn">
+<h3><a class="toc-backref" href="#id24">5.5.1.1. AWSを利用したCDNによる静的コンテンツの配信</a><a class="headerlink" href="#awscdn" title="Permalink to this headline">¶</a></h3>
+<p>AWSではコンテンツ配信ネットワークサービスとして、<a class="reference external" href="https://aws.amazon.com/jp/cloudfront/">Amazon CloudFront</a>が提供されている。
+本ガイドラインでは、オリジン（コンテンツの保存先）として<a class="reference external" href="https://aws.amazon.com/jp/s3/">Amazon S3</a>を利用し、S3上の静的コンテンツをCloudFrontを使用してCDNで配信する方法を説明する。</p>
+<div class="section" id="sc-cdn-image-aws">
+<span id="id3"></span><h4><a class="toc-backref" href="#id25">5.5.1.1.1. AWSを用いたCDNによる配信</a><a class="headerlink" href="#sc-cdn-image-aws" title="Permalink to this headline">¶</a></h4>
+<p>ここでは、S3とCloudFrontを組み合わせたCDNによる静的コンテンツの配信方式を紹介する。</p>
+<ul class="simple">
+<li>S3とCloudFrontを利用したCDN</li>
+</ul>
+<p>S3をオリジンサーバとし、配信する静的コンテンツを配置する。
+CloudFrontは複数のエッジロケーションへキャッシュを行い、最適なエッジロケーションから配信を行う。</p>
+<div class="figure">
+<a class="reference internal image-reference" href="../_images/StaticContentsCDNAWS.png"><img alt="../_images/StaticContentsCDNAWS.png" src="../_images/StaticContentsCDNAWS.png" style="width: 60%;" /></a>
+</div>
+<table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="6%" />
+<col width="94%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">CloudFrontはS3から多数あるエッジロケーションへコンテンツをキャッシュする。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(2)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">CloudFrontはアクセスするユーザを最寄りのエッジロケーションへ誘導しコンテンツを配信する。</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="section" id="id4">
+<h3><a class="toc-backref" href="#id26">5.5.1.2. AWSを用いたCDN利用時の静的コンテンツの更新</a><a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<p>ここでは、S3とCloudFrontを組み合わせたCDNによる、更新後の静的コンテンツをキャッシュタイムアウトを待たずに配信する方式を紹介する。</p>
+<p>方式としては、<a class="reference internal" href="../ImplementationAtEachLayer/StaticContents.html#impl-sc-cdn-clear-cache-update-contents"><span class="std std-ref">キャッシュクリア方式</span></a> と、<a class="reference internal" href="../ImplementationAtEachLayer/StaticContents.html#impl-sc-cdn-update-contents-version"><span class="std std-ref">コンテンツバージョン管理方式</span></a> がある。方式の詳細と使い分けについては、<a class="reference internal" href="../ImplementationAtEachLayer/StaticContents.html#impl-sc-cdn-update-contents"><span class="std std-ref">CDN利用時の静的コンテンツの更新</span></a> を参照されたい。</p>
+<div class="section" id="id5">
+<h4><a class="toc-backref" href="#id27">5.5.1.2.1. キャッシュクリア方式</a><a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h4>
+<p>キャッシュクリア方式とは、CloudFrontのキャッシュをクリアすることで、
+キャッシュタイムアウトを待たずに更新後の静的コンテンツをクライアントに配信する方式である。</p>
+<div class="figure">
+<a class="reference internal image-reference" href="../_images/StaticContentsClearCache.png"><img alt="../_images/StaticContentsClearCache.png" src="../_images/StaticContentsClearCache.png" style="width: 60%;" /></a>
+</div>
+<table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="6%" />
+<col width="94%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">S3に保存されている静的コンテンツを更新する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(2)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">管理者は、CloudFrontにある(1)で更新した静的コンテンツのキャッシュをCloudFront のCreateInvalidation APIでクリアする。</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(3)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">CloudFrontはアクセスするユーザを最寄りのエッジロケーションへ誘導する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(4)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">CloudFrontに静的コンテンツのキャッシュがないため、S3から更新後の静的コンテンツを取得し、CloudFrontにキャッシュする。更新後の静的コンテンツをCloudFrontから配信する。</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="id6">
+<h4><a class="toc-backref" href="#id28">5.5.1.2.2. コンテンツバージョン管理方式</a><a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h4>
+<p>コンテンツバージョン管理方式とは、静的コンテンツをバージョン管理して、整合性を保った状態で更新を行うための方式である。</p>
+<p>S3上で更新対象の静的コンテンツをバージョン別フォルダに入れておくなどし、バージョンごとに静的コンテンツへのパスが異なるようにする。更新時には、依存元(更新対象の静的コンテンツを参照している静的コンテンツ)で、更新後の静的コンテンツを利用するようにパスを書き換える。その後、CloudFrontから依存元のキャッシュをクリアする。</p>
+<p>依存関係のある静的コンテンツへのパスを整合性のある状態で切り替えることで、更新前と更新後の静的コンテンツが混在した状態でクライアントが取得することを防ぎ、整合性のとれた状態で静的コンテンツを配信する。</p>
+<p>以下にHTMLファイルでJavaScriptファイル(main.jsでsub.jsの関数を呼び出している)を読み込んでいる時の例を示す。</p>
+<ul class="simple">
+<li>v1リリース時</li>
+</ul>
+<div class="figure">
+<a class="reference internal image-reference" href="../_images/StaticContentsChangePathDeliver_1.png"><img alt="../_images/StaticContentsChangePathDeliver_1.png" src="../_images/StaticContentsChangePathDeliver_1.png" style="width: 60%;" /></a>
+</div>
+<table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="6%" />
+<col width="94%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">HTMLファイルでは、v1フォルダ配下にあるJavaScriptファイルを読み込むように記述する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(2)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">(1)でのHTMLファイルの記述に従い、v1フォルダ配下のJavaScriptファイルをCloudFrontのキャッシュ、キャッシュがなければ、S3から取得する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(3)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">CloudFrontはコンテンツをクライアントへ配信する。</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<ul class="simple">
+<li>v2リリース時</li>
+</ul>
+<div class="figure">
+<a class="reference internal image-reference" href="../_images/StaticContentsChangePathDeliver_2.png"><img alt="../_images/StaticContentsChangePathDeliver_2.png" src="../_images/StaticContentsChangePathDeliver_2.png" style="width: 60%;" /></a>
+</div>
+<table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="6%" />
+<col width="94%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">S3上のHTMLファイルを、v2フォルダ配下にあるJavaScriptファイルを読み込むように更新する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(2)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">CloudFrontのHTMLファイルのキャッシュをクリアする。</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(3)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">クライアントがHTMLファイルを取得しようとすると、CloudFrontにHTMLファイルのキャッシュがないため、S3から更新後のHTMLファイルを取得し、CloudFrontにキャッシュして配信する。
+HTMLファイルがキャッシュクリアされる前に、クライアントがHTMLファイルを読み込んだ場合でも、JavaScriptファイルは、HTMLファイルに記述したパスに従って読み込むため、整合性が保たれる。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(4)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">(1)でのHTMLファイルの記述に従い、v2フォルダ配下のJavaScriptファイルをCloudFrontのキャッシュ、キャッシュがなければ、S3から取得する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(5)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">CloudFrontはコンテンツをクライアントへ配信する。</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="section" id="how-to-use">
+<span id="sc-how-to-use"></span><h2><a class="toc-backref" href="#id29">5.5.2. How to use</a><a class="headerlink" href="#how-to-use" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="sc-using-s3">
+<span id="id7"></span><h3><a class="toc-backref" href="#id30">5.5.2.1. Amazon S3の利用</a><a class="headerlink" href="#sc-using-s3" title="Permalink to this headline">¶</a></h3>
+<p>静的コンテンツの保存先としてS3を利用する際の手順を説明する。</p>
+<div class="section" id="sc-using-s3-bucket">
+<span id="id8"></span><h4><a class="toc-backref" href="#id31">5.5.2.1.1. バケットの作成</a><a class="headerlink" href="#sc-using-s3-bucket" title="Permalink to this headline">¶</a></h4>
+<p>S3にファイルをアップロードする前にバケットを作成する必要がある。
+バケットの作成方法についてはAWS公式ドキュメント<a class="reference external" href="http://docs.aws.amazon.com/ja_jp/AmazonS3/latest/gsg/CreatingABucket.html">バケットの作成</a>を参照されたい。</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">S3では、静的ウェブサイトをホストするときに、バケット名とドメイン名を一致させる必要がある。バケット作成後はバケット名を変更できないため、バケットを作成する際には注意されたい。
+詳細は<a class="reference external" href="https://docs.aws.amazon.com/ja_jp/gettingstarted/latest/swh/getting-started-register-domain.html">静的ウェブサイトのホスティング ドメイン名を登録する</a>を参照されたい。</p>
+</div>
+</div>
+<div class="section" id="sc-using-s3-upload">
+<span id="id11"></span><h4><a class="toc-backref" href="#id32">5.5.2.1.2. コンテンツのアップロード</a><a class="headerlink" href="#sc-using-s3-upload" title="Permalink to this headline">¶</a></h4>
+<p>S3のバケット内を下記例の様に既存の資材と同じフォルダ構成にすることで、プロジェクト内の資材からスムーズに移行することができる。</p>
+<p><a class="reference internal" href="../ImplementationAtEachLayer/CreateWebApplicationProject.html"><span class="doc">オンライン版クラウド拡張開発プロジェクトの作成</span></a>で利用した、
+Macchinetta Server Framework for Java (1.x)の<a class="reference external" href="https://github.com/Macchinetta/macchinetta-web-multi-blank">マルチプロジェクト構成のブランクプロジェクト</a>のフォルダ構成を例にS3バケットのフォルダ構成例を以下に示す。</p>
+<ul class="simple">
+<li>プロジェクト内の既存コンテンツのフォルダ構成例</li>
+</ul>
+<div class="highlight-text"><div class="highlight"><pre><span></span>${contextPath}
+└─resources
+    ├─css
+    ├─image
+    └─js
+</pre></div>
+</div>
+<ul class="simple">
+<li>S3バケットのフォルダ構成例</li>
+</ul>
+<div class="highlight-text"><div class="highlight"><pre><span></span>${S3BucketRoot}
+└─resources
+    ├─css
+    ├─image
+    └─js
+</pre></div>
+</div>
+<p>上記フォルダ構成に従って、S3上に静的コンテンツをアップロードする。</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">アプリケーションをリリースする際、合わせて静的コンテンツをS3へアップロードする必要があるので注意されたい。</p>
+</div>
+</div>
+</div>
+<div class="section" id="amazon-s3amazon-cloudfront">
+<span id="sc-cdn-with-s3-and-cloudfront"></span><h3><a class="toc-backref" href="#id33">5.5.2.2. Amazon S3上のコンテンツのAmazon CloudFrontによる配信</a><a class="headerlink" href="#amazon-s3amazon-cloudfront" title="Permalink to this headline">¶</a></h3>
+<p>S3上のコンテンツをCloudFrontを使用して配信する。
+AWS側の設定は<a class="reference external" href="http://docs.aws.amazon.com/ja_jp/AmazonCloudFront/latest/DeveloperGuide/MigrateS3ToCloudFront.html">Amazon S3 での CloudFront の使用</a>を参照されたい。
+アプリケーション側では、静的コンテンツのパスをCloudFrontのURLに書き換えるだけで良い。
+下記では、JSPで使用している静的コンテンツの参照先をプロジェクト内の資材からCloudFrontに変更する設定例を説明する。</p>
+<ul class="simple">
+<li>application.yml</li>
+</ul>
+<div class="highlight-yaml"><div class="highlight"><pre><span></span><span class="c1"># (1)</span>
+<span class="l l-Scalar l-Scalar-Plain">content</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">url</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">https://xxxxxx.cloudfront.net</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li>include.jsp</li>
+</ul>
+<div class="highlight-jsp"><div class="highlight"><pre><span></span><span class="c">&lt;!-- (2) --&gt;</span>
+<span class="nt">&lt;spring:eval</span> <span class="na">expression=</span><span class="s">&quot;@environment.getProperty(&#39;content.url&#39;)&quot;</span> <span class="na">var=</span><span class="s">&quot;contentUrl&quot;</span> <span class="nt">/&gt;</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">contentUrl</span></code>の利用</li>
+</ul>
+<div class="highlight-jsp"><div class="highlight"><pre><span></span><span class="c">&lt;!-- omitted --&gt;</span>
+<span class="c">&lt;!-- (3) --&gt;</span>
+<span class="nt">&lt;img</span> <span class="na">alt=</span><span class="s">&quot;&quot;</span> <span class="na">src=</span><span class="s">&quot;${contentUrl}/resources/image/logo.jpg&quot;</span><span class="nt">&gt;</span>
+<span class="c">&lt;!-- omitted --&gt;</span>
+</pre></div>
+</div>
+<table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">プロパティにCloudFrontのURLを設定する。(例では<code class="docutils literal"><span class="pre">${content.url}</span></code>で参照される)</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(2)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">Springの<code class="docutils literal"><span class="pre">Environment</span></code>経由で<code class="docutils literal"><span class="pre">contentUrl</span></code>としてプロパティを取得する。
+このプロパティは複数画面で使用するので、 <code class="docutils literal"><span class="pre">include.jsp</span></code>などの共通部分で宣言する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(3)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">設定した<code class="docutils literal"><span class="pre">contentUrl</span></code>を使用するため、静的コンテンツのpathに<code class="docutils literal"><span class="pre">${contentUrl}</span></code>を設定する。
+画像、CSS、JavaScript等の静的コンテンツのパスすべてに設定する必要がある。</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last"><code class="docutils literal"><span class="pre">content.url</span></code>を環境依存プロパティにすることで、環境ごとに静的コンテンツの参照先を変更することができる。</p>
+</div>
+</div>
+<div class="section" id="amazon-cloudfrontamazon-s3">
+<span id="sc-access-cache-clear"></span><h3><a class="toc-backref" href="#id34">5.5.2.3. Amazon CloudFront利用時のAmazon S3上のコンテンツの更新</a><a class="headerlink" href="#amazon-cloudfrontamazon-s3" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id13">
+<h4><a class="toc-backref" href="#id35">5.5.2.3.1. コンテンツバージョン管理方式</a><a class="headerlink" href="#id13" title="Permalink to this headline">¶</a></h4>
+<p>コンテンツバージョン管理方式はクラウドベンダに依存しない方式であるため、実装方法は <a class="reference internal" href="../ImplementationAtEachLayer/StaticContents.html#impl-sc-cdn-update-how-to-use-contents-version"><span class="std std-ref">コンテンツバージョン管理方式</span></a> を参照されたい。</p>
+</div>
+<div class="section" id="id14">
+<h4><a class="toc-backref" href="#id36">5.5.2.3.2. Amazon CloudFrontのキャッシュクリア方式</a><a class="headerlink" href="#id14" title="Permalink to this headline">¶</a></h4>
+<p>CloudFrontのキャッシュクリア方法の詳細は <a class="reference external" href="http://docs.aws.amazon.com/ja_jp/AmazonCloudFront/latest/DeveloperGuide/Invalidation.html">オブジェクトの無効化（ウェブディストリビューションのみ）</a>を参照されたい。</p>
+</div>
+</div>
+</div>
+<div class="section" id="how-to-extend">
+<span id="sc-how-to-extend"></span><h2><a class="toc-backref" href="#id37">5.5.3. How to extend</a><a class="headerlink" href="#how-to-extend" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="sc-access-restriction">
+<span id="id16"></span><h3><a class="toc-backref" href="#id38">5.5.3.1. アクセス制限</a><a class="headerlink" href="#sc-access-restriction" title="Permalink to this headline">¶</a></h3>
+<p>ここではCloudFrontに対するアクセスを制限する方法を2つ紹介する。</p>
+<ul class="simple">
+<li><dl class="first docutils">
+<dt><a class="reference internal" href="#sc-access-restriction-waf"><span class="std std-ref">AWS WAFによる制限</span></a></dt>
+<dd>IPアドレスや地域などの条件でアクセスを制限したい場合。</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><a class="reference internal" href="#sc-access-restriction-signature"><span class="std std-ref">署名による制限</span></a></dt>
+<dd>有料・プライベートコンテンツなどへのアクセスを制限したい場合。</dd>
+</dl>
+</li>
+</ul>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">CloudFrontへのアクセス制限を設定しても、S3上のコンテンツが公開されている場合、S3に直接接続することでCloudFrontに設けたアクセス制限が適用されずにコンテンツへアクセスすることができてしまう。
+コンテンツの保護を行いたい場合、CloudFrontへの接続制限に加えS3への直接アクセスを制限する必要がある。
+詳細は<a class="reference external" href="http://docs.aws.amazon.com/ja_jp/AmazonCloudFront/latest/DeveloperGuide/private-content-restricting-access-to-s3.html">オリジンアクセスアイデンティティを使用してAmazon S3コンテンツへのアクセスを制限する</a>を参照されたい。</p>
+</div>
+<div class="section" id="aws-waf">
+<span id="sc-access-restriction-waf"></span><h4><a class="toc-backref" href="#id39">5.5.3.1.1. AWS WAFによる制限</a><a class="headerlink" href="#aws-waf" title="Permalink to this headline">¶</a></h4>
+<p>Amazonが提供するウェブアプリケーションファイアウォールである<a class="reference external" href="https://aws.amazon.com/jp/waf/">AWS WAF</a>を使用することで、
+定義した条件（IP アドレス、HTTP ヘッダー、HTTP 本文、URI 文字列…etc）に基づき、CloudFrontに対するウェブリクエストを許可、ブロックすることができる。</p>
+<p>IP アドレスによる制限が可能なので、開発中等でまだ公開したくない場合や、特定のユーザにのみ公開したい場合などに有効な制限方法である。</p>
+<p>WAFに定義可能な制限項目の詳細はAWS公式ドキュメント<a class="reference external" href="http://docs.aws.amazon.com/ja_jp/waf/latest/developerguide/what-is-aws-waf.html">What is AWS WAF and AWS Shield Advanced?</a>を、WAFとCloudFrontを組み合わせた際の振る舞いは<a class="reference external" href="http://docs.aws.amazon.com/ja_jp/waf/latest/developerguide/cloudfront-features.html">How AWS WAF Works with Amazon CloudFront Features</a>を参照されたい。</p>
+</div>
+<div class="section" id="sc-access-restriction-signature">
+<span id="id19"></span><h4><a class="toc-backref" href="#id40">5.5.3.1.2. 署名による制限</a><a class="headerlink" href="#sc-access-restriction-signature" title="Permalink to this headline">¶</a></h4>
+<p>CloudFrontはコンテンツへのアクセスコントロールを行いたい場合、署名付きURLまたはCookieを使用して制限することができる。
+CDNを使用してプライベートコンテンツを供給する場合に有効な制限方法である。</p>
+<p>詳細は<a class="reference external" href="http://docs.aws.amazon.com/ja_jp/AmazonCloudFront/latest/DeveloperGuide/PrivateContent.html">CloudFront を使用してプライベートコンテンツを供給する</a>を参照されたい。</p>
+<p>署名付きURLと署名付きCookieのどちらを使用するかの選択については<a class="reference external" href="http://docs.aws.amazon.com/ja_jp/AmazonCloudFront/latest/DeveloperGuide/private-content-choosing-signed-urls-cookies.html">署名付き URL と署名付き Cookie の選択</a>を参照されたい。</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">署名付き URL や署名付き Cookie を作成するために、有効なCloudFront キーペアが必要となる。
+IAM ユーザでは CloudFront キーペアを作成することができず、AWS アカウントのルート認証情報を使用してキーペアを作成する必要があるので注意されたい。
+詳細は<a class="reference external" href="http://docs.aws.amazon.com/ja_jp/AmazonCloudFront/latest/DeveloperGuide/private-content-trusted-signers.html#private-content-creating-cloudfront-key-pairs">信頼された署名者の CloudFront キーペアを作成する</a>を参照されたい。</p>
+</div>
+<div class="section" id="cookie">
+<span id="sc-signed-cookies"></span><h5>5.5.3.1.2.1. 署名付きCookie<a class="headerlink" href="#cookie" title="Permalink to this headline">¶</a></h5>
+<p>署名付きCookieを作成してプライベートコンテンツを配信する実装方法を紹介する。
+本ガイドラインでは、有料会員向けに複数の制限されたファイルへのアクセスを提供するアプリケーションを実装例として説明する。</p>
+<p>実装例では、プライベートコンテンツの配信が必要なアクセスに対して署名付きCookieを発行する仕組みを透過的に実現する実装として、Controllerに付与されたアノテーションをインターセプトして署名付きCookie発行する実装を紹介する。
+また、その際に署名付きCookieが不要となった場合の削除方法もあわせて紹介する。</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">署名付きCookieを使用してプライベートコンテンツを配信する際には、署名付きCookieの悪用の防止について配慮する必要がある。
+詳細は公式ドキュメント<a class="reference external" href="http://docs.aws.amazon.com/ja_jp/AmazonCloudFront/latest/DeveloperGuide/private-content-signed-cookies.html#private-content-signed-cookie-misuse">署名付き Cookie の悪用の防止</a>を参照されたい。</p>
+</div>
+<ul class="simple">
+<li>有料会員の権限保持者のみに署名付きCookieを発行するために、コントローラに付与するアノテーションの作成</li>
+</ul>
+<blockquote>
+<div><div class="highlight-java"><div class="highlight"><pre><span></span><span class="nd">@Target</span><span class="o">(</span><span class="n">METHOD</span><span class="o">)</span>
+<span class="nd">@Retention</span><span class="o">(</span><span class="n">RetentionPolicy</span><span class="o">.</span><span class="na">RUNTIME</span><span class="o">)</span>
+<span class="nd">@Documented</span>
+<span class="kd">public</span> <span class="nd">@interface</span> <span class="n">PresignedCookie</span> <span class="o">{</span>
+
+    <span class="c1">// (1)</span>
+    <span class="n">String</span><span class="o">[]</span> <span class="nf">value</span><span class="o">();</span>
+
+<span class="o">}</span>
+</pre></div>
+</div>
+<table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">署名付きCookieの発行対象のロールを指定する為の属性。</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<ul class="simple">
+<li>有料会員の権限保持者のみに署名付きCookieを発行するためのインターセプタの作成</li>
+</ul>
+<blockquote>
+<div><div class="highlight-java"><div class="highlight"><pre><span></span><span class="kd">public</span> <span class="kd">class</span> <span class="nc">PresignedCookieHandlerInterceptor</span> <span class="kd">implements</span> <span class="n">HandlerInterceptor</span> <span class="o">{</span>
+
+    <span class="c1">// (1)</span>
+    <span class="nd">@Inject</span>
+    <span class="n">CloudFrontSignatureHelper</span> <span class="n">signatureHelper</span><span class="o">;</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">boolean</span> <span class="nf">preHandle</span><span class="o">(</span><span class="n">HttpServletRequest</span> <span class="n">request</span><span class="o">,</span>
+            <span class="n">HttpServletResponse</span> <span class="n">response</span><span class="o">,</span> <span class="n">Object</span> <span class="n">handler</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
+        <span class="c1">// omitted</span>
+        <span class="k">return</span> <span class="kc">true</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">postHandle</span><span class="o">(</span><span class="n">HttpServletRequest</span> <span class="n">request</span><span class="o">,</span>
+            <span class="n">HttpServletResponse</span> <span class="n">response</span><span class="o">,</span> <span class="n">Object</span> <span class="n">handler</span><span class="o">,</span>
+            <span class="n">ModelAndView</span> <span class="n">modelAndView</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
+
+        <span class="k">if</span> <span class="o">(!</span><span class="n">enablePresignedCookie</span><span class="o">(</span><span class="n">handler</span><span class="o">))</span> <span class="o">{</span> <span class="c1">// (2)</span>
+            <span class="k">return</span><span class="o">;</span>
+        <span class="o">}</span>
+
+
+        <span class="n">CookiesForCustomPolicy</span> <span class="n">cookies</span> <span class="o">=</span> <span class="n">signatureHelper</span><span class="o">.</span><span class="na">getSignedCookies</span><span class="o">();</span> <span class="c1">// (3)</span>
+
+        <span class="c1">// (4)</span>
+        <span class="n">Cookie</span> <span class="n">cookiePolicy</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Cookie</span><span class="o">(</span><span class="n">cookies</span><span class="o">.</span><span class="na">getPolicy</span><span class="o">().</span><span class="na">getKey</span><span class="o">(),</span> <span class="n">cookies</span>
+                <span class="o">.</span><span class="na">getPolicy</span><span class="o">().</span><span class="na">getValue</span><span class="o">());</span>
+        <span class="n">cookiePolicy</span><span class="o">.</span><span class="na">setHttpOnly</span><span class="o">(</span><span class="kc">true</span><span class="o">);</span>
+        <span class="n">cookiePolicy</span><span class="o">.</span><span class="na">setSecure</span><span class="o">(</span><span class="n">signatureHelper</span><span class="o">.</span><span class="na">isSecure</span><span class="o">());</span>
+        <span class="n">cookiePolicy</span><span class="o">.</span><span class="na">setDomain</span><span class="o">(</span><span class="n">signatureHelper</span><span class="o">.</span><span class="na">getDomain</span><span class="o">());</span>
+        <span class="n">cookiePolicy</span><span class="o">.</span><span class="na">setPath</span><span class="o">(</span><span class="n">signatureHelper</span><span class="o">.</span><span class="na">getCookiePath</span><span class="o">());</span>
+        <span class="n">response</span><span class="o">.</span><span class="na">addCookie</span><span class="o">(</span><span class="n">cookiePolicy</span><span class="o">);</span>
+
+        <span class="n">Cookie</span> <span class="n">cookieSignature</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Cookie</span><span class="o">(</span><span class="n">cookies</span><span class="o">.</span><span class="na">getSignature</span><span class="o">()</span>
+                <span class="o">.</span><span class="na">getKey</span><span class="o">(),</span> <span class="n">cookies</span><span class="o">.</span><span class="na">getSignature</span><span class="o">().</span><span class="na">getValue</span><span class="o">());</span>
+        <span class="n">cookieSignature</span><span class="o">.</span><span class="na">setHttpOnly</span><span class="o">(</span><span class="kc">true</span><span class="o">);</span>
+        <span class="n">cookieSignature</span><span class="o">.</span><span class="na">setSecure</span><span class="o">(</span><span class="n">signatureHelper</span><span class="o">.</span><span class="na">isSecure</span><span class="o">());</span>
+        <span class="n">cookieSignature</span><span class="o">.</span><span class="na">setDomain</span><span class="o">(</span><span class="n">signatureHelper</span><span class="o">.</span><span class="na">getDomain</span><span class="o">());</span>
+        <span class="n">cookieSignature</span><span class="o">.</span><span class="na">setPath</span><span class="o">(</span><span class="n">signatureHelper</span><span class="o">.</span><span class="na">getCookiePath</span><span class="o">());</span>
+        <span class="n">response</span><span class="o">.</span><span class="na">addCookie</span><span class="o">(</span><span class="n">cookieSignature</span><span class="o">);</span>
+
+        <span class="n">Cookie</span> <span class="n">cookieKeyPairId</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Cookie</span><span class="o">(</span><span class="n">cookies</span><span class="o">.</span><span class="na">getKeyPairId</span><span class="o">()</span>
+                <span class="o">.</span><span class="na">getKey</span><span class="o">(),</span> <span class="n">cookies</span><span class="o">.</span><span class="na">getKeyPairId</span><span class="o">().</span><span class="na">getValue</span><span class="o">());</span>
+        <span class="n">cookieKeyPairId</span><span class="o">.</span><span class="na">setHttpOnly</span><span class="o">(</span><span class="kc">true</span><span class="o">);</span>
+        <span class="n">cookieKeyPairId</span><span class="o">.</span><span class="na">setSecure</span><span class="o">(</span><span class="n">signatureHelper</span><span class="o">.</span><span class="na">isSecure</span><span class="o">());</span>
+        <span class="n">cookieKeyPairId</span><span class="o">.</span><span class="na">setDomain</span><span class="o">(</span><span class="n">signatureHelper</span><span class="o">.</span><span class="na">getDomain</span><span class="o">());</span>
+        <span class="n">cookieKeyPairId</span><span class="o">.</span><span class="na">setPath</span><span class="o">(</span><span class="n">signatureHelper</span><span class="o">.</span><span class="na">getCookiePath</span><span class="o">());</span>
+        <span class="n">response</span><span class="o">.</span><span class="na">addCookie</span><span class="o">(</span><span class="n">cookieKeyPairId</span><span class="o">);</span>
+    <span class="o">}</span>
+
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">afterCompletion</span><span class="o">(</span><span class="n">HttpServletRequest</span> <span class="n">request</span><span class="o">,</span>
+            <span class="n">HttpServletResponse</span> <span class="n">response</span><span class="o">,</span> <span class="n">Object</span> <span class="n">handler</span><span class="o">,</span>
+            <span class="n">Exception</span> <span class="n">ex</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
+        <span class="c1">// omitted</span>
+    <span class="o">}</span>
+
+    <span class="kd">private</span> <span class="n">Collection</span><span class="o">&lt;?</span> <span class="kd">extends</span> <span class="n">GrantedAuthority</span><span class="o">&gt;</span> <span class="nf">getAuthorities</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">Authentication</span> <span class="n">authentication</span> <span class="o">=</span> <span class="n">SecurityContextHolder</span><span class="o">.</span><span class="na">getContext</span><span class="o">()</span>
+                <span class="o">.</span><span class="na">getAuthentication</span><span class="o">();</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">authentication</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">return</span> <span class="n">authentication</span><span class="o">.</span><span class="na">getAuthorities</span><span class="o">();</span>
+        <span class="o">}</span>
+        <span class="k">return</span> <span class="kc">null</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">private</span> <span class="kt">boolean</span> <span class="nf">enablePresignedCookie</span><span class="o">(</span><span class="n">Object</span> <span class="n">handler</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">if</span> <span class="o">(!(</span><span class="n">handler</span> <span class="k">instanceof</span> <span class="n">HandlerMethod</span><span class="o">))</span> <span class="o">{</span>
+            <span class="k">return</span> <span class="kc">false</span><span class="o">;</span>
+        <span class="o">}</span>
+
+        <span class="n">PresignedCookie</span> <span class="n">presignedCookie</span> <span class="o">=</span> <span class="n">HandlerMethod</span><span class="o">.</span><span class="na">class</span><span class="o">.</span><span class="na">cast</span><span class="o">(</span><span class="n">handler</span><span class="o">)</span>
+                <span class="o">.</span><span class="na">getMethodAnnotation</span><span class="o">(</span><span class="n">PresignedCookie</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+
+        <span class="k">if</span> <span class="o">(</span><span class="n">presignedCookie</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">return</span> <span class="kc">false</span><span class="o">;</span>
+        <span class="o">}</span>
+
+        <span class="n">Collection</span><span class="o">&lt;?</span> <span class="kd">extends</span> <span class="n">GrantedAuthority</span><span class="o">&gt;</span> <span class="n">authorities</span> <span class="o">=</span> <span class="n">getAuthorities</span><span class="o">();</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">authorities</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">return</span> <span class="kc">false</span><span class="o">;</span>
+        <span class="o">}</span>
+
+        <span class="k">for</span> <span class="o">(</span><span class="n">String</span> <span class="n">role</span> <span class="o">:</span> <span class="n">presignedCookie</span><span class="o">.</span><span class="na">value</span><span class="o">())</span> <span class="o">{</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">authorities</span><span class="o">.</span><span class="na">toString</span><span class="o">().</span><span class="na">contains</span><span class="o">(</span><span class="n">role</span><span class="o">))</span> <span class="o">{</span>
+                <span class="k">return</span> <span class="kc">true</span><span class="o">;</span>
+            <span class="o">}</span>
+        <span class="o">}</span>
+        <span class="k">return</span> <span class="kc">false</span><span class="o">;</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+<table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">CloudFrontの署名付きCookieを生成するためのヘルパーをインジェクションする。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(2)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">署名付きクッキーの発行対象かどうかをコントローラに付与されたアノテーション属性からログイン権限と照らし合わせて判定する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(3)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">ヘルパーを利用してレスポンスのSet-Cookieヘッダーに設定する為の情報を生成する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(4)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">CloudFront-Policy</span></code> 、<code class="docutils literal"><span class="pre">CloudFront-Signature</span></code> 、及び<code class="docutils literal"><span class="pre">CloudFront-KeyPairId</span></code> をCookieに設定する。</div>
+<div class="line">CloudFrontとアプリケーションではドメインが異なるため、Cookieをサブドメイン間で共有するにはドメインを明示的に指定する必要がある。また、対象のリソースにのみCookieが必要となるため、此処では明示的に指定している。</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<ul class="simple">
+<li>CloudFrontの署名付きCookieを生成するためのヘルパークラスの作成</li>
+</ul>
+<blockquote>
+<div><div class="highlight-java"><div class="highlight"><pre><span></span><span class="nd">@ConfigurationProperties</span><span class="o">(</span><span class="n">prefix</span> <span class="o">=</span> <span class="s">&quot;cf.signature&quot;</span><span class="o">)</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">CloudFrontSignatureHelper</span> <span class="o">{</span>
+
+    <span class="cm">/**</span>
+<span class="cm">     * プロトコル。</span>
+<span class="cm">     */</span>
+    <span class="kd">private</span> <span class="n">com</span><span class="o">.</span><span class="na">amazonaws</span><span class="o">.</span><span class="na">Protocol</span> <span class="n">protocol</span> <span class="o">=</span> <span class="n">com</span><span class="o">.</span><span class="na">amazonaws</span><span class="o">.</span><span class="na">Protocol</span><span class="o">.</span><span class="na">HTTPS</span><span class="o">;</span>
+
+    <span class="cm">/**</span>
+<span class="cm">     * セキュア。</span>
+<span class="cm">     */</span>
+    <span class="kd">private</span> <span class="kt">boolean</span> <span class="n">secure</span> <span class="o">=</span> <span class="kc">true</span><span class="o">;</span>
+
+    <span class="cm">/**</span>
+<span class="cm">     * ドメイン。</span>
+<span class="cm">     */</span>
+    <span class="nd">@NotEmpty</span>
+    <span class="kd">private</span> <span class="n">String</span> <span class="n">domain</span><span class="o">;</span>
+
+    <span class="cm">/**</span>
+<span class="cm">     * クッキーパス</span>
+<span class="cm">     */</span>
+    <span class="nd">@NotEmpty</span>
+    <span class="kd">private</span> <span class="n">String</span> <span class="n">cookiePath</span><span class="o">;</span>
+
+    <span class="cm">/**</span>
+<span class="cm">     * ディストリビューションドメイン。</span>
+<span class="cm">     */</span>
+    <span class="nd">@NotEmpty</span>
+    <span class="kd">private</span> <span class="n">String</span> <span class="n">distributionDomain</span><span class="o">;</span>
+
+    <span class="cm">/**</span>
+<span class="cm">     * プライベートキーファイルパス。</span>
+<span class="cm">     */</span>
+    <span class="nd">@NotEmpty</span>
+    <span class="kd">private</span> <span class="n">String</span> <span class="n">privateKeyFilePath</span><span class="o">;</span>
+
+    <span class="cm">/**</span>
+<span class="cm">     * リソースパス。</span>
+<span class="cm">     */</span>
+    <span class="nd">@NotEmpty</span>
+    <span class="kd">private</span> <span class="n">String</span> <span class="n">resourcePath</span><span class="o">;</span>
+
+    <span class="cm">/**</span>
+<span class="cm">     * キーペアID(アクセスキーID)。</span>
+<span class="cm">     */</span>
+    <span class="nd">@NotEmpty</span>
+    <span class="kd">private</span> <span class="n">String</span> <span class="n">keyPairId</span><span class="o">;</span>
+
+    <span class="cm">/**</span>
+<span class="cm">     * 有効期限開始までの時間（分）。</span>
+<span class="cm">     */</span>
+    <span class="kd">private</span> <span class="n">Integer</span> <span class="n">timeToActive</span><span class="o">;</span>
+
+    <span class="cm">/**</span>
+<span class="cm">     * 有効期限終了までの時間（分）。</span>
+<span class="cm">     */</span>
+    <span class="nd">@Min</span><span class="o">(</span><span class="mi">1</span><span class="o">)</span>
+    <span class="kd">private</span> <span class="kt">int</span> <span class="n">timeToExpire</span><span class="o">;</span>
+
+    <span class="cm">/**</span>
+<span class="cm">     * 許可するIPアドレスの範囲（CIDR）。</span>
+<span class="cm">     */</span>
+    <span class="kd">private</span> <span class="n">String</span> <span class="n">allowedIpRange</span><span class="o">;</span>
+
+    <span class="cm">/**</span>
+<span class="cm">     * カスタムポリシーによって作成されたクッキー情報を返却する。</span>
+<span class="cm">     * @return クッキー</span>
+<span class="cm">     */</span>
+    <span class="kd">public</span> <span class="n">CookiesForCustomPolicy</span> <span class="nf">getSignedCookies</span><span class="o">()</span> <span class="o">{</span>
+
+        <span class="c1">// プロトコルの設定</span>
+        <span class="n">Protocol</span> <span class="n">signerUtilsProtocol</span> <span class="o">=</span> <span class="n">Protocol</span><span class="o">.</span><span class="na">valueOf</span><span class="o">(</span><span class="n">protocol</span><span class="o">.</span><span class="na">toString</span><span class="o">());</span>
+
+        <span class="c1">// プライベートキーファイルの設定</span>
+        <span class="n">File</span> <span class="n">privateKeyFile</span> <span class="o">=</span> <span class="k">new</span> <span class="n">File</span><span class="o">(</span><span class="n">privateKeyFilePath</span><span class="o">);</span>
+
+        <span class="c1">// 有効期限の設定</span>
+        <span class="c1">// 有効期間：開始</span>
+        <span class="n">Date</span> <span class="n">activeFrom</span> <span class="o">=</span> <span class="n">getPlusMinutesFromCurrentTime</span><span class="o">(</span><span class="n">timeToActive</span><span class="o">);</span> <span class="c1">// (1)</span>
+
+        <span class="c1">// 有効期間:終了</span>
+        <span class="n">Date</span> <span class="n">expiresOn</span> <span class="o">=</span> <span class="n">getPlusMinutesFromCurrentTime</span><span class="o">(</span><span class="n">timeToExpire</span><span class="o">);</span>  <span class="c1">// (2)</span>
+
+        <span class="c1">// Cookie情報作成</span>
+        <span class="c1">// (3)</span>
+        <span class="n">CookiesForCustomPolicy</span> <span class="n">cookies</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+        <span class="k">try</span> <span class="o">{</span>
+            <span class="n">cookies</span> <span class="o">=</span> <span class="n">CloudFrontCookieSigner</span><span class="o">.</span><span class="na">getCookiesForCustomPolicy</span><span class="o">(</span>
+                    <span class="n">signerUtilsProtocol</span><span class="o">,</span> <span class="n">distributionDomain</span><span class="o">,</span> <span class="n">privateKeyFile</span><span class="o">,</span>
+                    <span class="n">resourcePath</span><span class="o">,</span> <span class="n">keyPairId</span><span class="o">,</span> <span class="n">expiresOn</span><span class="o">,</span> <span class="n">activeFrom</span><span class="o">,</span>
+                    <span class="n">allowedIpRange</span><span class="o">);</span>
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">IOException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="n">SystemException</span><span class="o">(</span><span class="s">&quot;e.xx.fw.9001&quot;</span><span class="o">,</span> <span class="s">&quot;I/O error occured.&quot;</span><span class="o">,</span> <span class="n">e</span><span class="o">);</span>
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">InvalidKeySpecException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="n">SystemException</span><span class="o">(</span><span class="s">&quot;e.xx.fw.9001&quot;</span><span class="o">,</span> <span class="s">&quot;invalid key specification.&quot;</span><span class="o">,</span> <span class="n">e</span><span class="o">);</span>
+        <span class="o">}</span>
+        <span class="k">return</span> <span class="n">cookies</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">private</span> <span class="n">Date</span> <span class="nf">getPlusMinutesFromCurrentTime</span><span class="o">(</span><span class="n">Integer</span> <span class="n">minutes</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">minutes</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">return</span> <span class="kc">null</span><span class="o">;</span>
+        <span class="o">}</span>
+        <span class="n">DateTime</span> <span class="n">currentTime</span> <span class="o">=</span> <span class="k">new</span> <span class="n">DateTime</span><span class="o">(</span><span class="n">DateTimeZone</span><span class="o">.</span><span class="na">UTC</span><span class="o">);</span>
+        <span class="k">return</span> <span class="n">currentTime</span><span class="o">.</span><span class="na">plusMinutes</span><span class="o">(</span><span class="n">minutes</span><span class="o">).</span><span class="na">toDate</span><span class="o">();</span>
+    <span class="o">}</span>
+
+    <span class="c1">// omitted</span>
+
+
+<span class="o">}</span>
+</pre></div>
+</div>
+<table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">設定された有効期限：開始(分後)から有効期限開始日時を生成する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(2)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">設定された有効期限：終了(分後)から有効期限終了日時を生成する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(3)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">レスポンスのSet-Cookieヘッダーに設定する為情報である<code class="docutils literal"><span class="pre">CookiesForCustomPolicy</span></code> を生成する。</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<ul class="simple">
+<li>ログアウト時にCloudFrontの署名付きCookieを削除する為のLogoutSuccessHandlerの作成</li>
+</ul>
+<blockquote>
+<div><div class="highlight-java"><div class="highlight"><pre><span></span><span class="kd">public</span> <span class="kd">class</span> <span class="nc">PresignedCookieClearingLogoutSuccessHandler</span> <span class="kd">extends</span>
+                                          <span class="n">SimpleUrlLogoutSuccessHandler</span> <span class="o">{</span>
+
+    <span class="nd">@Inject</span>
+    <span class="n">PresignedCookieCleaner</span> <span class="n">presignedCookieCleaner</span><span class="o">;</span>
+
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onLogoutSuccess</span><span class="o">(</span><span class="n">HttpServletRequest</span> <span class="n">request</span><span class="o">,</span>
+            <span class="n">HttpServletResponse</span> <span class="n">response</span><span class="o">,</span>
+            <span class="n">Authentication</span> <span class="n">authentication</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span><span class="o">,</span> <span class="n">ServletException</span> <span class="o">{</span>
+
+        <span class="n">presignedCookieCleaner</span><span class="o">.</span><span class="na">delete</span><span class="o">(</span><span class="n">response</span><span class="o">);</span> <span class="c1">// (1)</span>
+        <span class="kd">super</span><span class="o">.</span><span class="na">onLogoutSuccess</span><span class="o">(</span><span class="n">request</span><span class="o">,</span> <span class="n">response</span><span class="o">,</span> <span class="n">authentication</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+<table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">ログアウトが成功した場合に、Spring Securityの<code class="docutils literal"><span class="pre">CookieClearingLogoutHandler</span></code> では消すことができないサブドメインに適用したCookieを削除する為の処理を実行する。</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<ul class="simple">
+<li>ログアウトが実施されないでログインされた場合にも対応するためにAuthenticationSuccessHandlerを使用したCloudFrontの署名付きCookieの削除を作成</li>
+</ul>
+<blockquote>
+<div><div class="highlight-java"><div class="highlight"><pre><span></span><span class="kd">public</span> <span class="kd">class</span> <span class="nc">PresingedCookieClearingAuthenticationSuccessHandler</span> <span class="kd">extends</span>
+                                                                 <span class="n">SimpleUrlAuthenticationSuccessHandler</span> <span class="o">{</span>
+
+    <span class="nd">@Inject</span>
+    <span class="n">PresignedCookieCleaner</span> <span class="n">presignedCookieCleaner</span><span class="o">;</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onAuthenticationSuccess</span><span class="o">(</span><span class="n">HttpServletRequest</span> <span class="n">request</span><span class="o">,</span>
+            <span class="n">HttpServletResponse</span> <span class="n">response</span><span class="o">,</span>
+            <span class="n">Authentication</span> <span class="n">authentication</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span><span class="o">,</span> <span class="n">ServletException</span> <span class="o">{</span>
+        <span class="n">presignedCookieCleaner</span><span class="o">.</span><span class="na">delete</span><span class="o">(</span><span class="n">response</span><span class="o">);</span> <span class="c1">// (1)</span>
+        <span class="kd">super</span><span class="o">.</span><span class="na">onAuthenticationSuccess</span><span class="o">(</span><span class="n">request</span><span class="o">,</span> <span class="n">response</span><span class="o">,</span> <span class="n">authentication</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+<table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">認証が成功した場合に、Spring Securityの<code class="docutils literal"><span class="pre">CookieClearingLogoutHandler</span></code> では消すことができないサブドメインに適用したCookieを削除する為の処理を実行する。</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<ul class="simple">
+<li>Spring Securityでは削除することができないCloudFrontの署名付きCookieを削除する為のクラスを作成</li>
+</ul>
+<blockquote>
+<div><div class="highlight-java"><div class="highlight"><pre><span></span><span class="kd">public</span> <span class="kd">class</span> <span class="nc">PresignedCookieCleaner</span> <span class="o">{</span>
+
+
+    <span class="nd">@Inject</span>
+    <span class="n">CloudFrontSignatureHelper</span> <span class="n">signatureHelper</span><span class="o">;</span>
+
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">String</span><span class="o">[]</span> <span class="n">DELETE_COOKIES</span> <span class="o">=</span> <span class="o">{</span> <span class="s">&quot;CloudFront-Policy&quot;</span><span class="o">,</span>
+            <span class="s">&quot;CloudFront-Signature&quot;</span><span class="o">,</span> <span class="s">&quot;CloudFront-Key-Pair-Id&quot;</span> <span class="o">};</span>
+
+    <span class="c1">// (1)</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">delete</span><span class="o">(</span><span class="n">HttpServletResponse</span> <span class="n">response</span><span class="o">)</span> <span class="o">{</span>
+     <span class="k">for</span> <span class="o">(</span><span class="n">String</span> <span class="n">cookieName</span> <span class="o">:</span> <span class="n">DELETE_COOKIES</span><span class="o">)</span> <span class="o">{</span>
+         <span class="n">Cookie</span> <span class="n">cookie</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Cookie</span><span class="o">(</span><span class="n">cookieName</span><span class="o">,</span> <span class="kc">null</span><span class="o">);</span>
+         <span class="c1">// https://github.com/spring-projects/spring-security/issues/2325</span>
+         <span class="n">cookie</span><span class="o">.</span><span class="na">setPath</span><span class="o">(</span><span class="n">signatureHelper</span><span class="o">.</span><span class="na">getCookiePath</span><span class="o">()</span> <span class="o">+</span> <span class="s">&quot;/&quot;</span><span class="o">);</span>
+         <span class="n">cookie</span><span class="o">.</span><span class="na">setDomain</span><span class="o">(</span><span class="n">signatureHelper</span><span class="o">.</span><span class="na">getDomain</span><span class="o">());</span>
+         <span class="n">cookie</span><span class="o">.</span><span class="na">setMaxAge</span><span class="o">(</span><span class="mi">0</span><span class="o">);</span>
+         <span class="n">response</span><span class="o">.</span><span class="na">addCookie</span><span class="o">(</span><span class="n">cookie</span><span class="o">);</span>
+     <span class="o">}</span>
+    <span class="o">}</span>
+
+<span class="o">}</span>
+</pre></div>
+</div>
+<table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">CloudFrontの署名付きCookieを生成時に指定してドメイン、及びパスを指定して削除する。</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p><strong>Cookieの削除</strong></p>
+<p>本ガイドラインでは説明を割愛するが、 <code class="docutils literal"><span class="pre">&lt;sec:logout&gt;</span></code>タグには、ログアウト時に指定したCookieを削除するための<code class="docutils literal"><span class="pre">delete-cookies</span></code>属性が存在する。
+ただし、この属性を使用しても正常にCookieが削除できないケースが報告されている。</p>
+<p>詳細はSpring Securityの以下のJIRAを参照されたい。</p>
+<ul class="simple">
+<li><a class="reference external" href="https://jira.spring.io/browse/SEC-2091">https://jira.spring.io/browse/SEC-2091</a></li>
+</ul>
+<p class="last">また、サブドメインに対して設定したCookieについても削除ができないため独自のCookieを削除する仕組みを実装する必要がある。</p>
+</div>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<ul>
+<li><p class="first">CloudFrontの署名付きCookieを生成する為の設定を定義する</p>
+<p>以下に、<code class="docutils literal"><span class="pre">application.yml</span></code>の定義例を示す。</p>
+</li>
+</ul>
+<blockquote>
+<div><div class="highlight-yaml"><div class="highlight"><pre><span></span><span class="c1"># CloudFront Signature</span>
+  <span class="l l-Scalar l-Scalar-Plain">cf</span><span class="p p-Indicator">:</span>
+    <span class="l l-Scalar l-Scalar-Plain">signature</span><span class="p p-Indicator">:</span>
+      <span class="c1"># (1)</span>
+      <span class="l l-Scalar l-Scalar-Plain">protocol</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">https</span>
+      <span class="c1"># (2)</span>
+      <span class="l l-Scalar l-Scalar-Plain">secure</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
+      <span class="c1"># (3)</span>
+      <span class="l l-Scalar l-Scalar-Plain">domain</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">XXX.XXX</span>
+      <span class="c1"># (4)</span>
+      <span class="l l-Scalar l-Scalar-Plain">cookiePath</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">/prcd</span>
+      <span class="c1"># (5)</span>
+      <span class="l l-Scalar l-Scalar-Plain">distributionDomain</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">www.xxxxxx.net</span>
+      <span class="c1"># (6)</span>
+      <span class="l l-Scalar l-Scalar-Plain">privateKeyFilePath</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">${user.home}/private-key.der</span>
+      <span class="c1"># (7)</span>
+      <span class="l l-Scalar l-Scalar-Plain">resourcePath</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">prcd/paid/*</span>
+      <span class="c1"># (8)</span>
+      <span class="l l-Scalar l-Scalar-Plain">keyPairId</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">XXXXXXXXX</span>
+      <span class="c1"># (9)</span>
+      <span class="l l-Scalar l-Scalar-Plain">timeToActive</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">1</span>
+      <span class="c1"># (10)</span>
+      <span class="l l-Scalar l-Scalar-Plain">timeToExpire</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">30</span>
+      <span class="c1"># (11)</span>
+      <span class="l l-Scalar l-Scalar-Plain">allowedIpRange</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">0.0.0.0/0</span>
+</pre></div>
+</div>
+<table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">使用するプロトコルを設定する。署名付きCookieは<code class="docutils literal"><span class="pre">http</span></code>と<code class="docutils literal"><span class="pre">https</span></code>がサポートされている。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(2)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">CookieをHTTPSやSSLなどのセキュアなプロトコルのみを使用して送信するべきかどうか設定する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(3)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">Cookieが提示されるドメイン名を設定する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(4)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">クライアントがCookieを返す必要のあるCookieのパスを設定する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(5)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">CloudFrontのディストリビューションドメイン名を設定する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(6)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">作成したプライベートキーのパスを設定する。設定例は、ホームディレクトリのプライベートキーのパスを設定している。</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(7)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">アクセスを許可するリソースパスの設定をする。設定例ではS3オブジェクト内の<code class="docutils literal"><span class="pre">paid/</span></code>配下すべてのオブジェクトに対してアクセスを許可している。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(8)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">キーペアID(アクセスキーID)を設定する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(9)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">発行する署名が有効になるまでの時間(分)を設定する。設定例では1分後に有効になる。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(10)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">発行する署名が失効するまでの時間(分)を設定する。設定例ではセッションと同じタイミングで失効する様に、セッションタイムアウトと同じ30分を設定している。</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(11)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">アクセスを許可するIPアドレスの範囲(CIDR)を設定する。設定例ではすべて許可している。</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<ul>
+<li><p class="first">CloudFrontの署名付きCookieを生成するためのヘルパークラスのBean定義</p>
+<p>以下に、<code class="docutils literal"><span class="pre">spring-mvc.xml</span></code>の定義例を示す。</p>
+</li>
+</ul>
+<blockquote>
+<div><div class="highlight-xml"><div class="highlight"><pre><span></span><span class="c">&lt;!-- (1) --&gt;</span>
+<span class="nt">&lt;bean</span> <span class="na">class=</span><span class="s">&quot;com.example.xxx.app.signature.CloudFrontSignatureHelper&quot;</span><span class="nt">/&gt;</span>
+</pre></div>
+</div>
+<table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">CloudFrontSignatureHelper</span></code> をBean定義する。</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<ul>
+<li><p class="first">Spring Securityの機能を利用したCloudFrontの署名付きCookieを削除する為の設定</p>
+<p>以下に、<code class="docutils literal"><span class="pre">spring-security.xml</span></code>の定義例を示す。</p>
+<div class="highlight-xml"><div class="highlight"><pre><span></span><span class="nt">&lt;sec:http&gt;</span>
+    <span class="c">&lt;!-- (1) --&gt;</span>
+    <span class="nt">&lt;sec:form-login</span> <span class="na">login-page=</span><span class="s">&quot;/login&quot;</span>
+        <span class="na">authentication-failure-url=</span><span class="s">&quot;/login?error=true&quot;</span> <span class="na">authentication-success-handler-ref=</span><span class="s">&quot;presingedCookieClearingAuthenticationSuccessHandler&quot;</span><span class="nt">/&gt;</span>
+    <span class="c">&lt;!-- (2) --&gt;</span>
+    <span class="nt">&lt;sec:logout</span> <span class="na">success-handler-ref=</span><span class="s">&quot;presignedCookieClearingLogoutSuccessHandler&quot;</span>
+        <span class="na">delete-cookies=</span><span class="s">&quot;JSESSIONID&quot;</span> <span class="nt">/&gt;</span>
+    <span class="c">&lt;!-- omitted --&gt;</span>
+<span class="nt">&lt;/sec:http&gt;</span>
+<span class="c">&lt;!-- omitted --&gt;</span>
+<span class="c">&lt;!-- (3) --&gt;</span>
+<span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;presignedCookieClearingLogoutSuccessHandler&quot;</span>
+    <span class="na">class=</span><span class="s">&quot;com.example.xxx.app.signature.PresignedCookieClearingLogoutSuccessHandler&quot;</span><span class="nt">&gt;</span>
+<span class="nt">&lt;/bean&gt;</span>
+<span class="c">&lt;!-- (4) --&gt;</span>
+<span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;presingedCookieClearingAuthenticationSuccessHandler&quot;</span>
+    <span class="na">class=</span><span class="s">&quot;com.example.xxx.app.signature.PresingedCookieClearingAuthenticationSuccessHandler&quot;</span> <span class="nt">&gt;</span>
+<span class="nt">&lt;/bean&gt;</span>
+<span class="c">&lt;!-- (5) --&gt;</span>
+<span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;presignedCookieCleaner&quot;</span>
+    <span class="na">class=</span><span class="s">&quot;com.example.xxx.app.signature.PresignedCookieCleaner&quot;</span><span class="nt">&gt;</span>
+<span class="nt">&lt;/bean&gt;</span>
+</pre></div>
+</div>
+<table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">sec:form-login</span></code>要素の<code class="docutils literal"><span class="pre">authentication-success-handler-ref</span></code>属性にログアウトが実施されないでログインされた場合に署名付きCookieを削除する為の<code class="docutils literal"><span class="pre">presingedCookieClearingAuthenticationSuccessHandler</span></code>を設定する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(2)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">sec:logout</span></code>要素の<code class="docutils literal"><span class="pre">success-handler-ref</span></code>属性にログアウト時にCloudFrontの署名付きCookieを削除する為の<code class="docutils literal"><span class="pre">presignedCookieClearingLogoutSuccessHandler</span></code>を設定する。
+これによりログアウト時に署名情報がCookieから削除される。</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(3)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">ログアウト時にCloudFrontの署名付きCookieを削除する為の<code class="docutils literal"><span class="pre">presignedCookieClearingLogoutSuccessHandler</span></code>をBean定義する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(4)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">ログアウトが実施されないでログインされた場合に署名付きCookieを削除する為の<code class="docutils literal"><span class="pre">presingedCookieClearingAuthenticationSuccessHandler</span></code>をBean定義する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(5)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">CloudFrontの署名付きCookieを削除する為の<code class="docutils literal"><span class="pre">PresignedCookieCleaner</span></code>をBean定義する。</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</li>
+</ul>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<ul>
+<li><p class="first">有料会員の権限保持者のみに署名付きCookieを発行するコントローラの実装例</p>
+<div class="highlight-java"><div class="highlight"><pre><span></span><span class="nd">@Controller</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">HelloController</span> <span class="o">{</span>
+
+    <span class="nd">@Inject</span>
+    <span class="n">PresignedCookieCleaner</span> <span class="n">presignedCookieCleaner</span><span class="o">;</span>
+
+
+    <span class="nd">@RequestMapping</span><span class="o">(</span><span class="n">value</span> <span class="o">=</span> <span class="s">&quot;/&quot;</span><span class="o">,</span> <span class="n">method</span> <span class="o">=</span> <span class="o">{</span> <span class="n">RequestMethod</span><span class="o">.</span><span class="na">GET</span><span class="o">,</span>
+         <span class="n">RequestMethod</span><span class="o">.</span><span class="na">POST</span> <span class="o">})</span>
+    <span class="nd">@PresignedCookie</span><span class="o">({</span> <span class="s">&quot;PAID&quot;</span> <span class="o">})</span> <span class="c1">// (1)</span>
+    <span class="kd">public</span> <span class="n">String</span> <span class="nf">home</span><span class="o">(</span><span class="n">Locale</span> <span class="n">locale</span><span class="o">,</span> <span class="n">Model</span> <span class="n">model</span><span class="o">)</span> <span class="o">{</span>
+        <span class="c1">// omitted</span>
+        <span class="k">return</span> <span class="s">&quot;welcome/home&quot;</span><span class="o">;</span>
+    <span class="o">}</span>
+
+<span class="o">}</span>
+</pre></div>
+</div>
+<table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">署名付きCookieの発行をする為に<code class="docutils literal"><span class="pre">&#64;PresignedCookie</span></code> を付与して発行対象のロールを指定する。設定例では有料会員を示すPAIDを指定している。</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</li>
+</ul>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="amazon-route-53dns">
+<span id="sc-fallback-with-route53"></span><h3><a class="toc-backref" href="#id41">5.5.3.2. Amazon Route 53を利用したDNSフェイルオーバー</a><a class="headerlink" href="#amazon-route-53dns" title="Permalink to this headline">¶</a></h3>
+<p>Amazon Route 53を使用することで、CloudFrontへのアクセスが一時的にできなくなった場合に、S3を直接参照させるDNSフェイルオーバーを設定することができる。
+Route53のDNSフェイルオーバーについての詳細は
+<a class="reference external" href="https://docs.aws.amazon.com/ja_jp/Route53/latest/DeveloperGuide/dns-failover-configuring-options.html?console_help=true#dns-failover-failover-rrsets">公式ドキュメント</a>を参照されたい。</p>
+<p>平常時はCloudFrontを使用してコンテンツを配信し、
+障害発生時にはS3からコンテンツを配信するように設定する場合の設定手順を以下に示す。</p>
+<ol class="arabic simple">
+<li>Route 53のヘルスチェックを作成する</li>
+<li><dl class="first docutils">
+<dt>レコードセットを作成する</dt>
+<dd><ul class="first last">
+<li>Failover Record Type:PrimaryにはCloudFrontを指定</li>
+<li>Failover Record Type:SecondaryにはS3を指定</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li>Primaryのレコードセットに作成したヘルスチェックを紐付ける</li>
+</ol>
+<p>設定の詳細は<a class="reference external" href="http://docs.aws.amazon.com/ja_jp/Route53/latest/DeveloperGuide/dns-failover.html">Amazon Route 53 ヘルスチェックの作成と DNS フェイルオーバーの設定</a>を参照されたい。</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">本ガイドラインで説明したDNSフェイルオーバーでは、CloudFrontの障害時にS3を直接参照させることでフェイルオーバーを実現している。
+<a class="reference internal" href="#sc-access-restriction"><span class="std std-ref">アクセス制限</span></a>で紹介したようにS3への直接アクセスを制限している場合、このフェイルオーバーを利用することができないので注意されたい。</p>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="Queuing/index.html" title="5.6. キューイング活用"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="FileManagement/StorageFileSearch.html" title="5.4.4. インターネットストレージ内ファイルの効率的な検索"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Macchinetta Server Framework Cloud Extension Development Guideline 1.0.2.RELEASE documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >5. AWS連携</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2017 NTT Corporation.
+    Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.6.3.Theme by <a href="http://github.com/vkvn">vkvn</a>
+    </div>
+    
+    <script>
+    
+    $(function() {
+    	var $sidebar	= $('.sphinxsidebar'),
+    		$window		= $(window),
+    		offset		= $sidebar.offset(),
+    		topPadding	= 3,
+    		$scroll		= $('#scroll');
+    	
+    	$window.scroll(function() {
+    		if ($scroll.is(':checked')) {
+				if ($window.scrollTop() > offset.top) {
+					$sidebar.stop().animate({
+						marginTop:$window.scrollTop() - offset.top + topPadding
+					});
+				} else {
+					$sidebar.stop().animate({
+						marginTop:0
+					});
+				}
+			}
+		});
+    	
+    	var $navList = $('ul:first', $sidebar);
+    	$('li:first', $navList).addClass('open');
+    	
+    	$navList.treeview({
+    		persist: "location",
+    		collapsed: true,
+    		unique: false
+    	});
+    	
+	});
+    </script>
+  </body>
+</html>

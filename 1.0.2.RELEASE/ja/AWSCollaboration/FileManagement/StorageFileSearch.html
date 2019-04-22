@@ -1,0 +1,1258 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>5.4.4. インターネットストレージ内ファイルの効率的な検索 &#8212; Macchinetta Server Framework Cloud Extension Development Guideline 1.0.2.RELEASE documentation</title>
+    <link rel="stylesheet" href="../../_static/solar.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1.0.2.RELEASE',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="5.5. 静的コンテンツの配信" href="../StaticContents.html" />
+    <link rel="prev" title="5.4.3. ダウンロードファイル管理" href="DownloadFileManagement.html" /><script src="../../_static/jquery.treeview.js" type="text/javascript"></script>
+<!-- <link href='http://fonts.googleapis.com/css?family=Source+Code+Pro|Open+Sans:300italic,400italic,700italic,400,300,700' rel='stylesheet' type='text/css'> -->
+<link href="../../_static/solarized-dark.css" rel="stylesheet">
+<link href="../../_static/jquery.treeview.css" rel="stylesheet">
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../StaticContents.html" title="5.5. 静的コンテンツの配信"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="DownloadFileManagement.html" title="5.4.3. ダウンロードファイル管理"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Macchinetta Server Framework Cloud Extension Development Guideline 1.0.2.RELEASE documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >5. AWS連携</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" accesskey="U">5.4. ファイル管理</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><label><input id="scroll" type="checkbox" checked> scroll sidebar</label>
+
+  <h3><a href="../../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">5.4.4. インターネットストレージ内ファイルの効率的な検索</a><ul>
+<li><a class="reference internal" href="#overview">5.4.4.1. Overview</a><ul>
+<li><a class="reference internal" href="#amazon-s3">5.4.4.1.1. Amazon S3のイベント通知機能</a></li>
+<li><a class="reference internal" href="#storage-file-search-overview-metadata-label">5.4.4.1.2. メタデータの格納先</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#how-to-use">5.4.4.2. How to use</a><ul>
+<li><a class="reference internal" href="#id6">5.4.4.2.1. ライブラリの使い分け</a></li>
+<li><a class="reference internal" href="#storage-file-search-s3-label">5.4.4.2.2. Amazon S3の設定</a><ul>
+<li><a class="reference internal" href="#sqss3">5.4.4.2.2.1. SQSへのS3イベントの通知</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#amazon-dynamodb">5.4.4.2.3. Amazon DynamoDBの設定</a><ul>
+<li><a class="reference internal" href="#storage-file-search-dynamodb-index-label">5.4.4.2.3.1. テーブルおよびセカンダリインデックスの作成</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#storage-file-search-message-label">5.4.4.2.4. メッセージの非同期受信</a><ul>
+<li><a class="reference internal" href="#storage-file-search-message-receive-label">5.4.4.2.4.1. S3イベントメッセージの受信</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#storage-file-search-metadata-label">5.4.4.2.5. メタデータの登録</a></li>
+<li><a class="reference internal" href="#storage-file-search-search-label">5.4.4.2.6. オブジェクトの検索</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#how-to-extend">5.4.4.3. How to extend</a><ul>
+<li><a class="reference internal" href="#storage-file-search-extend-metadata1-label">5.4.4.3.1. メタデータの登録項目について</a></li>
+<li><a class="reference internal" href="#storage-file-search-extend-metadata2-label">5.4.4.3.2. メタデータの登録先について</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="DownloadFileManagement.html"
+                        title="previous chapter">5.4.3. ダウンロードファイル管理</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../StaticContents.html"
+                        title="next chapter">5.5. 静的コンテンツの配信</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/AWSCollaboration/FileManagement/StorageFileSearch.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="id1">
+<h1>5.4.4. インターネットストレージ内ファイルの効率的な検索<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h1>
+<div class="contents local topic" id="id2">
+<p class="topic-title first">目次</p>
+<ul class="simple">
+<li><a class="reference internal" href="#overview" id="id18">Overview</a><ul>
+<li><a class="reference internal" href="#amazon-s3" id="id19">Amazon S3のイベント通知機能</a></li>
+<li><a class="reference internal" href="#storage-file-search-overview-metadata-label" id="id20">メタデータの格納先</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#how-to-use" id="id21">How to use</a><ul>
+<li><a class="reference internal" href="#id6" id="id22">ライブラリの使い分け</a></li>
+<li><a class="reference internal" href="#storage-file-search-s3-label" id="id23">Amazon S3の設定</a><ul>
+<li><a class="reference internal" href="#sqss3" id="id24">SQSへのS3イベントの通知</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#amazon-dynamodb" id="id25">Amazon DynamoDBの設定</a><ul>
+<li><a class="reference internal" href="#storage-file-search-dynamodb-index-label" id="id26">テーブルおよびセカンダリインデックスの作成</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#storage-file-search-message-label" id="id27">メッセージの非同期受信</a><ul>
+<li><a class="reference internal" href="#storage-file-search-message-receive-label" id="id28">S3イベントメッセージの受信</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#storage-file-search-metadata-label" id="id29">メタデータの登録</a></li>
+<li><a class="reference internal" href="#storage-file-search-search-label" id="id30">オブジェクトの検索</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#how-to-extend" id="id31">How to extend</a><ul>
+<li><a class="reference internal" href="#storage-file-search-extend-metadata1-label" id="id32">メタデータの登録項目について</a></li>
+<li><a class="reference internal" href="#storage-file-search-extend-metadata2-label" id="id33">メタデータの登録先について</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="overview">
+<h2><a class="toc-backref" href="#id18">5.4.4.1. Overview</a><a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<div class="line-block">
+<div class="line">本ガイドラインでは、AWSの提供するインターネットストレージ S3（Amazon Simple Storage Service）を利用する際に、高度な検索条件を指定してファイルの検索、取得を行うための方法を説明する。</div>
+</div>
+<div class="line-block">
+<div class="line">S3は登録ファイルにオブジェクトキー文字列を付与して保管し、同様にオブジェクトキー文字列を指定することで目的のファイルを取得する。</div>
+<div class="line">こうしたオブジェクトキー文字列を指定して直接目的のファイルを取得するケースには対応しているが、ファイル名や作成日、作成者といった、取得条件を指定したファイル検索には対応していないため、ファイル検索を実現するためには登録ファイルを全て取得して1つずつ取得条件との一致を確認しなくてはならなくなる。</div>
+<div class="line">しかしこの方法では登録ファイルの増加とともに検索処理の負荷も増加し、レスポンスの悪化も見込まれるため現実的ではない。</div>
+</div>
+<div class="line-block">
+<div class="line">これを解決するため、登録ファイルのオブジェクトキー文字列と取得条件となる情報を組み合わせて持つことができ、かつそれら情報を指定した検索も容易なKVSを検索処理に利用する。</div>
+<div class="line"><a class="reference internal" href="../../ImplementationAtEachLayer/FileManagement/StorageFileSearch.html#storage-file-search-label"><span class="std std-ref">処理方式概要</span></a> に則って検索性能の高いKVSを利用してファイルを特定し、特定されたファイルをS3から取得することで、高度な検索条件を指定したファイル検索、取得を実現する。</div>
+</div>
+<div class="line-block">
+<div class="line">KVSにはAWSの提供するDynamoDBを利用し、ファイルの検索情報としてオブジェクトキーおよびメタデータ（作成日、作成者、サイズなど）を登録する。</div>
+<div class="line">また、S3へのファイル登録とDynamoDBへの検索情報登録を一連の処理として実行する必要があるため、S3の更新をトリガーとしてDynamoDBの登録処理を実行する仕組みが必要となる。</div>
+<div class="line">この仕組みはS3の更新イベントを受信してDynamoDBへの検索情報登録を行うイベントリスナを作成することで実現する。</div>
+<div class="line">イベントの連携にはAWSの提供するSQS（Simple Queue Service）を利用する。</div>
+</div>
+<blockquote>
+<div><div class="figure">
+<a class="reference internal image-reference" href="../../_images/StorageFileSearchOverview.png"><img alt="Screen image of storage file search overview." src="../../_images/StorageFileSearchOverview.png" style="width: 100%;" /></a>
+</div>
+<table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">クライアントはアップロードしたいファイルに対して任意のオブジェクトキーを設定し、S3のバケットへファイルをアップロードする。</div>
+<div class="line">（ファイルの削除をしたい場合は削除対象のファイルのオブジェクトキーを指定することにより、S3のバケットからファイルを削除する。）</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(2)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">Createイベント（またはDeleteイベント）がイベントメッセージとしてSQSへ通知される。</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(3)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">イベントリスナがイベントメッセージを受信する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(4)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">イベントメッセージから更新対象のファイル情報を取得する。</div>
+<div class="line">Createイベントを受信した場合はファイル情報をDynamoDBへ検索情報として登録する。</div>
+<div class="line">Deleteイベントを受信した場合はDynamoDBから検索情報を削除する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(5)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">クライアントはDynamoDBを検索するアプリケーションを利用してダウンロード条件に一致するファイルを検索し、対象ファイルのオブジェクトキーを取得する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(6)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">クライアントはDynamoDBから取得したオブジェクトキーを利用して、S3のバケットからファイルをダウンロードする。</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<div class="section" id="amazon-s3">
+<span id="storage-file-search-overview-event-label"></span><h3><a class="toc-backref" href="#id19">5.4.4.1.1. Amazon S3のイベント通知機能</a><a class="headerlink" href="#amazon-s3" title="Permalink to this headline">¶</a></h3>
+<div class="line-block">
+<div class="line">S3にはイベント通知機能が備わっており、バケット内で特定のイベントが発生した際に通知メッセージを送出することができる。</div>
+<div class="line">イベント通知の設定はバケット単位に行い、通知対象とするイベントとその通知先の組み合わせを指定することができる。</div>
+</div>
+<div class="line-block">
+<div class="line">発生するイベントについては <a class="reference external" href="http://docs.aws.amazon.com/ja_jp/AmazonS3/latest/dev/NotificationHowTo.html#notification-how-to-event-types-and-destinations">イベント通知のタイプおよび送信先</a> を参照されたい。</div>
+</div>
+<div class="line-block">
+<div class="line">通知メッセージの構造については <a class="reference external" href="http://docs.aws.amazon.com/ja_jp/AmazonS3/latest/dev/notification-content-structure.html">イベントメッセージの構造</a> を参照されたい。</div>
+</div>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+</div>
+<div class="section" id="storage-file-search-overview-metadata-label">
+<span id="id5"></span><h3><a class="toc-backref" href="#id20">5.4.4.1.2. メタデータの格納先</a><a class="headerlink" href="#storage-file-search-overview-metadata-label" title="Permalink to this headline">¶</a></h3>
+<div class="line-block">
+<div class="line">アップロードしたファイルを高度な検索によって取得できるようにするため、検索用の情報としてファイルのメタデータ（作成日、作成者、サイズなど）をKVSに登録しておく。</div>
+<div class="line">ファイルのメタデータはイベントメッセージより取得する。</div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">DynamoDBに登録する検索情報は、情報量が多くなることにより検索性能にも影響が出るため、実現したい「高度な検索」の要件に応じた登録情報を検討し、不必要な情報は登録しないようにすることが望ましい。</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">本ガイドラインではメタデータの登録先にDynamoDBを使用しているが、登録先は検索要件に応じて選択することができる。
+詳細は <a class="reference internal" href="#storage-file-search-extend-metadata2-label"><span class="std std-ref">メタデータの登録先について</span></a> を参照されたい。</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">本ガイドラインでは検索用情報としてイベントメッセージから取得できる情報のみを登録しているが、検索要件に応じてイベントメッセージに含まれない情報も別途取得して登録することができる。
+詳細は <a class="reference internal" href="#storage-file-search-extend-metadata1-label"><span class="std std-ref">メタデータの登録項目について</span></a> を参照されたい。</p>
+</div>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+</div>
+</div>
+<div class="section" id="how-to-use">
+<h2><a class="toc-backref" href="#id21">5.4.4.2. How to use</a><a class="headerlink" href="#how-to-use" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id6">
+<h3><a class="toc-backref" href="#id22">5.4.4.2.1. ライブラリの使い分け</a><a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
+<div class="line-block">
+<div class="line">DynamoDBへのアクセスはspring-data-dynamodbまたはAmazon SDK for Javaを使用することで実装可能であるが、両者の使い分けについて説明する。</div>
+<div class="line">spring-data-dynamodbによる実装では、Spring Framework が提供する<code class="docutils literal"><span class="pre">CrudRepository</span></code>インタフェースにより、Spring Data と親和性のあるリソースアクセスの抽象化が可能である。</div>
+<div class="line">一方で Spring Data 仕様に寄せられていることにより、DynamoDBアクセス固有の機能についてはいくつか制限がある。</div>
+<div class="line">spring-data-dynamodbの詳細については、 <a class="reference external" href="https://github.com/michaellavelle/spring-data-dynamodb">Spring Data DynamoDB#</a> を参照されたい。</div>
+<div class="line">対してAmazon SDK for JavaではDynamoDB用の高レベルプログラミングインターフェイス<code class="docutils literal"><span class="pre">DynamoDBMapper</span></code>を利用することにより、参照・更新の都度<code class="docutils literal"><span class="pre">DynamoDBMapperConfig.ConsistentReads</span></code>、<code class="docutils literal"><span class="pre">DynamoDBMapperConfig.SaveBehavior</span></code>によるきめ細かいオプションを指定することができる。</div>
+</div>
+<div class="line-block">
+<div class="line">本項ではS3のオンデマンドな更新に対し整合性を保ったメタデータの登録を実現させるために、上記機能が利用できるAmazon SDK for Javaを利用する。</div>
+</div>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+</div>
+<div class="section" id="storage-file-search-s3-label">
+<span id="id7"></span><h3><a class="toc-backref" href="#id23">5.4.4.2.2. Amazon S3の設定</a><a class="headerlink" href="#storage-file-search-s3-label" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="sqss3">
+<span id="storage-file-search-s3-event-label"></span><h4><a class="toc-backref" href="#id24">5.4.4.2.2.1. SQSへのS3イベントの通知</a><a class="headerlink" href="#sqss3" title="Permalink to this headline">¶</a></h4>
+<div class="line-block">
+<div class="line">本ガイドラインではS3の特定バケットへのファイルの登録、更新、削除のイベントを受信したいため、以下のイベントをSQSに通知するよう設定する。</div>
+<div class="line">設定方法は <a class="reference external" href="http://docs.aws.amazon.com/ja_jp/AmazonS3/latest/user-guide/enable-event-notifications.html">S3 バケットのイベント通知を有効化および設定する方法</a> を参照されたい。</div>
+<div class="line">なお、ファイルの更新は登録イベントとして通知されるため、<code class="docutils literal"><span class="pre">ObjectCreate</span> <span class="pre">(All)</span></code>のイベント設定によって登録、更新のイベント通知がまとめて設定される。</div>
+<div class="line">登録、更新の判別は後述する <a class="reference internal" href="#storage-file-search-metadata-label"><span class="std std-ref">メタデータの登録</span></a> にてDynamoDBにメタデータが登録済であるか否かで行う。</div>
+<div class="line"><br /></div>
+</div>
+<table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="20%" />
+<col width="20%" />
+<col width="10%" />
+<col width="10%" />
+<col width="10%" />
+<col width="30%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">名前</th>
+<th class="head">イベント</th>
+<th class="head">プレフィックス</th>
+<th class="head">サフィックス</th>
+<th class="head">送信先</th>
+<th class="head">SQS</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>Create ※任意</td>
+<td>ObjectCreate (All)</td>
+<td>－</td>
+<td>－</td>
+<td>SQSキュー</td>
+<td>イベント通知先として作成したSQSキュー</td>
+</tr>
+<tr class="row-odd"><td>Delete ※任意</td>
+<td>ObjectDelete (All)</td>
+<td>－</td>
+<td>－</td>
+<td>SQSキュー</td>
+<td>イベント通知先として作成したSQSキュー</td>
+</tr>
+</tbody>
+</table>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+</div>
+</div>
+<div class="section" id="amazon-dynamodb">
+<span id="storage-file-search-dynamodb-label"></span><h3><a class="toc-backref" href="#id25">5.4.4.2.3. Amazon DynamoDBの設定</a><a class="headerlink" href="#amazon-dynamodb" title="Permalink to this headline">¶</a></h3>
+<div class="line-block">
+<div class="line">DynamoDBについては <a class="reference internal" href="../DatabaseSharding.html#aws-dynamodb"><span class="std std-ref">DynamoDB</span></a> を参照されたい。</div>
+</div>
+<div class="section" id="storage-file-search-dynamodb-index-label">
+<span id="id8"></span><h4><a class="toc-backref" href="#id26">5.4.4.2.3.1. テーブルおよびセカンダリインデックスの作成</a><a class="headerlink" href="#storage-file-search-dynamodb-index-label" title="Permalink to this headline">¶</a></h4>
+<div class="line-block">
+<div class="line">ファイルの情報の中から検索用情報として使用したい属性を選択し、DynamoDBのテーブルに格納すべき属性（列）を選定する。</div>
+</div>
+<div class="line-block">
+<div class="line">選定した属性（列）の中から、項目（行）を一意にできる属性（列）をパーティションキーに設定する。</div>
+<div class="line">本ガイドラインではS3のオブジェクトキーをパーティションキーとする。</div>
+</div>
+<div class="line-block">
+<div class="line">上記を踏まえ、<code class="docutils literal"><span class="pre">FileMetaData</span></code>テーブルを以下の構成で作成する。</div>
+<div class="line"><br /></div>
+</div>
+<table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="10%" />
+<col width="10%" />
+<col width="10%" />
+<col width="20%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">PK</th>
+<th class="head">属性名（論理）</th>
+<th class="head">属性名（物理）</th>
+<th class="head">登録値サンプル</th>
+<th class="head">属性説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>パーティションキー</td>
+<td>オブジェクトキー</td>
+<td><code class="docutils literal"><span class="pre">objectKey</span></code></td>
+<td>USER001_FILE001.txt</td>
+<td>ファイルを一意に特定するためのキー。ユーザIDとファイル名の連結値を登録する。</td>
+</tr>
+<tr class="row-odd"><td>－</td>
+<td>バケット名</td>
+<td><code class="docutils literal"><span class="pre">bucketName</span></code></td>
+<td>fileupload.a</td>
+<td>ファイルアップロード先のバケット名</td>
+</tr>
+<tr class="row-even"><td>－</td>
+<td>ファイルID</td>
+<td><code class="docutils literal"><span class="pre">fileId</span></code></td>
+<td>FILE001.txt</td>
+<td>ファイルID</td>
+</tr>
+<tr class="row-odd"><td>－</td>
+<td>サイズ</td>
+<td><code class="docutils literal"><span class="pre">size</span></code></td>
+<td>12</td>
+<td>ファイルサイズ</td>
+</tr>
+<tr class="row-even"><td>－</td>
+<td>登録ユーザ</td>
+<td><code class="docutils literal"><span class="pre">uploadUser</span></code></td>
+<td>USER001</td>
+<td>ファイルアップロードを行ったユーザ名</td>
+</tr>
+<tr class="row-odd"><td>－</td>
+<td>登録日付</td>
+<td><code class="docutils literal"><span class="pre">uploadDate</span></code></td>
+<td>2017-08-20</td>
+<td>ファイルアップロードを行った日付</td>
+</tr>
+<tr class="row-even"><td>－</td>
+<td>シーケンサ</td>
+<td><code class="docutils literal"><span class="pre">sequencer</span></code></td>
+<td>00599E9964323435D9</td>
+<td>同一ファイルをアップロードした際の順序性検証のために使用する。
+詳細は <a class="reference internal" href="#storage-file-search-metadata-label"><span class="std std-ref">メタデータの登録</span></a> を参照されたい。</td>
+</tr>
+</tbody>
+</table>
+<div class="line-block">
+<div class="line"><br /></div>
+<div class="line">また、検索条件に使用したい属性（列）の組み合わせに応じたセカンダリインデックスを作成する。</div>
+<div class="line">本ガイドラインでは、以下の検索条件を想定してセカンダリインデックスを作成する。</div>
+<div class="line"><br /></div>
+</div>
+<table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="20%" />
+<col width="20%" />
+<col width="20%" />
+<col width="20%" />
+<col width="20%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">検索条件</th>
+<th class="head">セカンダリインデックス名</th>
+<th class="head">パーティションキー</th>
+<th class="head">ソートキー</th>
+<th class="head">種類</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>特定ユーザのファイルを更新日時順に取得する。</td>
+<td><code class="docutils literal"><span class="pre">uploadUser-uploadDate-index</span></code></td>
+<td>登録ユーザ</td>
+<td>登録日付</td>
+<td>グローバルセカンダリインデックス</td>
+</tr>
+<tr class="row-odd"><td>特定バケットのファイルサイズ順に取得する。</td>
+<td><code class="docutils literal"><span class="pre">bucketName-size-index</span></code></td>
+<td>バケット名</td>
+<td>サイズ</td>
+<td>グローバルセカンダリインデックス</td>
+</tr>
+</tbody>
+</table>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+</div>
+</div>
+<div class="section" id="storage-file-search-message-label">
+<span id="id9"></span><h3><a class="toc-backref" href="#id27">5.4.4.2.4. メッセージの非同期受信</a><a class="headerlink" href="#storage-file-search-message-label" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="storage-file-search-message-receive-label">
+<span id="id10"></span><h4><a class="toc-backref" href="#id28">5.4.4.2.4.1. S3イベントメッセージの受信</a><a class="headerlink" href="#storage-file-search-message-receive-label" title="Permalink to this headline">¶</a></h4>
+<p>SQSキューに通知されるS3のイベントメッセージを受信する。
+<a class="reference internal" href="../Queuing/AsynchronousProcessing.html"><span class="doc">非同期処理の実装（共通編）</span></a>
+に従って、SQSキューからイベントメッセージを受信するリスナクラスを作成する。</p>
+<p>リスナクラスではイベントメッセージの受信と同時に後述するメタデータの登録も行うため、実装例は <a class="reference internal" href="#storage-file-search-metadata-label"><span class="std std-ref">メタデータの登録</span></a> を参照されたい。</p>
+</div>
+</div>
+<div class="section" id="storage-file-search-metadata-label">
+<span id="id11"></span><h3><a class="toc-backref" href="#id29">5.4.4.2.5. メタデータの登録</a><a class="headerlink" href="#storage-file-search-metadata-label" title="Permalink to this headline">¶</a></h3>
+<div class="line-block">
+<div class="line">イベントメッセージに含まれるアップロードファイルのメタデータをDynamoDBに登録する。</div>
+<div class="line">登録前に既存データの有無を確認し、既存データが登録済の場合は更新、未登録の場合は登録を行う。</div>
+</div>
+<div class="line-block">
+<div class="line">既存データの検索の際は、読み込み整合性に「強力な整合性のある読み込み」を設定して最新の登録情報を確実に取得する。</div>
+<div class="line">読み込み整合性については <a class="reference external" href="http://docs.aws.amazon.com/ja_jp/amazondynamodb/latest/developerguide/HowItWorks.ReadConsistency.html">読み込み整合性</a> を参照されたい。</div>
+</div>
+<div class="line-block">
+<div class="line">既存データの更新前には、既存データの登録契機となったイベントメッセージと今回のイベントメッセージの発生順序を確認し、既存データよりも発生順序が古いイベントメッセージの情報で更新しないよう順序性を検証する。</div>
+<div class="line">順序性の検証はイベントメッセージに含まれる<code class="docutils literal"><span class="pre">sequencer</span></code>の値を比較することで行う。</div>
+<div class="line"><code class="docutils literal"><span class="pre">sequencer</span></code>を利用したイベントの順序性の検証についての詳細は <a class="reference external" href="http://docs.aws.amazon.com/ja_jp/AmazonS3/latest/dev/notification-content-structure.html">イベントメッセージの構造</a> を参照されたい。</div>
+</div>
+<div class="line-block">
+<div class="line">既存データの更新時には、既存データが検索時点から更新されていないことを確認するため、バージョン番号を使用したオプティミスティックロックを利用する。</div>
+<div class="line">バージョン番号を使用したオプティミスティックロックの詳細は <a class="reference external" href="http://docs.aws.amazon.com/ja_jp/amazondynamodb/latest/developerguide/DynamoDBMapper.OptimisticLocking.html">バージョン番号を使用したオプティミスティックロック</a> を参照されたい。</div>
+</div>
+<div class="line-block">
+<div class="line">登録処理の実装例を以下に示す。</div>
+<div class="line"><br /></div>
+</div>
+<ul>
+<li><p class="first"><code class="docutils literal"><span class="pre">pom.xml</span></code></p>
+<div class="highlight-xml"><div class="highlight"><pre><span></span>...
+<span class="c">&lt;!-- (1) --&gt;</span>
+<span class="nt">&lt;dependency&gt;</span>
+    <span class="nt">&lt;groupId&gt;</span>com.amazonaws<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>aws-java-sdk-dynamodb<span class="nt">&lt;/artifactId&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span>
+...
+</pre></div>
+</div>
+<table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">AWS SDK for Java を利用するための<code class="docutils literal"><span class="pre">aws-java-sdk-dynamodb</span></code>を定義する。</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</li>
+</ul>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<ul>
+<li><p class="first"><code class="docutils literal"><span class="pre">xxx-env.xml</span></code></p>
+<div class="highlight-xml"><div class="highlight"><pre><span></span><span class="c">&lt;!-- Spring Data DynamoDB --&gt;</span>
+<span class="c">&lt;!-- (1) --&gt;</span>
+<span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;amazonDynamoDB&quot;</span> <span class="na">class=</span><span class="s">&quot;com.example.xxx.app.fileupload.DynamoDBClientFactory&quot;</span> <span class="na">factory-method=</span><span class="s">&quot;create&quot;</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;constructor-arg</span> <span class="na">index=</span><span class="s">&quot;0&quot;</span> <span class="na">value=</span><span class="s">&quot;${cloud.aws.region.static}&quot;</span> <span class="nt">/&gt;</span>
+<span class="nt">&lt;/bean&gt;</span>
+<span class="c">&lt;!-- (2) --&gt;</span>
+<span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;dynamoDBMapper&quot;</span> <span class="na">class=</span><span class="s">&quot;com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper&quot;</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;constructor-arg</span> <span class="na">index=</span><span class="s">&quot;0&quot;</span> <span class="na">ref=</span><span class="s">&quot;amazonDynamoDB&quot;</span> <span class="nt">/&gt;</span>
+<span class="nt">&lt;/bean&gt;</span>
+</pre></div>
+</div>
+<table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">DynamoDBへアクセスするための<code class="docutils literal"><span class="pre">AmazonDynamoDBClient</span></code>を定義する。</div>
+<div class="line"><code class="docutils literal"><span class="pre">DynamoDBClientFactory</span></code>を使用してインスタンスを生成する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(2)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">AWS SDK for Java を利用するための<code class="docutils literal"><span class="pre">DynamoDBMapper</span></code>を定義する。</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</li>
+</ul>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<ul>
+<li><p class="first"><code class="docutils literal"><span class="pre">DynamoDBClientFactory.java</span></code></p>
+<div class="highlight-java"><div class="highlight"><pre><span></span><span class="kd">public</span> <span class="kd">class</span> <span class="nc">DynamoDBClientFactory</span> <span class="o">{</span>
+    <span class="kd">public</span> <span class="kd">static</span> <span class="n">AmazonDynamoDB</span> <span class="nf">create</span><span class="o">(</span><span class="n">String</span> <span class="n">region</span><span class="o">)</span> <span class="o">{</span>
+        <span class="c1">// (1)</span>
+        <span class="k">return</span> <span class="n">AmazonDynamoDBClientBuilder</span><span class="o">.</span><span class="na">standard</span><span class="o">().</span><span class="na">withRegion</span><span class="o">(</span><span class="n">region</span><span class="o">).</span><span class="na">build</span><span class="o">();</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+<table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">AmazonDynamoDBClientBuilder</span></code>を使用してインスタンスを生成する。</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</li>
+</ul>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<ul>
+<li><p class="first"><code class="docutils literal"><span class="pre">S3NoticeMessageListener.java</span></code></p>
+<div class="highlight-java"><div class="highlight"><pre><span></span><span class="nd">@Component</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">S3NoticeMessageListener</span> <span class="o">{</span>
+
+    <span class="nd">@Inject</span>
+    <span class="n">DynamoDBMapper</span> <span class="n">dbMapper</span><span class="o">;</span>  <span class="c1">// (1)</span>
+
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">EV_CREATED</span> <span class="o">=</span> <span class="s">&quot;ObjectCreated&quot;</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">EV_REMOVED</span> <span class="o">=</span> <span class="s">&quot;ObjectRemoved&quot;</span><span class="o">;</span>
+
+    <span class="nd">@JmsListener</span><span class="o">(</span><span class="n">destination</span> <span class="o">=</span> <span class="s">&quot;S3_UPDATE_NOTICE&quot;</span><span class="o">,</span> <span class="n">concurrency</span> <span class="o">=</span> <span class="s">&quot;1&quot;</span><span class="o">)</span>  <span class="c1">// (2)</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">receive</span><span class="o">(</span><span class="n">SQSTextMessage</span> <span class="n">recvMsg</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">try</span> <span class="o">{</span>
+            <span class="c1">// (3)  JSON -&gt; Java</span>
+            <span class="n">S3EventNotification</span> <span class="n">event</span> <span class="o">=</span> <span class="n">S3EventNotification</span><span class="o">.</span><span class="na">parseJson</span><span class="o">(</span><span class="n">recvMsg</span><span class="o">.</span><span class="na">getText</span><span class="o">());</span>
+            <span class="n">S3EventNotificationRecord</span> <span class="n">eventMsg</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="na">getRecords</span><span class="o">().</span><span class="na">get</span><span class="o">(</span><span class="mi">0</span><span class="o">);</span>
+
+            <span class="c1">// Consistent Read</span>
+            <span class="n">FileMetaData</span> <span class="n">currentData</span> <span class="o">=</span> <span class="n">dbMapper</span><span class="o">.</span><span class="na">load</span><span class="o">(</span><span class="n">FileMetaData</span><span class="o">.</span><span class="na">class</span><span class="o">,</span>
+                    <span class="n">eventMsg</span><span class="o">.</span><span class="na">getS3</span><span class="o">().</span><span class="na">getObject</span><span class="o">().</span><span class="na">getKey</span><span class="o">(),</span>
+                    <span class="n">ConsistentReads</span><span class="o">.</span><span class="na">CONSISTENT</span><span class="o">.</span><span class="na">config</span><span class="o">());</span>  <span class="c1">// (4)</span>
+
+            <span class="c1">// Create</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">currentData</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+                <span class="n">createRecord</span><span class="o">(</span><span class="n">eventMsg</span><span class="o">);</span>  <span class="c1">// (5)</span>
+
+            <span class="c1">// Update</span>
+            <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+                <span class="n">updateRecord</span><span class="o">(</span><span class="n">currentData</span><span class="o">,</span> <span class="n">eventMsg</span><span class="o">);</span> <span class="c1">// (8)</span>
+            <span class="o">}</span>
+
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">JMSException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+            <span class="c1">// omitted</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+
+    <span class="kd">private</span> <span class="kt">void</span> <span class="nf">createRecord</span><span class="o">(</span><span class="n">S3EventNotificationRecord</span> <span class="n">eventMsg</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">String</span> <span class="n">objectKey</span> <span class="o">=</span> <span class="n">eventMsg</span><span class="o">.</span><span class="na">getS3</span><span class="o">().</span><span class="na">getObject</span><span class="o">().</span><span class="na">getKey</span><span class="o">();</span>
+        <span class="c1">// omitted</span>
+
+        <span class="c1">// objectKey -&gt; {userId, fileName}</span>
+        <span class="n">String</span><span class="o">[]</span> <span class="n">objectKeyArr</span> <span class="o">=</span> <span class="n">dataSplit</span><span class="o">(</span><span class="n">objectKey</span><span class="o">);</span>  <span class="c1">// (6)</span>
+
+        <span class="c1">// create</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">eventMsg</span><span class="o">.</span><span class="na">getEventName</span><span class="o">().</span><span class="na">contains</span><span class="o">(</span><span class="n">EV_CREATED</span><span class="o">))</span> <span class="o">{</span>
+            <span class="n">FileMetaData</span> <span class="n">newData</span> <span class="o">=</span> <span class="k">new</span> <span class="n">FileMetaData</span><span class="o">();</span>
+            <span class="n">newData</span><span class="o">.</span><span class="na">setObjectKey</span><span class="o">(</span><span class="n">objectKey</span><span class="o">);</span>
+            <span class="c1">// omitted</span>
+            <span class="n">dbMapper</span><span class="o">.</span><span class="na">save</span><span class="o">(</span><span class="n">newData</span><span class="o">,</span> <span class="n">SaveBehavior</span><span class="o">.</span><span class="na">CLOBBER</span><span class="o">.</span><span class="na">config</span><span class="o">());</span>  <span class="c1">// (7)</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+
+    <span class="kd">private</span> <span class="kt">void</span> <span class="nf">updateRecord</span><span class="o">(</span><span class="n">FileMetaData</span> <span class="n">currentData</span><span class="o">,</span> <span class="n">S3EventNotificationRecord</span> <span class="n">eventMsg</span><span class="o">)</span> <span class="o">{</span>
+        <span class="c1">// event sequence check</span>
+        <span class="n">String</span> <span class="n">sequencer</span> <span class="o">=</span> <span class="n">eventMsg</span><span class="o">.</span><span class="na">getS3</span><span class="o">().</span><span class="na">getObject</span><span class="o">().</span><span class="na">getSequencer</span><span class="o">();</span>
+        <span class="k">if</span> <span class="o">(!</span><span class="n">isNewEntry</span><span class="o">(</span><span class="n">currentData</span><span class="o">.</span><span class="na">getSequencer</span><span class="o">(),</span> <span class="n">sequencer</span><span class="o">))</span> <span class="o">{</span>  <span class="c1">// (9)</span>
+            <span class="k">return</span><span class="o">;</span>
+        <span class="o">}</span>
+
+        <span class="n">String</span> <span class="n">objectKey</span> <span class="o">=</span> <span class="n">eventMsg</span><span class="o">.</span><span class="na">getS3</span><span class="o">().</span><span class="na">getObject</span><span class="o">().</span><span class="na">getKey</span><span class="o">();</span>
+        <span class="c1">// omitted</span>
+
+        <span class="c1">// objectKey -&gt; {userId, fileName}</span>
+        <span class="n">String</span><span class="o">[]</span> <span class="n">objectKeyArr</span> <span class="o">=</span> <span class="n">dataSplit</span><span class="o">(</span><span class="n">objectKey</span><span class="o">);</span>
+
+        <span class="k">try</span> <span class="o">{</span>
+            <span class="c1">// update</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">eventMsg</span><span class="o">.</span><span class="na">getEventName</span><span class="o">().</span><span class="na">contains</span><span class="o">(</span><span class="n">EV_CREATED</span><span class="o">))</span> <span class="o">{</span>
+                <span class="n">currentData</span><span class="o">.</span><span class="na">setBucketName</span><span class="o">(</span><span class="n">bucketName</span><span class="o">);</span>
+                <span class="c1">// omitted</span>
+                <span class="n">dbMapper</span><span class="o">.</span><span class="na">save</span><span class="o">(</span><span class="n">currentData</span><span class="o">,</span> <span class="n">SaveBehavior</span><span class="o">.</span><span class="na">UPDATE</span><span class="o">.</span><span class="na">config</span><span class="o">());</span>  <span class="c1">// (10)</span>
+
+            <span class="c1">// delete</span>
+            <span class="o">}</span> <span class="k">else</span> <span class="k">if</span> <span class="o">(</span><span class="n">eventMsg</span><span class="o">.</span><span class="na">getEventName</span><span class="o">().</span><span class="na">contains</span><span class="o">(</span><span class="n">EV_REMOVED</span><span class="o">))</span> <span class="o">{</span>
+                <span class="n">dbMapper</span><span class="o">.</span><span class="na">delete</span><span class="o">(</span><span class="n">currentData</span><span class="o">,</span> <span class="n">SaveBehavior</span><span class="o">.</span><span class="na">UPDATE</span><span class="o">.</span><span class="na">config</span><span class="o">());</span>  <span class="c1">// (11)</span>
+            <span class="o">}</span>
+
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">ConditionalCheckFailedException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>  <span class="c1">// (12)</span>
+            <span class="c1">// get current data</span>
+            <span class="n">currentData</span> <span class="o">=</span> <span class="n">dbMapper</span><span class="o">.</span><span class="na">load</span><span class="o">(</span><span class="n">FileMetaData</span><span class="o">.</span><span class="na">class</span><span class="o">,</span>
+                    <span class="n">eventMsg</span><span class="o">.</span><span class="na">getS3</span><span class="o">().</span><span class="na">getObject</span><span class="o">().</span><span class="na">getKey</span><span class="o">(),</span>
+                    <span class="n">ConsistentReads</span><span class="o">.</span><span class="na">CONSISTENT</span><span class="o">.</span><span class="na">config</span><span class="o">());</span>
+            <span class="c1">// update retry</span>
+            <span class="n">updateRecord</span><span class="o">(</span><span class="n">currentData</span><span class="o">,</span> <span class="n">eventMsg</span><span class="o">);</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+
+    <span class="kd">private</span> <span class="kt">boolean</span> <span class="nf">isNewEntry</span><span class="o">(</span><span class="n">String</span> <span class="n">curSequencer</span><span class="o">,</span> <span class="n">String</span> <span class="n">newSequencer</span><span class="o">)</span> <span class="o">{</span>
+        <span class="kt">int</span> <span class="n">len</span> <span class="o">=</span> <span class="n">Math</span><span class="o">.</span><span class="na">abs</span><span class="o">(</span><span class="n">curSequencer</span><span class="o">.</span><span class="na">length</span><span class="o">()</span> <span class="o">-</span> <span class="n">newSequencer</span><span class="o">.</span><span class="na">length</span><span class="o">());</span>
+
+        <span class="k">if</span> <span class="o">(</span><span class="n">len</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">String</span> <span class="n">paddingStr</span> <span class="o">=</span> <span class="n">String</span><span class="o">.</span><span class="na">format</span><span class="o">(</span><span class="s">&quot;%0&quot;</span><span class="o">+</span> <span class="n">len</span> <span class="o">+</span><span class="s">&quot;d&quot;</span><span class="o">,</span> <span class="mi">0</span><span class="o">);</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">curSequencer</span><span class="o">.</span><span class="na">length</span><span class="o">()</span> <span class="o">&lt;</span> <span class="n">newSequencer</span><span class="o">.</span><span class="na">length</span><span class="o">())</span> <span class="o">{</span>
+                <span class="n">curSequencer</span> <span class="o">+=</span> <span class="n">paddingStr</span><span class="o">;</span>
+            <span class="o">}</span> <span class="k">else</span> <span class="k">if</span> <span class="o">(</span><span class="n">newSequencer</span><span class="o">.</span><span class="na">length</span><span class="o">()</span> <span class="o">&lt;</span> <span class="n">curSequencer</span><span class="o">.</span><span class="na">length</span><span class="o">())</span> <span class="o">{</span>
+                <span class="n">newSequencer</span> <span class="o">+=</span> <span class="n">paddingStr</span><span class="o">;</span>
+            <span class="o">}</span>
+        <span class="o">}</span>
+        <span class="k">return</span> <span class="n">newSequencer</span><span class="o">.</span><span class="na">compareTo</span><span class="o">(</span><span class="n">curSequencer</span><span class="o">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">private</span> <span class="n">String</span><span class="o">[]</span> <span class="nf">dataSplit</span><span class="o">(</span><span class="n">String</span> <span class="n">objectKey</span><span class="o">)</span> <span class="o">{</span>
+        <span class="c1">// input string is &quot;[UserID]-[FileName]&quot;</span>
+        <span class="c1">// omitted</span>
+        <span class="k">return</span> <span class="k">new</span> <span class="n">String</span><span class="o">[]{</span><span class="n">userId</span><span class="o">,</span> <span class="n">fileName</span><span class="o">};</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+</li>
+</ul>
+<table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">AWS SDK for Java を利用するための<code class="docutils literal"><span class="pre">DynamoDBMapper</span></code>を設定する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(2)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">非同期受信用のメソッドに対し<code class="docutils literal"><span class="pre">&#64;JmsListener</span></code>アノテーションを設定する。</div>
+<div class="line"><code class="docutils literal"><span class="pre">destination</span></code>属性には、受信先のキュー名を指定する。</div>
+<div class="line"><code class="docutils literal"><span class="pre">concurrency</span></code>属性には、リスナメソッドの並列数の上限を指定する。</div>
+<div class="line">DynamoDBに登録済の既存データを検索する処理とそのデータの更新処理までの一連を排他的に実行したいため、並列数の上限を<code class="docutils literal"><span class="pre">1</span></code>に設定する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(3)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">S3EventNotification#parseJson</span></code>を利用したJSON-&gt;Java変換を実行する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(4)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">プライマリキーを指定して既存データを検索する。</div>
+<div class="line">読み込み整合性に「強力な整合性のある読み込み（<code class="docutils literal"><span class="pre">ConsistentReads.CONSISTENT</span></code>）」を指定し、最新状態の既存データを確実に取得する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(5)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">既存データが未登録の場合は、新規登録を行う。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(6)</div>
+</div>
+</td>
+<td><div class="first line-block">
+<div class="line">オブジェクトキーを分解して「ユーザID」、「ファイル名」を取得する。</div>
+</div>
+<blockquote class="last">
+<div><div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">オブジェクトキーのレイアウトにイベントメッセージからは取得できない属性（ユーザメタデータの値など）を持つことで、
+別途S3を参照する必要なくユーザメタデータを使用した検索を実現できる。
+またこのような属性値を取り出してDynamoDBに登録することで、セカンダリインデックスを使用した検索にも使用できる。</p>
+</div>
+</div></blockquote>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(7)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">DynamoDBへの登録を実行する。新規登録のため、<code class="docutils literal"><span class="pre">SaveBehavior.CLOBBER</span></code>を指定する。</div>
+<div class="line">（既存データが未登録であることを確認しているため効果はないが、<code class="docutils literal"><span class="pre">SaveBehavior.CLOBBER</span></code>を指定することで既存データの全ての属性をクリアした後に登録データの値で置換される。）</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(8)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">既存データが登録済の場合は、更新または削除を行う。</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(9)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">イベントメッセージの順序性を保障するため、既存データが登録データよりも過去に発生したイベントによって登録されたものであることを確認する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(10)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">DynamoDBへの更新を実行する。既存データの更新のため、<code class="docutils literal"><span class="pre">SaveBehavior.UPDATE</span></code>を指定する。</div>
+<div class="line"><code class="docutils literal"><span class="pre">SaveBehavior.UPDATE</span></code>を指定することで、登録データにフィールドとして存在する属性のみが更新される。（フィールドがnull値の場合も更新対象となる）</div>
+<div class="line">また、後述する「バージョン番号を使用したオプティミスティックロック」も利用可能となる。</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(11)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">DynamoDBからの削除を実行する。</div>
+<div class="line">更新時と同様、後述する「バージョン番号を使用したオプティミスティックロック」を利用するため<code class="docutils literal"><span class="pre">SaveBehavior.UPDATE</span></code>を指定する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(12)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">バージョンチェックエラーが発生した場合（既存データに別の更新がされていた場合）は既存データを再取得して更新処理を再実行する。</div>
+<div class="line">再実行の結果、(9)の処理にて既存データよりも今回の登録データの方が新しい情報である場合は更新処理を実行し、そうでない場合は更新不要と判定する。</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<div class="line-block">
+<div class="line"><br /></div>
+<div class="line"><code class="docutils literal"><span class="pre">FileMetaData</span></code>テーブルの項目のマッピングクラスの実装例を以下に示す。</div>
+</div>
+<ul>
+<li><p class="first"><code class="docutils literal"><span class="pre">FileMetaData.java</span></code></p>
+<div class="highlight-java"><div class="highlight"><pre><span></span><span class="nd">@DynamoDBTable</span><span class="o">(</span><span class="n">tableName</span> <span class="o">=</span> <span class="s">&quot;FileMetaData&quot;</span><span class="o">)</span>  <span class="c1">// (1)</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">FileMetaData</span> <span class="o">{</span>
+
+    <span class="kd">private</span> <span class="n">String</span> <span class="n">objectKey</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="n">String</span> <span class="n">bucketName</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="n">String</span> <span class="n">fileName</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="kt">int</span> <span class="n">size</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="n">String</span> <span class="n">uploadUser</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="n">String</span> <span class="n">uploadDate</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="n">String</span> <span class="n">sequencer</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="n">Long</span> <span class="n">version</span><span class="o">;</span>
+
+    <span class="nd">@DynamoDBHashKey</span>  <span class="c1">// (2)</span>
+    <span class="kd">public</span> <span class="n">String</span> <span class="nf">getObjectKey</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">objectKey</span><span class="o">;</span>
+    <span class="o">}</span>
+    <span class="c1">// omitted</span>
+
+    <span class="nd">@DynamoDBIndexHashKey</span><span class="o">(</span><span class="n">globalSecondaryIndexName</span> <span class="o">=</span> <span class="s">&quot;bucketName-size-index&quot;</span><span class="o">)</span>  <span class="c1">// (3)</span>
+    <span class="kd">public</span> <span class="n">String</span> <span class="nf">getBucketName</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">bucketName</span><span class="o">;</span>
+    <span class="o">}</span>
+    <span class="c1">// omitted</span>
+
+    <span class="nd">@DynamoDBAttribute</span>  <span class="c1">// (8)</span>
+    <span class="kd">public</span> <span class="n">String</span> <span class="nf">getFileName</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">fileName</span><span class="o">;</span>
+    <span class="o">}</span>
+    <span class="c1">// omitted</span>
+
+    <span class="nd">@DynamoDBIndexRangeKey</span><span class="o">(</span><span class="n">globalSecondaryIndexName</span> <span class="o">=</span> <span class="s">&quot;bucketName-size-index&quot;</span><span class="o">)</span>  <span class="c1">// (4)</span>
+    <span class="kd">public</span> <span class="kt">int</span> <span class="nf">getSize</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">size</span><span class="o">;</span>
+    <span class="o">}</span>
+    <span class="c1">// omitted</span>
+
+    <span class="nd">@DynamoDBIndexHashKey</span><span class="o">(</span><span class="n">globalSecondaryIndexName</span> <span class="o">=</span> <span class="s">&quot;uploadUser-uploadDate-index&quot;</span><span class="o">)</span>  <span class="c1">// (5)</span>
+    <span class="kd">public</span> <span class="n">String</span> <span class="nf">getUploadUser</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">uploadUser</span><span class="o">;</span>
+    <span class="o">}</span>
+    <span class="c1">// omitted</span>
+
+    <span class="nd">@DynamoDBIndexRangeKey</span><span class="o">(</span><span class="n">globalSecondaryIndexName</span> <span class="o">=</span> <span class="s">&quot;uploadUser-uploadDate-index&quot;</span><span class="o">)</span>  <span class="c1">// (6)</span>
+    <span class="kd">public</span> <span class="n">String</span> <span class="nf">getUploadDate</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">uploadDate</span><span class="o">;</span>
+    <span class="o">}</span>
+    <span class="c1">// omitted</span>
+
+    <span class="nd">@DynamoDBAttribute</span>
+    <span class="kd">public</span> <span class="n">String</span> <span class="nf">getSequencer</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">sequencer</span><span class="o">;</span>
+    <span class="o">}</span>
+    <span class="c1">// omitted</span>
+
+    <span class="nd">@DynamoDBVersionAttribute</span>  <span class="c1">// (7)</span>
+    <span class="kd">public</span> <span class="n">Long</span> <span class="nf">getVersion</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">version</span><span class="o">;</span>
+    <span class="o">}</span>
+    <span class="c1">// omitted</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+</li>
+</ul>
+<table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">クラスに対して<code class="docutils literal"><span class="pre">&#64;DynamoDBTable</span></code>アノテーションを付与し、<code class="docutils literal"><span class="pre">tableName</span></code>にマッピング対象となる<code class="docutils literal"><span class="pre">FileMetaData</span></code>テーブルを指定する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(2)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">FileMetaData</span></code>テーブルのハッシュキーである<code class="docutils literal"><span class="pre">objectKey</span></code>のGetterに対して<code class="docutils literal"><span class="pre">&#64;DynamoDBHashKey</span></code>アノテーションを付与する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(3)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">グローバルセカンダリインデックス「<code class="docutils literal"><span class="pre">bucketName-size-index</span></code>」のハッシュキーである<code class="docutils literal"><span class="pre">bucketName</span></code>のGetterに対して<code class="docutils literal"><span class="pre">&#64;DynamoDBIndexHashKey</span></code>アノテーションを付与する。</div>
+<div class="line"><code class="docutils literal"><span class="pre">globalSecondaryIndexName</span></code>には<code class="docutils literal"><span class="pre">bucketName-size-index</span></code>を指定する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(4)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">グローバルセカンダリインデックス「<code class="docutils literal"><span class="pre">bucketName-size-index</span></code>」のソートキーである<code class="docutils literal"><span class="pre">size</span></code>のGetterに対して<code class="docutils literal"><span class="pre">&#64;DynamoDBIndexRangeKey</span></code>アノテーションを付与する。</div>
+<div class="line"><code class="docutils literal"><span class="pre">globalSecondaryIndexName</span></code>には<code class="docutils literal"><span class="pre">bucketName-size-index</span></code>を指定する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(5)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">グローバルセカンダリインデックス「<code class="docutils literal"><span class="pre">uploadUser-uploadDate-index</span></code>」のハッシュキーである<code class="docutils literal"><span class="pre">uploadUser</span></code>のGetterに対して<code class="docutils literal"><span class="pre">&#64;DynamoDBIndexHashKey</span></code>アノテーションを付与する。</div>
+<div class="line"><code class="docutils literal"><span class="pre">globalSecondaryIndexName</span></code>には<code class="docutils literal"><span class="pre">uploadUser-uploadDate-index</span></code>を指定する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(6)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">グローバルセカンダリインデックス「<code class="docutils literal"><span class="pre">uploadUser-uploadDate-index</span></code>」のソートキーである<code class="docutils literal"><span class="pre">uploadDate</span></code>のGetterに対して<code class="docutils literal"><span class="pre">&#64;DynamoDBIndexRangeKey</span></code>アノテーションを付与する。</div>
+<div class="line"><code class="docutils literal"><span class="pre">globalSecondaryIndexName</span></code>には<code class="docutils literal"><span class="pre">uploadUser-uploadDate-index</span></code>を指定する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(7)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">バージョン番号を使用したオプティミスティックロックを行うため、<code class="docutils literal"><span class="pre">version</span></code>のGetterに対して<code class="docutils literal"><span class="pre">&#64;DynamoDBVersionAttribute</span></code>アノテーションを付与する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(8)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">プライマリキーまたはセカンダリインデックスに使用しない属性については、<code class="docutils literal"><span class="pre">&#64;DynamoDBAttribute</span></code>アノテーションを付与する。</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+</div>
+<div class="section" id="storage-file-search-search-label">
+<span id="id15"></span><h3><a class="toc-backref" href="#id30">5.4.4.2.6. オブジェクトの検索</a><a class="headerlink" href="#storage-file-search-search-label" title="Permalink to this headline">¶</a></h3>
+<p>プライマリキーまたはセカンダリインデックスを使用してDynamoDBからアップロードファイルのメタデータを検索する。</p>
+<p>以下の条件指定による検索を行う。</p>
+<ul class="simple">
+<li>ハッシュキー（オブジェクトキー）を指定して単一のアップロード情報を取得する。</li>
+<li>グローバルセカンダリインデックス（登録ユーザ、登録日時）を指定して、特定ユーザの特定日のアップロードファイル情報をリスト取得する。</li>
+<li>グローバルセカンダリインデックスのハッシュキーのみ（登録ユーザ）を指定して、特定ユーザのアップロードファイル情報を登録日順（昇順）にリスト取得する。</li>
+<li>グローバルセカンダリインデックスのハッシュキーのみ（バケット名）を指定して、特定バケットのアップロードファイル情報をサイズ順（降順）にリスト取得する。</li>
+</ul>
+<p>検索処理の実装例を以下に示す。</p>
+<ul>
+<li><p class="first"><code class="docutils literal"><span class="pre">SearchSharedServiceImpl.java</span></code></p>
+<div class="highlight-java"><div class="highlight"><pre><span></span><span class="nd">@Service</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">SearchSharedServiceImpl</span> <span class="kd">implements</span> <span class="n">SearchSharedService</span> <span class="o">{</span>
+
+    <span class="nd">@Inject</span>
+    <span class="n">DynamoDBMapper</span> <span class="n">dbMapper</span><span class="o">;</span>  <span class="c1">// (1)</span>
+
+    <span class="kd">public</span> <span class="n">FileMetaData</span> <span class="nf">doPkSearch</span><span class="o">(</span><span class="n">String</span> <span class="n">objectKey</span><span class="o">)</span> <span class="o">{</span>
+        <span class="c1">// (2)</span>
+        <span class="n">FileMetaData</span> <span class="n">result</span> <span class="o">=</span> <span class="n">dbMapper</span><span class="o">.</span><span class="na">load</span><span class="o">(</span><span class="n">FileMetaData</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="n">objectKey</span><span class="o">);</span>
+        <span class="k">return</span> <span class="n">result</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="n">List</span><span class="o">&lt;</span><span class="n">FileMetaData</span><span class="o">&gt;</span> <span class="nf">doUserIdIndexSearch</span><span class="o">(</span><span class="n">String</span> <span class="n">uploadUser</span><span class="o">,</span> <span class="n">String</span> <span class="n">uploadDate</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">HashMap</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">AttributeValue</span><span class="o">&gt;</span> <span class="n">eav</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HashMap</span><span class="o">&lt;&gt;();</span>
+        <span class="n">eav</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="s">&quot;:v1&quot;</span><span class="o">,</span> <span class="k">new</span> <span class="n">AttributeValue</span><span class="o">().</span><span class="na">withS</span><span class="o">(</span><span class="n">uploadUser</span><span class="o">));</span>
+        <span class="n">String</span> <span class="n">keyConditionExpression</span> <span class="o">=</span> <span class="s">&quot;uploadUser = :v1&quot;</span><span class="o">;</span>
+
+        <span class="k">if</span> <span class="o">(</span><span class="n">uploadDate</span><span class="o">.</span><span class="na">length</span><span class="o">()</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">eav</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="s">&quot;:v2&quot;</span><span class="o">,</span> <span class="k">new</span> <span class="n">AttributeValue</span><span class="o">().</span><span class="na">withS</span><span class="o">(</span><span class="n">uploadDate</span><span class="o">));</span>
+            <span class="n">keyConditionExpression</span> <span class="o">+=</span> <span class="s">&quot; and uploadDate = :v2&quot;</span><span class="o">;</span>
+        <span class="o">}</span>
+        <span class="c1">// (3)</span>
+        <span class="n">DynamoDBQueryExpression</span><span class="o">&lt;</span><span class="n">FileMetaData</span><span class="o">&gt;</span> <span class="n">queryExpression</span> <span class="o">=</span> <span class="k">new</span> <span class="n">DynamoDBQueryExpression</span><span class="o">&lt;</span><span class="n">FileMetaData</span><span class="o">&gt;()</span>
+            <span class="o">.</span><span class="na">withIndexName</span><span class="o">(</span><span class="s">&quot;uploadUser-uploadDate-index&quot;</span><span class="o">)</span>
+            <span class="o">.</span><span class="na">withConsistentRead</span><span class="o">(</span><span class="kc">false</span><span class="o">)</span>
+            <span class="o">.</span><span class="na">withKeyConditionExpression</span><span class="o">(</span><span class="n">keyConditionExpression</span><span class="o">)</span>
+            <span class="o">.</span><span class="na">withExpressionAttributeValues</span><span class="o">(</span><span class="n">eav</span><span class="o">);</span>
+        <span class="n">List</span><span class="o">&lt;</span><span class="n">FileMetaData</span><span class="o">&gt;</span> <span class="n">indexResult</span> <span class="o">=</span> <span class="n">dbMapper</span><span class="o">.</span><span class="na">query</span><span class="o">(</span><span class="n">FileMetaData</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="n">queryExpression</span><span class="o">);</span>
+        <span class="k">return</span> <span class="n">indexResult</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="n">List</span><span class="o">&lt;</span><span class="n">FileMetaData</span><span class="o">&gt;</span> <span class="nf">doBucketNameIndexSearch</span><span class="o">(</span><span class="n">String</span> <span class="n">bucketName</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">HashMap</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">AttributeValue</span><span class="o">&gt;</span> <span class="n">eav</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HashMap</span><span class="o">&lt;&gt;();</span>
+        <span class="n">eav</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="s">&quot;:v1&quot;</span><span class="o">,</span> <span class="k">new</span> <span class="n">AttributeValue</span><span class="o">().</span><span class="na">withS</span><span class="o">(</span><span class="n">bucketName</span><span class="o">));</span>
+        <span class="c1">// (4)</span>
+        <span class="n">DynamoDBQueryExpression</span><span class="o">&lt;</span><span class="n">FileMetaData</span><span class="o">&gt;</span> <span class="n">queryExpression</span> <span class="o">=</span> <span class="k">new</span> <span class="n">DynamoDBQueryExpression</span><span class="o">&lt;</span><span class="n">FileMetaData</span><span class="o">&gt;()</span>
+            <span class="o">.</span><span class="na">withIndexName</span><span class="o">(</span><span class="s">&quot;bucketName-size-index&quot;</span><span class="o">)</span>
+            <span class="o">.</span><span class="na">withConsistentRead</span><span class="o">(</span><span class="kc">false</span><span class="o">)</span>
+            <span class="o">.</span><span class="na">withKeyConditionExpression</span><span class="o">(</span><span class="s">&quot;bucketName = :v1&quot;</span><span class="o">)</span>
+            <span class="o">.</span><span class="na">withScanIndexForward</span><span class="o">(</span><span class="kc">false</span><span class="o">)</span>
+            <span class="o">.</span><span class="na">withExpressionAttributeValues</span><span class="o">(</span><span class="n">eav</span><span class="o">);</span>
+        <span class="n">List</span><span class="o">&lt;</span><span class="n">FileMetaData</span><span class="o">&gt;</span> <span class="n">indexResult</span> <span class="o">=</span> <span class="n">dbMapper</span><span class="o">.</span><span class="na">query</span><span class="o">(</span><span class="n">FileMetaData</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="n">queryExpression</span><span class="o">);</span>
+        <span class="k">return</span> <span class="n">indexResult</span><span class="o">;</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+</li>
+</ul>
+<table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">AWS SDK for Java を利用するための<code class="docutils literal"><span class="pre">DynamoDBMapper</span></code>を設定する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(2)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">FileMetaData</span></code>テーブルのハッシュキーである<code class="docutils literal"><span class="pre">objectKey</span></code>を指定した検索を実行する。</div>
+<div class="line">プライマリキーを指定した検索となるため、1項目のみ取得される。</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(3)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">グローバルセカンダリインデックス「<code class="docutils literal"><span class="pre">uploadUser-uploadDate-index</span></code>」を指定した検索を実行する。</div>
+<div class="line">ハッシュキーが<code class="docutils literal"><span class="pre">uploadUser</span></code>、ソートキーが<code class="docutils literal"><span class="pre">uploadDate</span></code>となる。</div>
+<div class="line"><code class="docutils literal"><span class="pre">uploadUser</span></code>のみが指定された場合は、<code class="docutils literal"><span class="pre">uploadUser</span></code>が一致する項目が<code class="docutils literal"><span class="pre">uploadDate</span></code>順（昇順）にリスト取得される。</div>
+<div class="line"><code class="docutils literal"><span class="pre">uploadUser</span></code>と<code class="docutils literal"><span class="pre">uploadDate</span></code>の両方が指定された場合は、<code class="docutils literal"><span class="pre">uploadUser</span></code>と<code class="docutils literal"><span class="pre">uploadDate</span></code>が一致する項目がリスト取得される。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(4)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">グローバルセカンダリインデックス「<code class="docutils literal"><span class="pre">bucketName-size-index</span></code>」を指定した検索を実行する。</div>
+<div class="line">ハッシュキーが<code class="docutils literal"><span class="pre">bucketName</span></code>、ソートキーが<code class="docutils literal"><span class="pre">size</span></code>となる。</div>
+<div class="line"><code class="docutils literal"><span class="pre">bucketName</span></code>が一致する項目が<code class="docutils literal"><span class="pre">size</span></code>順（降順）にリスト取得される。</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="section" id="how-to-extend">
+<h2><a class="toc-backref" href="#id31">5.4.4.3. How to extend</a><a class="headerlink" href="#how-to-extend" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="storage-file-search-extend-metadata1-label">
+<span id="id16"></span><h3><a class="toc-backref" href="#id32">5.4.4.3.1. メタデータの登録項目について</a><a class="headerlink" href="#storage-file-search-extend-metadata1-label" title="Permalink to this headline">¶</a></h3>
+<div class="line-block">
+<div class="line">検索要件によって、イベントメッセージから取得できる情報（ファイルのシステムメタデータ）だけでは検索情報として足りない場合、必要な情報を別途取得する処理を実装する必要がある。</div>
+<div class="line">例えばファイルのユーザメタデータの情報を利用したい場合には、イベントメッセージの受信処理にてS3を参照し、ユーザメタデータの情報を取得してDynamoDBへ登録することで、ユーザメタデータの情報を指定した検索を行うことができる。</div>
+</div>
+</div>
+<div class="section" id="storage-file-search-extend-metadata2-label">
+<span id="id17"></span><h3><a class="toc-backref" href="#id33">5.4.4.3.2. メタデータの登録先について</a><a class="headerlink" href="#storage-file-search-extend-metadata2-label" title="Permalink to this headline">¶</a></h3>
+<div class="line-block">
+<div class="line">DynamoDBでは対応できない複雑な検索条件が必要な要件がある場合（例えば複数テーブルを結合しての検索など）、Amazon Relational Database Service (RDS) の利用も検討できる。</div>
+<div class="line">KVSではないためDynamoDBと比べて検索速度は劣るものの、リレーショナルデータベースの特性を利用してデータを柔軟に取り扱うことができる。</div>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../StaticContents.html" title="5.5. 静的コンテンツの配信"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="DownloadFileManagement.html" title="5.4.3. ダウンロードファイル管理"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Macchinetta Server Framework Cloud Extension Development Guideline 1.0.2.RELEASE documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >5. AWS連携</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" >5.4. ファイル管理</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2017 NTT Corporation.
+    Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.6.3.Theme by <a href="http://github.com/vkvn">vkvn</a>
+    </div>
+    
+    <script>
+    
+    $(function() {
+    	var $sidebar	= $('.sphinxsidebar'),
+    		$window		= $(window),
+    		offset		= $sidebar.offset(),
+    		topPadding	= 3,
+    		$scroll		= $('#scroll');
+    	
+    	$window.scroll(function() {
+    		if ($scroll.is(':checked')) {
+				if ($window.scrollTop() > offset.top) {
+					$sidebar.stop().animate({
+						marginTop:$window.scrollTop() - offset.top + topPadding
+					});
+				} else {
+					$sidebar.stop().animate({
+						marginTop:0
+					});
+				}
+			}
+		});
+    	
+    	var $navList = $('ul:first', $sidebar);
+    	$('li:first', $navList).addClass('open');
+    	
+    	$navList.treeview({
+    		persist: "location",
+    		collapsed: true,
+    		unique: false
+    	});
+    	
+	});
+    </script>
+  </body>
+</html>

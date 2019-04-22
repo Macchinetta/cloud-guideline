@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>3.2. オンライン版クラウド拡張開発プロジェクトの作成 &#8212; Macchinetta Server Framework Cloud Extension Development Guideline 1.0.2.RELEASE documentation</title>
+    <link rel="stylesheet" href="../_static/solar.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.0.2.RELEASE',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="3.3. セッション外部管理" href="SessionManagement.html" />
+    <link rel="prev" title="3.1. 実装方針" href="ImplementationPolicy.html" /><script src="../_static/jquery.treeview.js" type="text/javascript"></script>
+<!-- <link href='http://fonts.googleapis.com/css?family=Source+Code+Pro|Open+Sans:300italic,400italic,700italic,400,300,700' rel='stylesheet' type='text/css'> -->
+<link href="../_static/solarized-dark.css" rel="stylesheet">
+<link href="../_static/jquery.treeview.css" rel="stylesheet">
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="SessionManagement.html" title="3.3. セッション外部管理"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="ImplementationPolicy.html" title="3.1. 実装方針"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Macchinetta Server Framework Cloud Extension Development Guideline 1.0.2.RELEASE documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">3. アプリケーション開発</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><label><input id="scroll" type="checkbox" checked> scroll sidebar</label>
+
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">3.2. オンライン版クラウド拡張開発プロジェクトの作成</a><ul>
+<li><a class="reference internal" href="#create-project-blankpj">3.2.1. 開発プロジェクトの作成</a></li>
+<li><a class="reference internal" href="#create-project-customize">3.2.2. 開発プロジェクトのカスタマイズ</a><ul>
+<li><a class="reference internal" href="#spring-boot">3.2.2.1. Spring Bootの利用</a></li>
+<li><a class="reference internal" href="#create-project-adding-dependencies">3.2.2.2. 依存ライブラリの追加</a></li>
+<li><a class="reference internal" href="#create-project-making-entrypoint">3.2.2.3. エントリポイントの作成</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#create-project-constrait">3.2.3. オンライン版クラウド拡張開発プロジェクトで考慮すべき点・制約事項</a><ul>
+<li><a class="reference internal" href="#create-project-constrait-springboot">3.2.3.1. Spring Boot使用に伴う制約事項</a><ul>
+<li><a class="reference internal" href="#logback">3.2.3.1.1. Logbackの拡張の利用</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spring-boottomcat">3.2.3.2. Spring Bootで組み込みTomcatを使用しない場合の制約事項</a><ul>
+<li><a class="reference internal" href="#dispring-boot">3.2.3.2.1. DIコンテナの構築タイミングによりSpring Bootの機能が一部動作しない</a></li>
+<li><a class="reference internal" href="#create-project-constrait-embeddedtomcat-transactiontoken">3.2.3.2.2. トランザクショントークンチェックを使用するための設定方法が異なる</a></li>
+<li><a class="reference internal" href="#spring-boot-actuator">3.2.3.2.3. Spring Boot Actuatorのエンドポイントのポートが変更できない</a></li>
+<li><a class="reference internal" href="#create-project-constrait-embeddedtomcat-cloudconfig">3.2.3.2.4. Spring Cloud Configのリフレッシュ機能が使用できない</a></li>
+<li><a class="reference internal" href="#filter">3.2.3.2.5. Filterが自動で登録され意図しない動作が発生する</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#webmvcautoconfiguration">3.2.3.3. WebMvcAutoConfigurationによる不具合</a><ul>
+<li><a class="reference internal" href="#viewresolverview">3.2.3.3.1. ViewResolverが上書きされViewの解決ができない</a></li>
+<li><a class="reference internal" href="#create-project-constrait-webmvc-errorpage">3.2.3.3.2. エラー画面表示の不具合</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="ImplementationPolicy.html"
+                        title="previous chapter">3.1. 実装方針</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="SessionManagement.html"
+                        title="next chapter">3.3. セッション外部管理</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/ImplementationAtEachLayer/CreateWebApplicationProject.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="id1">
+<h1>3.2. オンライン版クラウド拡張開発プロジェクトの作成<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h1>
+<div class="contents local topic" id="id2">
+<p class="topic-title first">目次</p>
+<ul class="simple">
+<li><a class="reference internal" href="#create-project-blankpj" id="id20">開発プロジェクトの作成</a></li>
+<li><a class="reference internal" href="#create-project-customize" id="id21">開発プロジェクトのカスタマイズ</a><ul>
+<li><a class="reference internal" href="#spring-boot" id="id22">Spring Bootの利用</a></li>
+<li><a class="reference internal" href="#create-project-adding-dependencies" id="id23">依存ライブラリの追加</a></li>
+<li><a class="reference internal" href="#create-project-making-entrypoint" id="id24">エントリポイントの作成</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#create-project-constrait" id="id25">オンライン版クラウド拡張開発プロジェクトで考慮すべき点・制約事項</a><ul>
+<li><a class="reference internal" href="#create-project-constrait-springboot" id="id26">Spring Boot使用に伴う制約事項</a><ul>
+<li><a class="reference internal" href="#logback" id="id27">Logbackの拡張の利用</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spring-boottomcat" id="id28">Spring Bootで組み込みTomcatを使用しない場合の制約事項</a><ul>
+<li><a class="reference internal" href="#dispring-boot" id="id29">DIコンテナの構築タイミングによりSpring Bootの機能が一部動作しない</a></li>
+<li><a class="reference internal" href="#create-project-constrait-embeddedtomcat-transactiontoken" id="id30">トランザクショントークンチェックを使用するための設定方法が異なる</a></li>
+<li><a class="reference internal" href="#spring-boot-actuator" id="id31">Spring Boot Actuatorのエンドポイントのポートが変更できない</a></li>
+<li><a class="reference internal" href="#create-project-constrait-embeddedtomcat-cloudconfig" id="id32">Spring Cloud Configのリフレッシュ機能が使用できない</a></li>
+<li><a class="reference internal" href="#filter" id="id33">Filterが自動で登録され意図しない動作が発生する</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#webmvcautoconfiguration" id="id34">WebMvcAutoConfigurationによる不具合</a><ul>
+<li><a class="reference internal" href="#viewresolverview" id="id35">ViewResolverが上書きされViewの解決ができない</a></li>
+<li><a class="reference internal" href="#create-project-constrait-webmvc-errorpage" id="id36">エラー画面表示の不具合</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p>本ガイドラインでは、クラウドネイティブなアプリケーション向けの開発プロジェクトを作成する方法について説明する。</p>
+<p>Macchinetta Server Framework for Java (1.x) の <a class="reference external" href="https://github.com/Macchinetta/macchinetta-web-multi-blank">マルチプロジェクト構成のブランクプロジェクト</a>
+を元に、カスタマイズを加えることで作成する。</p>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<div class="section" id="create-project-blankpj">
+<span id="id4"></span><h2><a class="toc-backref" href="#id20">3.2.1. 開発プロジェクトの作成</a><a class="headerlink" href="#create-project-blankpj" title="Permalink to this headline">¶</a></h2>
+<p>開発プロジェクトの作成方法は、
+Macchinetta Server Framework for Java (1.x) Development Guideline <a class="reference external" href="https://macchinetta.github.io/server-guideline/1.5.2.RELEASE/ja/ImplementationAtEachLayer/CreateWebApplicationProject.html#createwebapplicationproject">開発プロジェクトの作成</a>
+を参照されたい。</p>
+</div>
+<div class="section" id="create-project-customize">
+<span id="id6"></span><h2><a class="toc-backref" href="#id21">3.2.2. 開発プロジェクトのカスタマイズ</a><a class="headerlink" href="#create-project-customize" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference internal" href="#create-project-blankpj"><span class="std std-ref">開発プロジェクトの作成</span></a> で作成したプロジェクトを
+クラウドネイティブなアプリケーション向けにカスタマイズが必要な箇所がいくつか存在する。</p>
+<p>カスタマイズが必要な箇所を以下に示す。</p>
+<ul class="simple">
+<li><a class="reference internal" href="#create-project-springboot"><span class="std std-ref">Spring Bootの利用</span></a></li>
+<li><a class="reference internal" href="#create-project-adding-dependencies"><span class="std std-ref">依存ライブラリの追加</span></a></li>
+<li><a class="reference internal" href="#create-project-making-entrypoint"><span class="std std-ref">エントリポイントの作成</span></a></li>
+</ul>
+<div class="section" id="spring-boot">
+<span id="create-project-springboot"></span><h3><a class="toc-backref" href="#id22">3.2.2.1. Spring Bootの利用</a><a class="headerlink" href="#spring-boot" title="Permalink to this headline">¶</a></h3>
+<p><a class="reference external" href="http://projects.spring.io/spring-cloud/">Spring Cloud</a> との親和性を高めるために、
+オンライン版クラウド拡張開発プロジェクトでは <a class="reference external" href="https://projects.spring.io/spring-boot/">Spring Boot</a> を利用する。
+Spring Bootを使用すると、プロジェクトのアーカイブ方式として「実行可能jarファイル」と「デプロイ可能warファイル」が選択できるが、
+本ガイドラインでは、Macchinetta Server Framework for Java (1.x) のノウハウを活用するため、<strong>デプロイ可能warファイル</strong> を採用する。
+Spring Bootを使用したデプロイ可能warファイルの作成方法の詳細はSpring Bootの公式リファレンス
+<a class="reference external" href="http://docs.spring.io/spring-boot/docs/1.5.20.RELEASE/reference/html/howto-traditional-deployment.html">Traditional deployment</a>
+を参照されたい。</p>
+<p>Spring Bootを使用するとBean定義など多くの設定が自動で行われる。
+このような自動設定の仕組みのことを<code class="docutils literal"><span class="pre">Spring</span> <span class="pre">Boot</span> <span class="pre">Auto-configuration</span></code>といい、アプリケーション開発者は最小限の設定を行うだけでアプリケーションを構築することができる。
+詳しくはSpring Bootの公式リファレンス <a class="reference external" href="http://docs.spring.io/spring-boot/docs/1.5.20.RELEASE/reference/html/using-boot-auto-configuration.html">Auto-configuration</a> を参照されたい。</p>
+</div>
+<div class="section" id="create-project-adding-dependencies">
+<span id="id8"></span><h3><a class="toc-backref" href="#id23">3.2.2.2. 依存ライブラリの追加</a><a class="headerlink" href="#create-project-adding-dependencies" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>project/pom.xml (プロジェクトrootのParent POM)</li>
+</ul>
+<div class="highlight-xml"><div class="highlight"><pre><span></span><span class="nt">&lt;dependencyManagement&gt;</span>
+    <span class="c">&lt;!-- (1) --&gt;</span>
+    <span class="nt">&lt;dependency&gt;</span>
+        <span class="nt">&lt;groupId&gt;</span>org.springframework.cloud<span class="nt">&lt;/groupId&gt;</span>
+        <span class="nt">&lt;artifactId&gt;</span>spring-cloud-dependencies<span class="nt">&lt;/artifactId&gt;</span>
+        <span class="nt">&lt;version&gt;</span>Dalston.SR5<span class="nt">&lt;/version&gt;</span>
+        <span class="nt">&lt;type&gt;</span>pom<span class="nt">&lt;/type&gt;</span>
+        <span class="nt">&lt;scope&gt;</span>import<span class="nt">&lt;/scope&gt;</span>
+    <span class="nt">&lt;/dependency&gt;</span>
+<span class="nt">&lt;/dependencyManagement&gt;</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li>project/xxx-web/pom.xml</li>
+</ul>
+<div class="highlight-xml"><div class="highlight"><pre><span></span><span class="nt">&lt;dependencies&gt;</span>
+    <span class="c">&lt;!-- (2) --&gt;</span>
+    <span class="nt">&lt;dependency&gt;</span>
+        <span class="nt">&lt;groupId&gt;</span>org.springframework.boot<span class="nt">&lt;/groupId&gt;</span>
+        <span class="nt">&lt;artifactId&gt;</span>spring-boot-starter<span class="nt">&lt;/artifactId&gt;</span>
+    <span class="nt">&lt;/dependency&gt;</span>
+    <span class="c">&lt;!-- (3) --&gt;</span>
+    <span class="nt">&lt;dependency&gt;</span>
+        <span class="nt">&lt;groupId&gt;</span>org.springframework.boot<span class="nt">&lt;/groupId&gt;</span>
+        <span class="nt">&lt;artifactId&gt;</span>spring-boot-configuration-processor<span class="nt">&lt;/artifactId&gt;</span>
+    <span class="nt">&lt;optional&gt;</span>true<span class="nt">&lt;/optional&gt;</span>
+    <span class="nt">&lt;/dependency&gt;</span>
+    <span class="c">&lt;!-- (4) --&gt;</span>
+    <span class="nt">&lt;dependency&gt;</span>
+        <span class="nt">&lt;groupId&gt;</span>org.springframework.cloud<span class="nt">&lt;/groupId&gt;</span>
+        <span class="nt">&lt;artifactId&gt;</span>spring-cloud-config-client<span class="nt">&lt;/artifactId&gt;</span>
+    <span class="nt">&lt;/dependency&gt;</span>
+<span class="nt">&lt;dependencies&gt;</span>
+</pre></div>
+</div>
+<table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="10%" />
+<col width="30%" />
+<col width="60%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head"><div class="first last line-block">
+<div class="line">項番</div>
+</div>
+</th>
+<th class="head"><div class="first last line-block">
+<div class="line">依存ライブラリ</div>
+</div>
+</th>
+<th class="head"><div class="first last line-block">
+<div class="line">説明</div>
+</div>
+</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">spring-cloud-dependencies</span></code></div>
+</div>
+</td>
+<td><a class="reference external" href="http://projects.spring.io/spring-cloud/">Spring Cloud</a> のBOM。
+プロジェクトのParent POMの<code class="docutils literal"><span class="pre">dependencyManagement</span></code>に定義することで、Spring Cloud関連の依存ライブラリのバージョンを解決する。
+1.0.2.RELEASE で利用するOSSのバージョンについては、 <a class="reference internal" href="../Overview/FrameworkStack.html"><span class="doc">フレームワークスタック</span></a> を参照されたい。</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(2)</div>
+</div>
+</td>
+<td><code class="docutils literal"><span class="pre">spring-boot-starter</span></code></td>
+<td><a class="reference external" href="https://projects.spring.io/spring-boot/">Spring Boot</a> の機能を実現するために必要なライブラリの依存関係を集約したもので、
+Spring Boot特有のAuto-configuration、ロギング、YAMLなどが利用できるようになる。</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(3)</div>
+</div>
+</td>
+<td><code class="docutils literal"><span class="pre">spring-boot-configuration-processor</span></code></td>
+<td><code class="docutils literal"><span class="pre">spring-boot-configuration-processor</span></code>の依存ライブラリを追加することで、
+Spring Bootの<code class="docutils literal"><span class="pre">&#64;ConfigurationProperties</span></code>アノテーションを使用して定義したプロパティのメタデータを生成することができる。
+詳細については、Spring Boot公式リファレンス
+<a class="reference external" href="http://docs.spring.io/spring-boot/docs/1.5.20.RELEASE/reference/html/configuration-metadata.html#configuration-metadata-annotation-processor">Generating your own meta-data using the annotation processor</a>
+を参照されたい。</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(4)</div>
+</div>
+</td>
+<td><code class="docutils literal"><span class="pre">spring-cloud-config-client</span></code></td>
+<td><a class="reference external" href="https://cloud.spring.io/spring-cloud-config/">Spring Cloud Config</a> を利用するための依存ライブラリ。
+<code class="docutils literal"><span class="pre">spring-cloud-config-client</span></code>に依存したSpring Bootアプリケーションとしてビルドすることで、Spring Cloud Configが利用できる。</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="create-project-making-entrypoint">
+<span id="id11"></span><h3><a class="toc-backref" href="#id24">3.2.2.3. エントリポイントの作成</a><a class="headerlink" href="#create-project-making-entrypoint" title="Permalink to this headline">¶</a></h3>
+<p>Spring Bootを利用して、デプロイ可能なwarファイルを作成するために必要な設定クラスを作成する。
+このクラスはSpring Bootのエントリポイントとして、アプリケーションの起動時に読み込まれ、Springアプリケーションに必要なサーブレットやフィルタ等の情報を設定する。</p>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">Bootstrap.java</span></code></li>
+</ul>
+<div class="highlight-java"><div class="highlight"><pre><span></span><span class="kn">package</span> <span class="nn">com.example.xxx.app</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">org.springframework.boot.autoconfigure.EnableAutoConfiguration</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.boot.autoconfigure.jmx.JmxAutoConfiguration</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.boot.autoconfigure.web.WebMvcAutoConfiguration</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.boot.builder.SpringApplicationBuilder</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.boot.web.support.SpringBootServletInitializer</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.context.annotation.ImportResource</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration</span><span class="o">;</span>
+
+<span class="c1">//(1)</span>
+<span class="nd">@ImportResource</span><span class="o">({</span> <span class="s">&quot;classpath*:META-INF/spring/applicationContext.xml&quot;</span><span class="o">,</span> <span class="s">&quot;classpath*:META-INF/spring/spring-security.xml&quot;</span><span class="o">,</span>
+                  <span class="s">&quot;classpath*:/META-INF/spring/spring-mvc.xml&quot;</span><span class="o">})</span> <span class="c1">//(2)</span>
+<span class="c1">//(3)</span>
+<span class="nd">@EnableAutoConfiguration</span><span class="o">(</span><span class="n">exclude</span> <span class="o">=</span> <span class="o">{</span> <span class="n">DataSourceAutoConfiguration</span><span class="o">.</span><span class="na">class</span><span class="o">,</span>
+                                      <span class="n">JmxAutoConfiguration</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="n">WebMvcAutoConfiguration</span><span class="o">.</span><span class="na">class</span><span class="o">,</span>
+                                      <span class="n">SecurityAutoConfiguration</span><span class="o">.</span><span class="na">class</span> <span class="o">})</span>
+<span class="c1">//(4)</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">Bootstrap</span> <span class="kd">extends</span> <span class="n">SpringBootServletInitializer</span> <span class="o">{</span>
+
+    <span class="c1">//(5)</span>
+    <span class="nd">@Override</span>
+    <span class="kd">protected</span> <span class="n">SpringApplicationBuilder</span> <span class="nf">configure</span><span class="o">(</span><span class="n">SpringApplicationBuilder</span> <span class="n">application</span><span class="o">)</span> <span class="o">{</span>
+        <span class="c1">//(6)</span>
+        <span class="n">setRegisterErrorPageFilter</span><span class="o">(</span><span class="kc">false</span><span class="o">);</span>
+        <span class="k">return</span> <span class="n">application</span><span class="o">.</span><span class="na">sources</span><span class="o">(</span><span class="n">Bootstrap</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+<table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head"><div class="first last line-block">
+<div class="line">項番</div>
+</div>
+</th>
+<th class="head"><div class="first last line-block">
+<div class="line">説明</div>
+</div>
+</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td>Spring Frameworkのアノテーションコンフィグの仕組みである<code class="docutils literal"><span class="pre">&#64;ImportResource</span></code>を使用してXMLのBean定義ファイルを読み込んでいる。
+ここでは、classpath*:META-INF/spring/配下の<code class="docutils literal"><span class="pre">applicationContext.xml</span></code>、<code class="docutils literal"><span class="pre">spring-security.xml</span></code>を読み込むように設定している。</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(2)</div>
+</div>
+</td>
+<td><code class="docutils literal"><span class="pre">web.xml</span></code>において<code class="docutils literal"><span class="pre">DispathcerServlet</span></code>の<code class="docutils literal"><span class="pre">contextConfigLocation</span></code>で指定していた<code class="docutils literal"><span class="pre">classpath*:/META-INF/spring/spring-mvc.xml</span></code>を追加する。
+Spring Bootを使用した際の制約で、<code class="docutils literal"><span class="pre">DispatcherServlet</span></code>ではなくエントリポイントでロードする必要がある。
+詳細は <a class="reference internal" href="#create-project-constrait-embeddedtomcat-springboot"><span class="std std-ref">DIコンテナの構築タイミングによりSpring Bootの機能が一部動作しない</span></a> を参照されたい。</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(3)</div>
+</div>
+</td>
+<td><code class="docutils literal"><span class="pre">&#64;EnableAutoConfiguration</span></code>の <code class="docutils literal"><span class="pre">exclude</span></code>属性を使用することで、特定のコンフィギュレーションクラスをAuto-configurationの適用対象から除外できる。
+本ガイドラインで作成するプロジェクトでは、
+<code class="docutils literal"><span class="pre">DataSourceAutoConfiguration</span></code>、<code class="docutils literal"><span class="pre">JmxAutoConfiguration</span></code>、<code class="docutils literal"><span class="pre">WebMvcAutoConfiguration</span></code>、<code class="docutils literal"><span class="pre">SecurityAutoConfiguration</span></code> を除外する必要がある。</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(4) (5)</div>
+</div>
+</td>
+<td>デプロイ可能なwarファイルを作成するために<code class="docutils literal"><span class="pre">SpringBootServletInitializer</span></code>を継承したクラスを作成し、<code class="docutils literal"><span class="pre">configure</span></code>メソッドをオーバーライドする。
+この実装を行うことで、通常はSpringが提供する<code class="docutils literal"><span class="pre">ContextLoaderListener</span></code>が行っているサーブレットコンテキストの構築がSpring Bootによって行われる。</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(6)</div>
+</div>
+</td>
+<td><a class="reference internal" href="#create-project-constrait-webmvc-errorpage"><span class="std std-ref">エラー画面表示の不具合</span></a> への対応。Spring Bootの<code class="docutils literal"><span class="pre">ErrorPageFilter</span></code>を無効にしている。</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>項番(2)で説明されているAuto-configurationクラスについて、除外対象のクラスと除外理由は以下の通り。</p>
+<blockquote class="last">
+<div><table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="30%" />
+<col width="70%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head"><div class="first last line-block">
+<div class="line">除外対象クラス</div>
+</div>
+</th>
+<th class="head"><div class="first last line-block">
+<div class="line">説明</div>
+</div>
+</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">DataSourceAutoConfiguration</span></code></div>
+</div>
+</td>
+<td>データソースを設定するAuto-configurationクラス。Spring Bootがデータソースが一つであることを想定しているため、
+Macchinetta Server Framework for Java (1.x) のブランクプロジェクトのように複数のデータソースが定義されている場合、
+<code class="docutils literal"><span class="pre">NoUniqueBeanDefinitionException</span></code>が発生する。
+これを回避するには<code class="docutils literal"><span class="pre">DataSourceAutoConfiguration</span></code>をAuto-configurationから除外するか、
+データソースの１つに<code class="docutils literal"><span class="pre">primary=true</span></code>を設定する必要がある。
+このクラスを除外せずに複数のデータソースを定義する方法は、Spring Boot公式リファレンス
+<a class="reference external" href="http://docs.spring.io/spring-boot/docs/1.5.20.RELEASE/reference/htmlsingle/#howto-two-datasources">Configure Two DataSource</a> を参照されたい。</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">JmxAutoConfiguration</span></code></div>
+</div>
+</td>
+<td>JMXを設定するAuto-configurationクラス。デフォルトでは同一サーバに複数のAPを起動した場合、
+JMXのドメインが重複してBeanが登録できず<code class="docutils literal"><span class="pre">UnableToRegisterMBeanException</span></code>が発生するため除外する。</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">WebMvcAutoConfiguration</span></code></div>
+</div>
+</td>
+<td>Spring MVCを設定するAuto-configurationクラス。
+除外しない場合、<code class="docutils literal"><span class="pre">&lt;mvc:view-resolvers&gt;</span></code>で作成したBeanが上書きされてしまうため不具合が発生する。
+詳細は <a class="reference internal" href="#create-project-constrait-webmvc"><span class="std std-ref">WebMvcAutoConfigurationによる不具合</span></a> を参照されたい。</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">SecurityAutoConfiguration</span></code></div>
+</div>
+</td>
+<td>Spring Securityを設定するAuto-configurationクラス。
+<code class="docutils literal"><span class="pre">SecurityAutoConfiguration</span></code>が有効である場合、<code class="docutils literal"><span class="pre">WebSecurityConfigurerAdapter</span></code>を継承した<code class="docutils literal"><span class="pre">SpringBootWebSecurityConfiguration.DefaultConfigurerAdapter</span></code>をBean生成しようとするが、
+<code class="docutils literal"><span class="pre">DefaultConfigurerAdapter</span></code>をBean生成する際に必要となる<code class="docutils literal"><span class="pre">ObjectPostProcessor</span></code>がないために<code class="docutils literal"><span class="pre">NoSuchBeanDefinitionException</span></code>が発生する。
+事象を回避する実装として<code class="docutils literal"><span class="pre">SecurityAutoConfiguration</span></code>をAuto-configurationから除外する。
+他にもSecurityConfigurationクラスに<code class="docutils literal"><span class="pre">&#64;EnableWebSecurity</span></code>を付与する実装もあるが、本ガイドラインでは <a class="reference internal" href="ImplementationPolicy.html#usexmlconfig"><span class="std std-ref">XMLConfigの利用</span></a> に則る。</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+</div>
+<ul class="simple">
+<li>web.xml</li>
+</ul>
+<p>エントリポイントの作成にともなって、web.xmlに下記変更を加える。</p>
+<div class="highlight-xml"><div class="highlight"><pre><span></span><span class="c">&lt;!-- (1) --&gt;</span>
+<span class="c">&lt;!-- 削除 ここから --&gt;</span>
+<span class="nt">&lt;listener&gt;</span>
+    <span class="nt">&lt;listener-class&gt;</span>org.springframework.web.context.ContextLoaderListener<span class="nt">&lt;/listener-class&gt;</span>
+<span class="nt">&lt;/listener&gt;</span>
+<span class="nt">&lt;context-param&gt;</span>
+    <span class="nt">&lt;param-name&gt;</span>contextConfigLocation<span class="nt">&lt;/param-name&gt;</span>
+    <span class="nt">&lt;param-value&gt;</span>
+        classpath*:META-INF/spring/applicationContext.xml
+        classpath*:META-INF/spring/spring-security.xml
+    <span class="nt">&lt;/param-value&gt;</span>
+<span class="nt">&lt;/context-param&gt;</span>
+<span class="c">&lt;!-- 削除 ここまで --&gt;</span>
+<span class="c">&lt;!-- omitted --&gt;</span>
+<span class="nt">&lt;servlet&gt;</span>
+    <span class="nt">&lt;servlet-name&gt;</span>appServlet<span class="nt">&lt;/servlet-name&gt;</span>
+    <span class="nt">&lt;servlet-class&gt;</span>org.springframework.web.servlet.DispatcherServlet<span class="nt">&lt;/servlet-class&gt;</span>
+    <span class="nt">&lt;init-param&gt;</span>
+        <span class="nt">&lt;param-name&gt;</span>contextConfigLocation<span class="nt">&lt;/param-name&gt;</span>
+        <span class="nt">&lt;param-value&gt;&lt;/param-value&gt;</span> <span class="c">&lt;!-- (2) --&gt;</span>
+    <span class="nt">&lt;/init-param&gt;</span>
+    <span class="nt">&lt;load-on-startup&gt;</span>1<span class="nt">&lt;/load-on-startup&gt;</span>
+<span class="nt">&lt;/servlet&gt;</span>
+</pre></div>
+</div>
+<table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head"><div class="first last line-block">
+<div class="line">項番</div>
+</div>
+</th>
+<th class="head"><div class="first last line-block">
+<div class="line">説明</div>
+</div>
+</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><code class="docutils literal"><span class="pre">ContextLoaderListener</span></code>を削除する。
+<code class="docutils literal"><span class="pre">SpringBootServletInitializer</span></code>で<code class="docutils literal"><span class="pre">ContextLoaderListener</span></code>を登録しているので、<code class="docutils literal"><span class="pre">web.xml</span></code>での定義は不要になる。</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(2)</div>
+</div>
+</td>
+<td><a class="reference internal" href="#create-project-constrait-embeddedtomcat-springboot"><span class="std std-ref">DIコンテナの構築タイミングによりSpring Bootの機能が一部動作しない</span></a> への対処。
+<code class="docutils literal"><span class="pre">DispathcerServlet</span></code>の<code class="docutils literal"><span class="pre">contextConfigLocation</span></code>属性の設定値を削除する。
+<code class="docutils literal"><span class="pre">contextConfigLocation</span></code>属性を削除してしまうと例外が発生するので、
+空を設定することにより、　<code class="docutils literal"><span class="pre">DispathcerServlet</span></code>にダミーのコンテキストを設定しこれを回避する。
+また、自分でダミーファイルをデフォルト指定(<code class="docutils literal"><span class="pre">WEB-INF/appServlet-servlet.xml</span></code>)に
+作成することで、<code class="docutils literal"><span class="pre">contextConfigLocation</span></code>属性を削除しても例外が発生しなくなる。</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="section" id="create-project-constrait">
+<span id="id12"></span><h2><a class="toc-backref" href="#id25">3.2.3. オンライン版クラウド拡張開発プロジェクトで考慮すべき点・制約事項</a><a class="headerlink" href="#create-project-constrait" title="Permalink to this headline">¶</a></h2>
+<p>オンライン版クラウド拡張開発プロジェクトを作成するにあたり、下記について考慮しなければならない。</p>
+<ul class="simple">
+<li><a class="reference internal" href="#create-project-constrait-springboot"><span class="std std-ref">Spring Boot使用に伴う制約事項</span></a></li>
+<li><a class="reference internal" href="#create-project-constrait-embeddedtomcat"><span class="std std-ref">Spring Bootで組み込みTomcatを使用しない場合の制約事項</span></a></li>
+<li><a class="reference internal" href="#create-project-constrait-webmvc"><span class="std std-ref">WebMvcAutoConfigurationによる不具合</span></a></li>
+</ul>
+<div class="section" id="create-project-constrait-springboot">
+<span id="id13"></span><h3><a class="toc-backref" href="#id26">3.2.3.1. Spring Boot使用に伴う制約事項</a><a class="headerlink" href="#create-project-constrait-springboot" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="logback">
+<span id="create-project-constrait-springboot-profile"></span><h4><a class="toc-backref" href="#id27">3.2.3.1.1. Logbackの拡張の利用</a><a class="headerlink" href="#logback" title="Permalink to this headline">¶</a></h4>
+<p>Spring BootではLogbackの拡張を行っており追加の設定を行うことができるが、
+デフォルトの設定ファイル名(<code class="docutils literal"><span class="pre">logback.xml</span></code>)では読み込みのタイミングが早すぎるため、Spring BootによるLogbackの拡張を利用することができない。</p>
+<p>この拡張を利用するには、Spring Bootではデフォルトのファイル名ではなく、<code class="docutils literal"><span class="pre">-spring</span></code>のサフィックスを付けた<code class="docutils literal"><span class="pre">logback-spring.xml</span></code>を使用する必要がある。</p>
+<p>詳細は、Spring Bootの公式リファレンス <a class="reference external" href="http://docs.spring.io/spring-boot/docs/1.5.20.RELEASE/reference/html/boot-features-logging.html#boot-features-custom-log-configuration">Custom log configuration</a>
+を参照されたい。</p>
+<p>また、Logbackの設定例は Macchinetta Server Framework for Java (1.x) Development Guideline
+<a class="reference external" href="https://macchinetta.github.io/server-guideline/1.5.2.RELEASE/ja/ArchitectureInDetail/GeneralFuncDetail/Logging.html#id5">Logbackの設定</a>
+を参照されたい。</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p>Spring Cloud Configを利用し<code class="docutils literal"><span class="pre">logging.path</span></code>の設定値をConfigサーバに持たせる場合、Configサーバからプロパティを取得まするまでの間のログが意図しないディレクトリに出力されてしまう。
+これは<a class="reference external" href="http://docs.spring.io/spring-boot/docs/1.5.20.RELEASE/reference/html/boot-features-logging.html#boot-features-custom-log-configuration">Custom log configuration</a>に記載されているような設定ファイル名が存在するとSpring Bootが自動で読み込んでしまうが、<code class="docutils literal"><span class="pre">logging.path</span></code>が未解決のためログの出力先を制御することができないため発生する。
+logbackを利用する場合、<code class="docutils literal"><span class="pre">logback.xml</span></code>と<code class="docutils literal"><span class="pre">logback-spring.xml</span></code>以外の名前を利用すれば良い。
+設定ファイル名をSpring Bootが読み込みに行かない独自のファイル名に設定し、<code class="docutils literal"><span class="pre">logging.config</span></code>のプロパティを設定することで意図しないログ出力を制御することができる。
+この方法を取った場合、logbackが読み込まれてから<code class="docutils literal"><span class="pre">logging.path</span></code>が解決されるまでの間のログはSpring Bootのデフォルトの設定で標準出力に出力される。</p>
+<p>設定ファイル名を<code class="docutils literal"><span class="pre">appName-logback-spring.xml</span></code>とし、Configサーバに持たせる<code class="docutils literal"><span class="pre">application-development.yml</span></code>にプロパティを設定した場合の例を以下に示す。</p>
+<ul class="simple">
+<li>application-development.yml</li>
+</ul>
+<blockquote>
+<div><div class="highlight-yaml"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">logging</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">config</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">classpath:appName-logback-spring.xml</span>
+</pre></div>
+</div>
+</div></blockquote>
+<p class="last">Configサーバの使用方法については、 <a class="reference internal" href="EnvironmentValuesExternalManagement.html"><span class="doc">環境依存値の外部管理</span></a> を参照されたい。</p>
+</div>
+</div>
+</div>
+<div class="section" id="spring-boottomcat">
+<span id="create-project-constrait-embeddedtomcat"></span><h3><a class="toc-backref" href="#id28">3.2.3.2. Spring Bootで組み込みTomcatを使用しない場合の制約事項</a><a class="headerlink" href="#spring-boottomcat" title="Permalink to this headline">¶</a></h3>
+<p>組み込みTomcatを使用しない場合、以下の制約が発生する。</p>
+<ul class="simple">
+<li><a class="reference internal" href="#create-project-constrait-embeddedtomcat-springboot"><span class="std std-ref">DIコンテナの構築タイミングによりSpring Bootの機能が一部動作しない</span></a></li>
+<li><a class="reference internal" href="#create-project-constrait-embeddedtomcat-transactiontoken"><span class="std std-ref">トランザクショントークンチェックを使用するための設定方法が異なる</span></a></li>
+<li><a class="reference internal" href="#create-project-constrait-embeddedtomcat-actuator"><span class="std std-ref">Spring Boot Actuatorのエンドポイントのポートが変更できない</span></a></li>
+<li><a class="reference internal" href="#create-project-constrait-embeddedtomcat-cloudconfig"><span class="std std-ref">Spring Cloud Configのリフレッシュ機能が使用できない</span></a></li>
+<li><a class="reference internal" href="#create-project-constrait-embeddedtomcat-register-filter"><span class="std std-ref">Filterが自動で登録され意図しない動作が発生する</span></a></li>
+</ul>
+<div class="section" id="dispring-boot">
+<span id="create-project-constrait-embeddedtomcat-springboot"></span><h4><a class="toc-backref" href="#id29">3.2.3.2.1. DIコンテナの構築タイミングによりSpring Bootの機能が一部動作しない</a><a class="headerlink" href="#dispring-boot" title="Permalink to this headline">¶</a></h4>
+<p>DIコンテナの構築タイミングによって、Spring Bootの機能が一部動作しないことがある。
+例えば、<code class="docutils literal"><span class="pre">DispatcherServlet</span></code>で行われたコンポーネントスキャンでは、Spring Boot ActuatorにCustom HealthIndicatorを<code class="docutils literal"><span class="pre">&#64;Component</span></code>で定義しても動作させることができない。</p>
+<p>Spring Bootではエントリポイントで、<code class="docutils literal"><span class="pre">ContextLoaderListener</span></code>を登録し、コンテキストの読み込みを行っている。
+また、Macchinetta Server Framework for Java (1.x) のブランクプロジェクトでは<code class="docutils literal"><span class="pre">DispatcherServlet</span></code>でもコンテキストの読み込みを行っている。
+読み込みは、<code class="docutils literal"><span class="pre">ContextLoaderListener</span></code>、<code class="docutils literal"><span class="pre">DispatcherServlet</span></code>の順で行われるため、
+<code class="docutils literal"><span class="pre">DispatcherServlet</span></code>側で行われたコンポーネントスキャンでは、Spring Bootの機能への組み込みに間に合わず、動作しないことがある。</p>
+<p>正常に動作させるためには、<code class="docutils literal"><span class="pre">DispatcherServlet</span></code>で読み込みを行っていたXMLファイルをエントリポイントで読み込む必要がある。</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Custom HealthIndicatorの例はあくまで一例であり、類似の意図しない動作が発生する可能性があるためDIコンテナの構築には注意されたい。</p>
+</div>
+</div>
+<div class="section" id="create-project-constrait-embeddedtomcat-transactiontoken">
+<span id="id16"></span><h4><a class="toc-backref" href="#id30">3.2.3.2.2. トランザクショントークンチェックを使用するための設定方法が異なる</a><a class="headerlink" href="#create-project-constrait-embeddedtomcat-transactiontoken" title="Permalink to this headline">¶</a></h4>
+<p>Macchinetta Server Framework for Java (1.x) Development Guideline <a class="reference external" href="https://macchinetta.github.io/server-guideline/1.5.2.RELEASE/ja/ArchitectureInDetail/WebApplicationDetail/DoubleSubmitProtection.html#setting">トランザクショントークンチェックを使用するための設定</a>
+に記載されている設定方法を使用してもトランザクショントークンチェックが正常に動作しない。
+これは、組み込みTomcatを使用しない場合にSpring BootによるrequestDataValueProcessorの
+上書きが行われることにより、JSPにトランザクショントークンが埋め込まれないためである。</p>
+<p>参考：<a class="reference external" href="https://github.com/spring-projects/spring-boot/issues/4676">spring-boot#4676</a></p>
+<p>以下のような実装を行うことでトランザクショントークンチェックを有効にすることが可能である。</p>
+<ul class="simple">
+<li>RequestDataValueProcessorPostProcessor</li>
+</ul>
+<div class="highlight-java"><div class="highlight"><pre><span></span><span class="c1">// (1)</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">RequestDataValueProcessorPostProcessor</span> <span class="kd">implements</span> <span class="n">BeanDefinitionRegistryPostProcessor</span> <span class="o">{</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">postProcessBeanFactory</span><span class="o">(</span><span class="n">ConfigurableListableBeanFactory</span> <span class="n">beanFactory</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">BeansException</span> <span class="o">{</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">postProcessBeanDefinitionRegistry</span><span class="o">(</span><span class="n">BeanDefinitionRegistry</span> <span class="n">registry</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">BeansException</span> <span class="o">{</span>
+
+        <span class="c1">// (2)</span>
+        <span class="n">ConstructorArgumentValues</span> <span class="n">cav</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ConstructorArgumentValues</span><span class="o">();</span>
+        <span class="n">List</span><span class="o">&lt;</span><span class="n">RequestDataValueProcessor</span><span class="o">&gt;</span> <span class="n">values</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">RequestDataValueProcessor</span><span class="o">&gt;();</span>
+        <span class="n">values</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="k">new</span> <span class="n">TransactionTokenRequestDataValueProcessor</span><span class="o">());</span>
+        <span class="n">values</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="k">new</span> <span class="n">CsrfRequestDataValueProcessor</span><span class="o">());</span>
+        <span class="n">cav</span><span class="o">.</span><span class="na">addGenericArgumentValue</span><span class="o">(</span><span class="n">values</span><span class="o">);</span>
+        <span class="n">RootBeanDefinition</span> <span class="n">rootBeanDefinition</span> <span class="o">=</span> <span class="k">new</span> <span class="n">RootBeanDefinition</span><span class="o">(</span><span class="n">CompositeRequestDataValueProcessor</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="n">cav</span><span class="o">,</span> <span class="kc">null</span><span class="o">);</span>
+
+        <span class="c1">// (3)</span>
+        <span class="n">registry</span><span class="o">.</span><span class="na">removeBeanDefinition</span><span class="o">(</span><span class="s">&quot;requestDataValueProcessor&quot;</span><span class="o">);</span>
+        <span class="n">registry</span><span class="o">.</span><span class="na">registerBeanDefinition</span><span class="o">(</span><span class="s">&quot;requestDataValueProcessor&quot;</span><span class="o">,</span> <span class="n">rootBeanDefinition</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+<table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">内容</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">BeanDefinitionRegistryPostProcessor</span></code>を実装することで、Beanのインスタンス化前にBean定義の変更を行うことができる。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(2)</div>
+</div>
+</td>
+<td><div class="first line-block">
+<div class="line">Bean定義を行うオブジェクトを生成する。</div>
+<div class="line">ここでは、<code class="docutils literal"><span class="pre">TransactionTokenRequestDataValueProcessor</span></code>と<code class="docutils literal"><span class="pre">CsrfRequestDataValueProcessor</span></code>を併用する <code class="docutils literal"><span class="pre">CompositeRequestDataValueProcessor</span></code>を定義している。</div>
+</div>
+<div class="last admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">トランザクショントークンチェックとCSRFトークンチェックを併用したい場合、<code class="docutils literal"><span class="pre">CsrfRequestDataValueProcessor</span></code>を追加する必要があるので留意されたい。</p>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(3)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">作成した<code class="docutils literal"><span class="pre">CompositeRequestDataValueProcessor</span></code>オブジェクトでDIコンテナにrequestDataValueProcessorのBean名で登録されたオブジェクトを上書きする。</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<ul class="simple">
+<li>xxx-web/src/main/resources/META-INF/spring/spring-mvc.xml</li>
+</ul>
+<div class="highlight-xml"><div class="highlight"><pre><span></span><span class="c">&lt;!-- (1) --&gt;</span>
+<span class="nt">&lt;bean</span> <span class="na">class=</span><span class="s">&quot;com.example.xxx.app.RequestDataValueProcessorPostProcessor&quot;</span><span class="nt">/&gt;</span>
+</pre></div>
+</div>
+<table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">内容</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td>作成したBean定義の上書きを行うクラスのBean定義を行う。</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="spring-boot-actuator">
+<span id="create-project-constrait-embeddedtomcat-actuator"></span><h4><a class="toc-backref" href="#id31">3.2.3.2.3. Spring Boot Actuatorのエンドポイントのポートが変更できない</a><a class="headerlink" href="#spring-boot-actuator" title="Permalink to this headline">¶</a></h4>
+<p>組み込みTomcatを使用しない場合、Spring Boot Actuatorのエンドポイントが使用するポートを
+アプリケーションが使用するポートと別に設定することができない。
+そのため、クラウドベンダが提供するロードバランサの機能を使用してエンドポイントのURLへの外部アクセスを遮断する必要がある。</p>
+<p>詳細については、 <a class="reference internal" href="HealthCheck.html"><span class="doc">ヘルスチェック</span></a> を参照されたい。</p>
+</div>
+<div class="section" id="create-project-constrait-embeddedtomcat-cloudconfig">
+<span id="id18"></span><h4><a class="toc-backref" href="#id32">3.2.3.2.4. Spring Cloud Configのリフレッシュ機能が使用できない</a><a class="headerlink" href="#create-project-constrait-embeddedtomcat-cloudconfig" title="Permalink to this headline">¶</a></h4>
+<p>Spring Cloud Configを使用して構築したConfig Clientは設定変更を反映させるrefreshエンドポイント
+を利用することができるが、組み込みTomcatを使用しない場合は当該機能を利用することができない。</p>
+<p>詳細については、 <a class="reference internal" href="EnvironmentValuesExternalManagement.html"><span class="doc">環境依存値の外部管理</span></a> を参照されたい。</p>
+</div>
+<div class="section" id="filter">
+<span id="create-project-constrait-embeddedtomcat-register-filter"></span><h4><a class="toc-backref" href="#id33">3.2.3.2.5. Filterが自動で登録され意図しない動作が発生する</a><a class="headerlink" href="#filter" title="Permalink to this headline">¶</a></h4>
+<p>Spring Bootのデフォルトでは、アプリケーションコンテキスト上のすべての<code class="docutils literal"><span class="pre">Filter</span></code>を自動で登録する。
+本ガイドラインでは、<code class="docutils literal"><span class="pre">Filter</span></code>の登録をweb.xmlを使用して行っているため、<code class="docutils literal"><span class="pre">Filter</span></code>が二重登録されるなど意図しない動作が発生する可能性がある。</p>
+<p>以下のような実装を行うことでフィルタの自動登録を制御することが可能である。</p>
+<ul class="simple">
+<li>DefaultFiltersBeanFactoryPostProcessor</li>
+</ul>
+<div class="highlight-java"><div class="highlight"><pre><span></span><span class="c1">//(1)</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">DefaultFiltersBeanFactoryPostProcessor</span> <span class="kd">implements</span>
+                                                   <span class="n">BeanFactoryPostProcessor</span> <span class="o">{</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">postProcessBeanFactory</span><span class="o">(</span><span class="n">ConfigurableListableBeanFactory</span> <span class="n">bf</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">BeansException</span> <span class="o">{</span>
+        <span class="n">DefaultListableBeanFactory</span> <span class="n">beanFactory</span> <span class="o">=</span> <span class="o">(</span><span class="n">DefaultListableBeanFactory</span><span class="o">)</span> <span class="n">bf</span><span class="o">;</span>
+
+        <span class="c1">//(2)</span>
+        <span class="n">String</span><span class="o">[]</span> <span class="n">beanNames</span> <span class="o">=</span> <span class="n">beanFactory</span><span class="o">.</span><span class="na">getBeanNamesForType</span><span class="o">(</span><span class="n">Filter</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+        <span class="k">for</span> <span class="o">(</span><span class="n">String</span> <span class="n">beanName</span> <span class="o">:</span> <span class="n">beanNames</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">BeanDefinition</span> <span class="n">definition</span> <span class="o">=</span> <span class="n">BeanDefinitionBuilder</span>
+                    <span class="o">.</span><span class="na">genericBeanDefinition</span><span class="o">(</span><span class="n">FilterRegistrationBean</span><span class="o">.</span><span class="na">class</span><span class="o">)</span>
+                    <span class="o">.</span><span class="na">setScope</span><span class="o">(</span><span class="n">BeanDefinition</span><span class="o">.</span><span class="na">SCOPE_SINGLETON</span><span class="o">)</span>
+                    <span class="o">.</span><span class="na">addConstructorArgReference</span><span class="o">(</span><span class="n">beanName</span><span class="o">)</span>
+                    <span class="o">.</span><span class="na">addConstructorArgValue</span><span class="o">(</span><span class="k">new</span> <span class="n">ServletRegistrationBean</span><span class="o">[]</span> <span class="o">{})</span>
+                    <span class="o">.</span><span class="na">addPropertyValue</span><span class="o">(</span><span class="s">&quot;enabled&quot;</span><span class="o">,</span> <span class="kc">false</span><span class="o">).</span><span class="na">getBeanDefinition</span><span class="o">();</span>
+
+            <span class="n">beanFactory</span><span class="o">.</span><span class="na">registerBeanDefinition</span><span class="o">(</span><span class="n">beanName</span>
+                    <span class="o">+</span> <span class="s">&quot;FilterRegistrationBean&quot;</span><span class="o">,</span> <span class="n">definition</span><span class="o">);</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+<table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">内容</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">BeanFactoryPostProcessor</span></code>を実装することで、Beanのインスタンス化前にプロパティの変更を行うことができる。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(2)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">ConfigurableListableBeanFactory</span></code>の実装クラスである<code class="docutils literal"><span class="pre">DefaultListableBeanFactory</span></code>からデフォルトで登録される<code class="docutils literal"><span class="pre">Filter</span></code>のBean名を取得し、すべての<code class="docutils literal"><span class="pre">Filter</span></code>を無効にしている。</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<ul class="simple">
+<li>xxx-web/src/main/resources/META-INF/spring/spring-mvc.xml</li>
+</ul>
+<div class="highlight-xml"><div class="highlight"><pre><span></span><span class="c">&lt;!-- (1) --&gt;</span>
+<span class="nt">&lt;bean</span> <span class="na">class=</span><span class="s">&quot;com.example.xxx.app.DefaultFiltersBeanFactoryPostProcessor&quot;</span><span class="nt">/&gt;</span>
+</pre></div>
+</div>
+<table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">内容</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td>作成した<code class="docutils literal"><span class="pre">DefaultFiltersBeanFactoryPostProcessor</span></code>のBean定義を追加する。</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="section" id="webmvcautoconfiguration">
+<span id="create-project-constrait-webmvc"></span><h3><a class="toc-backref" href="#id34">3.2.3.3. WebMvcAutoConfigurationによる不具合</a><a class="headerlink" href="#webmvcautoconfiguration" title="Permalink to this headline">¶</a></h3>
+<p>Spring BootのAuto-configurationにより設定される<code class="docutils literal"><span class="pre">WebMvcAutoConfiguration</span></code>によって
+<code class="docutils literal"><span class="pre">&lt;mvc:view-resolvers&gt;</span></code>で作成したBeanが上書きされてしまうことで下記不具合が発生する。</p>
+<p>これらの問題に対処したソースコード例は <a class="reference internal" href="#create-project-making-entrypoint"><span class="std std-ref">エントリポイントの作成</span></a> を参照されたい。</p>
+<div class="section" id="viewresolverview">
+<span id="create-project-constrait-webmvc-tiles"></span><h4><a class="toc-backref" href="#id35">3.2.3.3.1. ViewResolverが上書きされViewの解決ができない</a><a class="headerlink" href="#viewresolverview" title="Permalink to this headline">¶</a></h4>
+<p>Macchinetta Server Framework for Java (1.x) Development Guideline <a class="reference external" href="https://macchinetta.github.io/server-guideline/1.5.2.RELEASE/ja/ImplementationAtEachLayer/ApplicationLayer.html#html">HTMLを応答する</a>
+に従いTilesの連携におけるBean定義<code class="docutils literal"><span class="pre">&lt;mvc:view-resolvers&gt;</span></code>を使用していると、Viewの解決ができなくなる不具合が発生する。</p>
+<p>これは、Spring Bootを非組み込みTomcatで使用する場合に、<code class="docutils literal"><span class="pre">&lt;mvc:view-resolvers&gt;</span></code>で定義した
+<code class="docutils literal"><span class="pre">ViewResolver</span></code>が<code class="docutils literal"><span class="pre">WebMvcAutoConfiguration</span></code>によって上書きされてしまいViewの解決ができなくなるからで、
+<code class="docutils literal"><span class="pre">WebMvcAutoConfiguration</span></code>をAuto-configurationから除外することで回避できる。</p>
+</div>
+<div class="section" id="create-project-constrait-webmvc-errorpage">
+<span id="id19"></span><h4><a class="toc-backref" href="#id36">3.2.3.3.2. エラー画面表示の不具合</a><a class="headerlink" href="#create-project-constrait-webmvc-errorpage" title="Permalink to this headline">¶</a></h4>
+<p>Spring Bootを非組み込みTomcatで使用する場合、上記の<code class="docutils literal"><span class="pre">ViewResolver</span></code>が上書きされてしまうことに加え、
+デフォルトで動作する<code class="docutils literal"><span class="pre">ErrorPageFilter</span></code>が意図せぬ動作をしてしまうことで、
+システム例外発生時などで定義したエラー画面が表示されず、真っ白な画面が表示されてしまう。</p>
+<p>これは、エントリポイントの<code class="docutils literal"><span class="pre">configure</span></code>メソッドで<code class="docutils literal"><span class="pre">ErrorPageFilter</span></code>を無効化することと、
+<code class="docutils literal"><span class="pre">WebMvcAutoConfiguration</span></code>をAuto-configurationから除外することで回避できる。</p>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="SessionManagement.html" title="3.3. セッション外部管理"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="ImplementationPolicy.html" title="3.1. 実装方針"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Macchinetta Server Framework Cloud Extension Development Guideline 1.0.2.RELEASE documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >3. アプリケーション開発</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2017 NTT Corporation.
+    Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.6.3.Theme by <a href="http://github.com/vkvn">vkvn</a>
+    </div>
+    
+    <script>
+    
+    $(function() {
+    	var $sidebar	= $('.sphinxsidebar'),
+    		$window		= $(window),
+    		offset		= $sidebar.offset(),
+    		topPadding	= 3,
+    		$scroll		= $('#scroll');
+    	
+    	$window.scroll(function() {
+    		if ($scroll.is(':checked')) {
+				if ($window.scrollTop() > offset.top) {
+					$sidebar.stop().animate({
+						marginTop:$window.scrollTop() - offset.top + topPadding
+					});
+				} else {
+					$sidebar.stop().animate({
+						marginTop:0
+					});
+				}
+			}
+		});
+    	
+    	var $navList = $('ul:first', $sidebar);
+    	$('li:first', $navList).addClass('open');
+    	
+    	$navList.treeview({
+    		persist: "location",
+    		collapsed: true,
+    		unique: false
+    	});
+    	
+	});
+    </script>
+  </body>
+</html>

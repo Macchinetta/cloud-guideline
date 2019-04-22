@@ -1,0 +1,1589 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>5.6.1. 非同期処理の実装（共通編） &#8212; Macchinetta Server Framework Cloud Extension Development Guideline 1.0.2.RELEASE documentation</title>
+    <link rel="stylesheet" href="../../_static/solar.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1.0.2.RELEASE',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="5.6.2. 非同期処理の実装（優先順位の設定）" href="PriorityQueue.html" />
+    <link rel="prev" title="5.6. キューイング活用" href="index.html" /><script src="../../_static/jquery.treeview.js" type="text/javascript"></script>
+<!-- <link href='http://fonts.googleapis.com/css?family=Source+Code+Pro|Open+Sans:300italic,400italic,700italic,400,300,700' rel='stylesheet' type='text/css'> -->
+<link href="../../_static/solarized-dark.css" rel="stylesheet">
+<link href="../../_static/jquery.treeview.css" rel="stylesheet">
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="PriorityQueue.html" title="5.6.2. 非同期処理の実装（優先順位の設定）"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="5.6. キューイング活用"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Macchinetta Server Framework Cloud Extension Development Guideline 1.0.2.RELEASE documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >5. AWS連携</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" accesskey="U">5.6. キューイング活用</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><label><input id="scroll" type="checkbox" checked> scroll sidebar</label>
+
+  <h3><a href="../../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">5.6.1. 非同期処理の実装（共通編）</a><ul>
+<li><a class="reference internal" href="#overview">5.6.1.1. Overview</a><ul>
+<li><a class="reference internal" href="#amazon-sqs">5.6.1.1.1. Amazon SQSとは</a></li>
+<li><a class="reference internal" href="#varietyofqueues">5.6.1.1.2. Amazon SQSが提供するキューの種類</a></li>
+<li><a class="reference internal" href="#javaamazon-sqs">5.6.1.1.3. JavaアプリケーションからのAmazon SQSの利用</a></li>
+<li><a class="reference internal" href="#spring-jmsamazon-sqs">5.6.1.1.4. Spring JMSを使用したAmazon SQSの利用</a><ul>
+<li><a class="reference internal" href="#synchronoussendingoverview">5.6.1.1.4.1. メッセージを同期送信する場合</a></li>
+<li><a class="reference internal" href="#asynchronousreceivingoverview">5.6.1.1.4.2. メッセージを非同期受信する場合</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#how-to-use">5.6.1.2. How to use</a><ul>
+<li><a class="reference internal" href="#configurationofsqs">5.6.1.2.1. Amazon SQSの設定</a><ul>
+<li><a class="reference internal" href="#creatingqueues">5.6.1.2.1.1. キューの作成</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#sqshowtouseenviromentsetting">5.6.1.2.2. メッセージの送受信に共通する設定</a><ul>
+<li><a class="reference internal" href="#sqshowtousedependentlibrary">5.6.1.2.2.1. 依存ライブラリの設定</a></li>
+<li><a class="reference internal" href="#connectionfactory">5.6.1.2.2.2. ConnectionFactoryの設定</a></li>
+<li><a class="reference internal" href="#destinationresolver">5.6.1.2.2.3. DestinationResolverの設定</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#sqshowtousesyncsendmessage">5.6.1.2.3. メッセージを同期送信する方法</a><ul>
+<li><a class="reference internal" href="#sqshowtousesettingforsyncsend">5.6.1.2.3.1. 基本的な同期送信</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#sqshowtouseasyncreceivemessage">5.6.1.2.4. メッセージを非同期受信する方法</a><ul>
+<li><a class="reference internal" href="#sqshowtousesettingforasyncreceive">5.6.1.2.4.1. 基本的な非同期受信</a></li>
+<li><a class="reference internal" href="#sqshowtocheckduplicatereceiving">5.6.1.2.4.2. 2重受信チェック</a></li>
+<li><a class="reference internal" href="#sqshowtologgingtraceid">5.6.1.2.4.3. メッセージのトレース</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">5.6. キューイング活用</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="PriorityQueue.html"
+                        title="next chapter">5.6.2. 非同期処理の実装（優先順位の設定）</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/AWSCollaboration/Queuing/AsynchronousProcessing.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="id1">
+<h1>5.6.1. 非同期処理の実装（共通編）<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h1>
+<div class="contents local topic" id="id2">
+<p class="topic-title first">目次</p>
+<ul class="simple">
+<li><a class="reference internal" href="#overview" id="id32">Overview</a><ul>
+<li><a class="reference internal" href="#amazon-sqs" id="id33">Amazon SQSとは</a></li>
+<li><a class="reference internal" href="#varietyofqueues" id="id34">Amazon SQSが提供するキューの種類</a></li>
+<li><a class="reference internal" href="#javaamazon-sqs" id="id35">JavaアプリケーションからのAmazon SQSの利用</a></li>
+<li><a class="reference internal" href="#spring-jmsamazon-sqs" id="id36">Spring JMSを使用したAmazon SQSの利用</a><ul>
+<li><a class="reference internal" href="#synchronoussendingoverview" id="id37">メッセージを同期送信する場合</a></li>
+<li><a class="reference internal" href="#asynchronousreceivingoverview" id="id38">メッセージを非同期受信する場合</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#how-to-use" id="id39">How to use</a><ul>
+<li><a class="reference internal" href="#configurationofsqs" id="id40">Amazon SQSの設定</a><ul>
+<li><a class="reference internal" href="#creatingqueues" id="id41">キューの作成</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#sqshowtouseenviromentsetting" id="id42">メッセージの送受信に共通する設定</a><ul>
+<li><a class="reference internal" href="#sqshowtousedependentlibrary" id="id43">依存ライブラリの設定</a></li>
+<li><a class="reference internal" href="#connectionfactory" id="id44">ConnectionFactoryの設定</a></li>
+<li><a class="reference internal" href="#destinationresolver" id="id45">DestinationResolverの設定</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#sqshowtousesyncsendmessage" id="id46">メッセージを同期送信する方法</a><ul>
+<li><a class="reference internal" href="#sqshowtousesettingforsyncsend" id="id47">基本的な同期送信</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#sqshowtouseasyncreceivemessage" id="id48">メッセージを非同期受信する方法</a><ul>
+<li><a class="reference internal" href="#sqshowtousesettingforasyncreceive" id="id49">基本的な非同期受信</a></li>
+<li><a class="reference internal" href="#sqshowtocheckduplicatereceiving" id="id50">2重受信チェック</a></li>
+<li><a class="reference internal" href="#sqshowtologgingtraceid" id="id51">メッセージのトレース</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="overview">
+<h2><a class="toc-backref" href="#id32">5.6.1.1. Overview</a><a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<div class="line-block">
+<div class="line">本節では、Amazon Simple Queue Service（以下、Amazon SQS）を使用した非同期処理の実装方法について、<a class="reference internal" href="../../ImplementationAtEachLayer/Queuing/AsynchronousProcessing.html"><span class="doc">非同期実行（共通編）</span></a> に則って説明する。</div>
+<div class="line">非同期処理実装の全体イメージを以下に示す。</div>
+</div>
+<div class="figure">
+<a class="reference internal image-reference" href="../../_images/AsynchronousProcessingOverviewUsingAWS.png"><img alt="Screen image of asynchronous processing." src="../../_images/AsynchronousProcessingOverviewUsingAWS.png" style="width: 100%;" /></a>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>リクエストを受け付け、キューにメッセージを送信するフロントサーバと、キューからメッセージを受信し非同期に処理を行うバックサーバの2つのサーバが存在する前提で説明を進める。</p>
+<p class="last">必要に応じて、バックサーバのプロジェクトを作成すること。プロジェクトの作成については、<a class="reference internal" href="../../ImplementationAtEachLayer/CreateWebApplicationProject.html"><span class="doc">オンライン版クラウド拡張開発プロジェクトの作成</span></a> を参照されたい。</p>
+</div>
+<div class="section" id="amazon-sqs">
+<span id="aboutsqs"></span><h3><a class="toc-backref" href="#id33">5.6.1.1.1. Amazon SQSとは</a><a class="headerlink" href="#amazon-sqs" title="Permalink to this headline">¶</a></h3>
+<div class="line-block">
+<div class="line">Amazon SQSは、Amazon Web Serviceが提供するメッセージキューサービスである。</div>
+<div class="line">非同期通信をサポートしており、クライアント間で疎結合にデータの移動を行える。</div>
+<div class="line">Amazon SQSの詳細については、<a class="reference external" href="https://aws.amazon.com/jp/sqs/">Amazon Simple Queue Service (SQS)</a>を参照されたい。</div>
+</div>
+</div>
+<div class="section" id="varietyofqueues">
+<span id="id3"></span><h3><a class="toc-backref" href="#id34">5.6.1.1.2. Amazon SQSが提供するキューの種類</a><a class="headerlink" href="#varietyofqueues" title="Permalink to this headline">¶</a></h3>
+<div class="line-block">
+<div class="line">Amazon SQSは、標準キューとFIFOキューという2タイプのキューを提供している。</div>
+<div class="line">なお、本ガイドラインでは標準キューの利用法について紹介する。</div>
+<div class="line">2017/02時点での両者の主な違いは以下の通り。</div>
+</div>
+<table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="40%" />
+<col width="30%" />
+<col width="30%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">&#160;</th>
+<th class="head">標準キュー</th>
+<th class="head">FIFOキュー</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>1秒あたりのトランザクション数</td>
+<td>無制限</td>
+<td>300件</td>
+</tr>
+<tr class="row-odd"><td>メッセージの2重配信</td>
+<td>稀に発生する</td>
+<td>発生しない</td>
+</tr>
+<tr class="row-even"><td>メッセージの到着順</td>
+<td>保証されない</td>
+<td>保証される</td>
+</tr>
+</tbody>
+</table>
+<div class="line-block">
+<div class="line">キューの詳細については<a class="reference external" href="https://aws.amazon.com/jp/sqs/details/">Amazon SQS 製品の詳細</a>を参照されたい。</div>
+</div>
+<ul class="simple">
+<li><strong>標準キュー利用時の注意点</strong></li>
+</ul>
+<blockquote>
+<div><div class="line-block">
+<div class="line">Amazon SQSでは、冗長性と高可用性を確保する為、メッセージのコピーを複数台のサーバに保持している。</div>
+<div class="line">その為、メッセージの削除をサーバ間で同期できない事象が発生した場合、処理済みのメッセージを再度受信してしまうケースが存在する。</div>
+<div class="line">対処法として、二重受信チェック処理を実装するなど、アプリケーション側でべき等性を担保する実装とする必要がある。</div>
+<div class="line">本ガイドラインでは、メッセージ受信時にメッセージIDをDBに登録する事で2重受信チェックを実現している。詳細については<a class="reference internal" href="#sqshowtocheckduplicatereceiving"><span class="std std-ref">2重受信チェック</span></a>を参照されたい。</div>
+</div>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p>標準キューを利用する場合、稀にメッセージの2重配信が発生する為、べき等性を担保するようアプリケーションを実装すること。</p>
+<p class="last">2重配信は標準キューの重要な特徴であるため、<a class="reference external" href="http://docs.aws.amazon.com/ja_jp/AWSSimpleQueueService/latest/SQSDeveloperGuide/standard-queues.html#standard-queues-at-least-once-delivery">少なくとも 1 回の配信</a>は必ず参照して頂きたい。</p>
+</div>
+</div></blockquote>
+<ul class="simple">
+<li><strong>キューの採用基準</strong></li>
+</ul>
+<blockquote>
+<div><div class="line-block">
+<div class="line">標準キューとFIFOキューはメリット・デメリットが一長一短な為、システムの性能目標や特性に合わせて採用を検討されたい。</div>
+<div class="line"><br /></div>
+<div class="line">例えば、連続したコマンドをメッセージに乗せて送信する場合など、厳密なメッセージ順序を求めるシステムには、性能面を考慮した上で、FIFOキューの採用を検討すると良い。</div>
+<div class="line">一方、メッセージ到着順の変動を許容できるシステムの場合は、性能面で優位性のある標準キューの採用を検討する良い。</div>
+<div class="line">本ガイドラインで紹介するモデルでは、チケット予約システムのように大量のリクエストが集中するシステムを想定しており、リクエストの順序は問わない為、標準キューを採用している。</div>
+</div>
+</div></blockquote>
+</div>
+<div class="section" id="javaamazon-sqs">
+<span id="usingsqswithjava"></span><h3><a class="toc-backref" href="#id35">5.6.1.1.3. JavaアプリケーションからのAmazon SQSの利用</a><a class="headerlink" href="#javaamazon-sqs" title="Permalink to this headline">¶</a></h3>
+<p>Amazon Web Serviceでは、JavaアプリケーションからAmazon SQSを利用する為のAPIを提供している。</p>
+<ul class="simple">
+<li><strong>AmazonSQSインタフェース(AWS SDK for Java)</strong></li>
+</ul>
+<blockquote>
+<div><div class="line-block">
+<div class="line"><code class="docutils literal"><span class="pre">com.amazonaws.services.sqs.AmazonSQS</span></code>をはじめとする、AWSが提供するSDKに含まれるAmazon SQS用のAPI。</div>
+<div class="line"><code class="docutils literal"><span class="pre">AmazonSQS</span></code>インタフェースを利用する場合、アプリケーションはAWS依存となる。</div>
+<div class="line">詳細については<a class="reference external" href="https://aws.amazon.com/jp/documentation/sdk-for-java/">AWS SDK for Java</a>および<a class="reference external" href="http://docs.aws.amazon.com/ja_jp/AWSSimpleQueueService/latest/SQSDeveloperGuide/standard-queues.html">スタンダード キュー</a>を参照されたい。</div>
+</div>
+</div></blockquote>
+<ul class="simple">
+<li><strong>JMSインタフェース(Amazon SQS Java Messaging Library)</strong></li>
+</ul>
+<blockquote>
+<div><div class="line-block">
+<div class="line">Amazon SQSをJMSプロバイダとして使用する為のインタフェース。</div>
+<div class="line"><strong>本ガイドラインでは、このJMSインタフェースと、後述するSpring JMSを組み合わせた実装例を紹介する。</strong></div>
+<div class="line">JMSインタフェースの詳細については<a class="reference external" href="http://docs.aws.amazon.com/ja_jp/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-java-message-service-jms-client.html">Amazon SQSでJMSを使用する</a>を参照されたい。</div>
+</div>
+</div></blockquote>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>JMSインタフェースは、SQSのメッセージ送受信をJMSライクに行えるインタフェースであり、実態はJMSとは異なる為、注意が必要である。
+例えば、非同期受信時のトランザクション管理や、Pub-Subモデルとしての送受信はサポートされていない。</p>
+<p class="last">Amazon SQS提供のJMSインタフェースがサポートしているJMS実装については、<a class="reference external" href="http://docs.aws.amazon.com/ja_jp/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-java-message-service-jms-client.html#supported-implementations">サポートされている JMS 1.1 実装</a>を参照されたい。</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">本ガイドライン執筆時点では、JMSインタフェースはFIFOキューをサポートしていない。利用するキューを選定する際は、使用するAPIに対応しているかを確認されたい。</p>
+</div>
+</div>
+<div class="section" id="spring-jmsamazon-sqs">
+<span id="usingsqswithspringjms"></span><h3><a class="toc-backref" href="#id36">5.6.1.1.4. Spring JMSを使用したAmazon SQSの利用</a><a class="headerlink" href="#spring-jmsamazon-sqs" title="Permalink to this headline">¶</a></h3>
+<div class="line-block">
+<div class="line">Spring Frameworkが提供するSpring JMSライブラリ経由でSQSを利用する方法について説明する。</div>
+<div class="line">Spring JMSについては、Macchinetta Server Framework for Java (1.x) のガイドライン<a class="reference external" href="https://macchinetta.github.io/server-guideline/1.5.2.RELEASE/ja/ArchitectureInDetail/MessagingDetail/JMS.html#spring-frameworkjms">Spring Frameworkのコンポーネントを使用したJMSの利用</a>に詳しい利用法が記されている為、参照されたい。</div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>Spring Cloudが提供する Spring Cloud for Amazon Web Services(以下、Spring Cloud AWS)を用いても、JavaアプリケーションからAmazon SQSを利用することができる。
+ただし、本ガイドライン執筆時点のバージョン(1.2.1.RELEASE)では、メッセージ受信を行う<code class="docutils literal"><span class="pre">SimpleMessageListenerContainer</span></code>の仕様により、メッセージ受信後の処理がパラレルに実行できないという制約がある。
+詳細については、Spring Cloud AWSの<a class="reference external" href="https://github.com/spring-cloud/spring-cloud-aws/issues/166">issues#166</a>を参照されたい。</p>
+<p class="last">以上の理由から、本ガイドラインではSpring Cloud AWSを使用せず、Spring JMSを用いて説明する。</p>
+</div>
+<div class="section" id="synchronoussendingoverview">
+<span id="id7"></span><h4><a class="toc-backref" href="#id37">5.6.1.1.4.1. メッセージを同期送信する場合</a><a class="headerlink" href="#synchronoussendingoverview" title="Permalink to this headline">¶</a></h4>
+<p>メッセージを同期送信する処理の流れについて図を用いて説明する。</p>
+<div class="figure">
+<a class="reference internal image-reference" href="../../_images/AsynchronousProcessingImageOfSynchronousSending.png"><img alt="Screen image of synchronous sending." src="../../_images/AsynchronousProcessingImageOfSynchronousSending.png" style="width: 70%;" /></a>
+</div>
+<table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">Service内で、<code class="docutils literal"><span class="pre">JmsMessagingTemplate</span></code>に対して「送信先のAmazon SQSキュー名」と「送信するメッセージのペイロード」を渡して処理を実行する。</div>
+<div class="line"><code class="docutils literal"><span class="pre">JmsMessagingTemplate</span></code>は<code class="docutils literal"><span class="pre">JmsTemplate</span></code>に処理を委譲する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(2)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">JmsTemplate</span></code>はDIコンテナから取得した<code class="docutils literal"><span class="pre">ConnectionFactory</span></code>から<code class="docutils literal"><span class="pre">javax.jms.Connection</span></code>を取得する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(3)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">JmsTemplate</span></code>は <code class="docutils literal"><span class="pre">MessageProducer</span></code>に<code class="docutils literal"><span class="pre">Destination</span></code>とメッセージを渡す。</div>
+<div class="line"><code class="docutils literal"><span class="pre">MessageProducer</span></code>は<code class="docutils literal"><span class="pre">javax.jms.Session</span></code>から生成される。(<code class="docutils literal"><span class="pre">Session</span></code>は(2)で取得した<code class="docutils literal"><span class="pre">Connection</span></code>から生成される。)</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(4)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">SQSMessageProducer</span></code>は送信対象の<code class="docutils literal"><span class="pre">Destination</span></code>へメッセージを送信する。</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="asynchronousreceivingoverview">
+<span id="id8"></span><h4><a class="toc-backref" href="#id38">5.6.1.1.4.2. メッセージを非同期受信する場合</a><a class="headerlink" href="#asynchronousreceivingoverview" title="Permalink to this headline">¶</a></h4>
+<p>メッセージを非同期受信する処理の流れについて図を用いて説明する。</p>
+<div class="figure">
+<a class="reference internal image-reference" href="../../_images/AsynchronousProcessingImageOfAsynchronousReceiving.png"><img alt="Screen image of asynchronous receiving." src="../../_images/AsynchronousProcessingImageOfAsynchronousReceiving.png" style="width: 70%;" /></a>
+</div>
+<table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">DIコンテナから取得した<code class="docutils literal"><span class="pre">ConnectionFactory</span></code>から<code class="docutils literal"><span class="pre">Connection</span></code>を取得する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(2)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">DefaultMessageListenerContainer</span></code>は<code class="docutils literal"><span class="pre">MessageConsumer</span></code>に<code class="docutils literal"><span class="pre">Destination</span></code>を渡す。</div>
+<div class="line"><code class="docutils literal"><span class="pre">MessageConsumer</span></code>は<code class="docutils literal"><span class="pre">Session</span></code>から生成される。(<code class="docutils literal"><span class="pre">Session</span></code>は(1)で取得した<code class="docutils literal"><span class="pre">Connection</span></code>から生成される。)</div>
+<div class="line">また、<code class="docutils literal"><span class="pre">Destination</span></code>は<code class="docutils literal"><span class="pre">&#64;JmsListener</span></code>アノテーションで指定された「受信対象のAmazon SQSキュー名」をもとに<code class="docutils literal"><span class="pre">AmazonSQS</span></code>経由で取得される。</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(3)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">MessageConsumer</span></code>は<code class="docutils literal"><span class="pre">Destination</span></code>からメッセージを受信する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(4)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">受信したメッセージを引数として、<code class="docutils literal"><span class="pre">MessageListener</span></code>内の<code class="docutils literal"><span class="pre">&#64;JmsListener</span></code>アノテーションが設定されたメソッド(リスナメソッド)が呼び出される。リスナメソッドは<code class="docutils literal"><span class="pre">DefaultMessageListenerContainer</span></code>で管理される。</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="section" id="how-to-use">
+<h2><a class="toc-backref" href="#id39">5.6.1.2. How to use</a><a class="headerlink" href="#how-to-use" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="configurationofsqs">
+<span id="id9"></span><h3><a class="toc-backref" href="#id40">5.6.1.2.1. Amazon SQSの設定</a><a class="headerlink" href="#configurationofsqs" title="Permalink to this headline">¶</a></h3>
+<p>Amazon SQSを使用する為に必要な設定について説明する。</p>
+<div class="section" id="creatingqueues">
+<span id="id10"></span><h4><a class="toc-backref" href="#id41">5.6.1.2.1.1. キューの作成</a><a class="headerlink" href="#creatingqueues" title="Permalink to this headline">¶</a></h4>
+<p>Amazon Web Serviceのコンソール、またはクエリAPIから、アプリケーションで使用するキューを作成する。
+キューの作成については、<a class="reference external" href="http://docs.aws.amazon.com/ja_jp/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-create-queue.html">チュートリアル: Amazon SQS キューの作成</a>を参照されたい。</p>
+<p>特筆すべき設定項目について、以下に紹介する。
+設定の詳細やその他の設定項目については<a class="reference external" href="http://docs.aws.amazon.com/ja_jp/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-how-it-works.html">Amazon SQS キューの操作</a>を参照されたい。</p>
+<blockquote>
+<div><ul>
+<li><p class="first"><strong>キューの種類</strong></p>
+<div class="line-block">
+<div class="line">標準キュー、FIFOキューから選択する。</div>
+<div class="line">なお、本ガイドラインは標準キューを使用した場合について紹介している。</div>
+</div>
+</li>
+<li><p class="first"><strong>キュー名</strong></p>
+<div class="line-block">
+<div class="line">キューの名称を決定する。</div>
+<div class="line">ここで決めた名称を、後述する<code class="docutils literal"><span class="pre">&#64;JmsListener</span></code>アノテーションに属性値として指定する。</div>
+</div>
+</li>
+<li><p class="first"><strong>可視性タイムアウト</strong></p>
+<div class="line-block">
+<div class="line">キューの可視性タイムアウトを設定する。</div>
+<div class="line">可視性タイムアウトとは、キューから受信されて処理中となっているメッセージが、他の受信コンポーネントから不可視となる時間の長さである。</div>
+<div class="line">可視性タイムアウト時間を超えて処理が継続した場合、処理中に別の受信コンポーネント(別スレッドを含む)にて再度受信されてしまう。その為、可視性タイムアウトは処理時間を勘案した上で、充分な値を設定すること。</div>
+<div class="line">詳細については、<a class="reference external" href="http://docs.aws.amazon.com/ja_jp/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-visibility-timeout.html">可視性タイムアウト</a>および <a class="reference external" href="http://docs.aws.amazon.com/ja_jp/AWSSimpleQueueService/latest/SQSDeveloperGuide/general-recommendations.html">全般的な推奨事項 メッセージの処理</a>を参照されたい。</div>
+</div>
+</li>
+<li><p class="first"><strong>メッセージ受信待機時間</strong></p>
+</li>
+</ul>
+<blockquote>
+<div><div class="line-block">
+<div class="line">メッセージの受信待機時間を設定する。</div>
+<div class="line">受信待機時間とは、受信コンポーネントが空のキューに対してReceiveMessageリクエストを行った際に、キューにメッセージが到着するまで待機する時間である。</div>
+<div class="line">値は0-20秒の間で設定でき、0秒をショートポーリング、1秒以上をロングポーリングと呼ぶ。</div>
+<div class="line">ロングポーリングを使用することでAmazon SQSへのReceiveMessageリクエスト回数を削減できる為、20秒のロングポーリングを使用する事を推奨する。</div>
+<div class="line">ロングポーリングについては<a class="reference external" href="http://docs.aws.amazon.com/ja_jp/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-long-polling.html">Amazon SQS ロングポーリング</a>を参照されたい。</div>
+</div>
+</div></blockquote>
+<ul class="simple">
+<li><strong>デッドレターキュー設定</strong></li>
+</ul>
+<blockquote>
+<div><div class="line-block">
+<div class="line">正常に処理できないメッセージの送達先として、デッドレターキューを設定できる。</div>
+<div class="line">デッドレターキューについては、<a class="reference external" href="http://docs.aws.amazon.com/ja_jp/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-dead-letter-queues.html">Amazon SQS デッドレターキューの使用</a>を参照されたい。</div>
+</div>
+</div></blockquote>
+</div></blockquote>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>メッセージ受信待機時間は、キュー側と受信コンポーネント側の両方に設定することができ、受信コンポーネント側の設定が優先される。</p>
+<p class="last">AWS SDK(JMSインタフェースを含む)は、デフォルトで20秒のロングポーリング設定となっている為、本ガイドラインで紹介する構成の場合、キューのメッセージ受信待機時間設定に関わらず、20秒のロングポーリングとなる。</p>
+</div>
+</div>
+</div>
+<div class="section" id="sqshowtouseenviromentsetting">
+<span id="id17"></span><h3><a class="toc-backref" href="#id42">5.6.1.2.2. メッセージの送受信に共通する設定</a><a class="headerlink" href="#sqshowtouseenviromentsetting" title="Permalink to this headline">¶</a></h3>
+<p>本節では、Amazon SQSを使用したメッセージの送受信に必要となる共通的な設定について説明する。</p>
+<div class="section" id="sqshowtousedependentlibrary">
+<span id="id18"></span><h4><a class="toc-backref" href="#id43">5.6.1.2.2.1. 依存ライブラリの設定</a><a class="headerlink" href="#sqshowtousedependentlibrary" title="Permalink to this headline">¶</a></h4>
+<p>フロントサーバ、バックサーバそれぞれのdomainプロジェクトのpom.xmlに、Amazon SQSを利用する為に必要となる依存ライブラリを追加する。</p>
+<p>記述例を以下に示す。</p>
+<ul class="simple">
+<li>xxx-domain/pom.xml</li>
+</ul>
+<blockquote>
+<div><div class="highlight-xml"><div class="highlight"><pre><span></span><span class="nt">&lt;dependencies&gt;</span>
+
+     <span class="c">&lt;!-- (1) --&gt;</span>
+     <span class="nt">&lt;dependency&gt;</span>
+         <span class="nt">&lt;groupId&gt;</span>org.springframework<span class="nt">&lt;/groupId&gt;</span>
+         <span class="nt">&lt;artifactId&gt;</span>spring-jms<span class="nt">&lt;/artifactId&gt;</span>
+     <span class="nt">&lt;/dependency&gt;</span>
+
+     <span class="c">&lt;!-- (2) --&gt;</span>
+     <span class="nt">&lt;dependency&gt;</span>
+         <span class="nt">&lt;groupId&gt;</span>com.amazonaws<span class="nt">&lt;/groupId&gt;</span>
+         <span class="nt">&lt;artifactId&gt;</span>amazon-sqs-java-messaging-lib<span class="nt">&lt;/artifactId&gt;</span>
+         <span class="nt">&lt;version&gt;</span>1.0.1<span class="nt">&lt;/version&gt;</span>
+     <span class="nt">&lt;/dependency&gt;</span>
+
+ <span class="nt">&lt;/dependencies&gt;</span>
+</pre></div>
+</div>
+<table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">Spring Frameworkが提供する<code class="docutils literal"><span class="pre">spring-jms</span></code>をdependenciesに追加する。</div>
+<div class="line">バージョンはSpring IO Platformによって定義されているため、pom.xmlで指定しなくてよい。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(2)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">JMSプロバイダとして、Amazon SQSのJMSインタフェース <code class="docutils literal"><span class="pre">amazon-sqs-java-messaging-lib</span></code>をdependenciesに追加する。</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+</div>
+<div class="section" id="connectionfactory">
+<span id="sqshowtouseconnectionfactory"></span><h4><a class="toc-backref" href="#id44">5.6.1.2.2.2. ConnectionFactoryの設定</a><a class="headerlink" href="#connectionfactory" title="Permalink to this headline">¶</a></h4>
+<p>フロントサーバ、バックサーバそれぞれのdomainプロジェクトのinfra.xmlに<code class="docutils literal"><span class="pre">ConnectionFactory</span></code>の定義を追加する。</p>
+<p>記述例を以下に示す。</p>
+<ul class="simple">
+<li>xxx-infra.xml</li>
+</ul>
+<blockquote>
+<div><div class="highlight-xml"><div class="highlight"><pre><span></span><span class="c">&lt;!-- (1) --&gt;</span>
+<span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;connectionFactory&quot;</span> <span class="na">class=</span><span class="s">&quot;com.amazon.sqs.javamessaging.SQSConnectionFactory&quot;</span>
+    <span class="na">factory-bean=</span><span class="s">&quot;connectionFactoryBuilder&quot;</span> <span class="na">factory-method=</span><span class="s">&quot;build&quot;</span> <span class="nt">/&gt;</span>
+
+<span class="c">&lt;!-- (2) --&gt;</span>
+<span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;connectionFactoryBuilder&quot;</span>
+    <span class="na">class=</span><span class="s">&quot;com.amazon.sqs.javamessaging.SQSConnectionFactory$Builder&quot;</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;regionName&quot;</span> <span class="na">value=</span><span class="s">&quot;us-east-1&quot;</span> <span class="nt">/&gt;</span>
+<span class="nt">&lt;/bean&gt;</span>
+</pre></div>
+</div>
+<table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">SQSConnectionFactory</span></code>をBean定義する。</div>
+<div class="line"><code class="docutils literal"><span class="pre">SQSConnectionFactory</span></code>は<code class="docutils literal"><span class="pre">SQSConnectionFactory$Builder</span></code>のファクトリメソッドにてインスタンス生成する為、</div>
+<div class="line"><code class="docutils literal"><span class="pre">factory-method</span></code>属性に <code class="docutils literal"><span class="pre">build</span></code>を指定する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(2)</div>
+</div>
+</td>
+<td><div class="first line-block">
+<div class="line"><code class="docutils literal"><span class="pre">SQSConnectionFactory</span></code>のインスタンス生成に用いるビルダクラス <code class="docutils literal"><span class="pre">SQSConnectionFactory$Builder</span></code>をBean定義する。</div>
+<div class="line"><code class="docutils literal"><span class="pre">regionName</span></code>属性に、接続先キューが存在するリージョンを指定する。</div>
+</div>
+<div class="last admonition note">
+<p class="first admonition-title">Note</p>
+<p>ここではリージョンを固定文字列として記述しているが、実際の開発では外部管理とすることが望ましい。</p>
+<p class="last">環境依存値の外部管理については、<a class="reference internal" href="../../ImplementationAtEachLayer/EnvironmentValuesExternalManagement.html"><span class="doc">環境依存値の外部管理</span></a> を参照されたい。</p>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p><strong>ConnectionFactoryの定義方法について</strong></p>
+<p>Macchinetta Server Framework for Java (1.x) のガイドライン<a class="reference external" href="https://macchinetta.github.io/server-guideline/1.5.2.RELEASE/ja/ArchitectureInDetail/MessagingDetail/JMS.html#connectionfactory">ConnectionFactoryの設定</a>では、
+Bean定義ファイルがアプリケーションサーバ提供のJMSプロバイダ依存となることを防ぐため、<code class="docutils literal"><span class="pre">ConnectionFactory</span></code>をアプリケーションサーバ側にて定義することを推奨しているが、
+本ガイドラインで紹介しているケースにおいては、JMSプロバイダはクラウドベンダ提供のライブラリを使用する為、アプリケーションサーバ側に定義する必要性は低い。</p>
+<p class="last">以上の理由から、本ガイドラインではBean定義ファイルで定義する方法を採っている。</p>
+</div>
+</div></blockquote>
+</div>
+<div class="section" id="destinationresolver">
+<span id="sqshowtousedestinationresolver"></span><h4><a class="toc-backref" href="#id45">5.6.1.2.2.3. DestinationResolverの設定</a><a class="headerlink" href="#destinationresolver" title="Permalink to this headline">¶</a></h4>
+<p>Amazon SQSキューの名前解決は、AWS SDK for Javaが提供するJMSプロバイダによって行われる。
+Spring JMSは、JMSプロバイダによる解決を行う <code class="docutils literal"><span class="pre">DynamicDestinationResolver</span></code>をデフォルトで使用する為、
+<code class="docutils literal"><span class="pre">DestinationResolver</span></code>についての設定は不要である。</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Spring BootのAuto-configurationの仕組みを採用し、デフォルトのまま使用した場合、
+<code class="docutils literal"><span class="pre">JmsAutoConfiguration</span></code>の設定により、JNDIによる名前解決を行う<code class="docutils literal"><span class="pre">JndiDestinationResolver</span></code>がBean定義され、宛先キューの解決に使用される。
+ただし、Amazon SQSのキューはJNDIでルックアップできない為、最終的には<code class="docutils literal"><span class="pre">DynamicDestinationResolver</span></code>での解決が行われる。</p>
+</div>
+</div>
+</div>
+<div class="section" id="sqshowtousesyncsendmessage">
+<span id="id20"></span><h3><a class="toc-backref" href="#id46">5.6.1.2.3. メッセージを同期送信する方法</a><a class="headerlink" href="#sqshowtousesyncsendmessage" title="Permalink to this headline">¶</a></h3>
+<div class="line-block">
+<div class="line">クライアントからAmazon SQSキューへメッセージを同期送信する方法を説明する。</div>
+</div>
+<p>本ガイドラインでは、Macchinetta Server Framework for Java (1.x) のガイドライン <a class="reference external" href="https://macchinetta.github.io/server-guideline/1.5.2.RELEASE/ja/ArchitectureInDetail/MessagingDetail/JMS.html#jmshowtousesyncsendmessage">メッセージを同期送信する方法</a>との差分について重点的に紹介している為、
+本ガイドラインと併せて、Macchinetta Server Framework for Java (1.x) のガイドラインも参照されたい。</p>
+<div class="section" id="sqshowtousesettingforsyncsend">
+<span id="id22"></span><h4><a class="toc-backref" href="#id47">5.6.1.2.3.1. 基本的な同期送信</a><a class="headerlink" href="#sqshowtousesettingforsyncsend" title="Permalink to this headline">¶</a></h4>
+<div class="line-block">
+<div class="line"><code class="docutils literal"><span class="pre">JmsMessagingTemplate</span></code>を利用して、Amazon SQSへの同期送信処理を実現する。</div>
+<div class="line">ここでは、<code class="docutils literal"><span class="pre">Reservation</span></code>クラスのオブジェクトをメッセージ同期送信する場合の実装例を紹介する。</div>
+</div>
+<ul>
+<li><p class="first">同期送信に必要となるBean定義</p>
+<div class="line-block">
+<div class="line">メッセージの送信側アプリケーションに必要となるBean定義例を以下に示す。</div>
+</div>
+<ul>
+<li><p class="first">xxx-infra.xml</p>
+<div class="highlight-xml"><div class="highlight"><pre><span></span><span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;cachingConnectionFactory&quot;</span>
+   <span class="na">class=</span><span class="s">&quot;org.springframework.jms.connection.CachingConnectionFactory&quot;</span> <span class="na">primary=</span><span class="s">&quot;true&quot;</span><span class="nt">&gt;</span> <span class="c">&lt;!-- (1) --&gt;</span>
+   <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;targetConnectionFactory&quot;</span> <span class="na">ref=</span><span class="s">&quot;connectionFactory&quot;</span> <span class="nt">/&gt;</span> <span class="c">&lt;!-- (2) --&gt;</span>
+   <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;sessionCacheSize&quot;</span> <span class="na">value=</span><span class="s">&quot;10&quot;</span> <span class="nt">/&gt;</span>  <span class="c">&lt;!-- (3) --&gt;</span>
+<span class="nt">&lt;/bean&gt;</span>
+</pre></div>
+</div>
+<table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">Session</span></code>、<code class="docutils literal"><span class="pre">MessageProducer</span></code>のキャッシュを行う<code class="docutils literal"><span class="pre">org.springframework.jms.connection.CachingConnectionFactory</span></code>をBean定義する。</div>
+<div class="line"><code class="docutils literal"><span class="pre">SQSConnectionFactory</span></code>をそのまま使うのではなく、
+<code class="docutils literal"><span class="pre">CachingConnectionFactory</span></code>にラップして使用することで、キャッシュ機能を使用することができる。</div>
+<div class="line">DIコンテナに<code class="docutils literal"><span class="pre">ConnectionFactory</span></code>実装クラスが複数登録されることになる為、<code class="docutils literal"><span class="pre">primary</span></code>属性に<code class="docutils literal"><span class="pre">true</span></code>を指定する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(2)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">Bean定義された<code class="docutils literal"><span class="pre">SQSConnectionFactory</span></code>を指定する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(3)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">Session</span></code>のキャッシュ数を設定する。（デフォルト値は1）</div>
+<div class="line">この例では10を指定しているが、性能要件に応じて適宜キャッシュ数を変更すること。</div>
+<div class="line">このキャッシュ数を超えてセッションが必要になるとキャッシュを使用せず、新しいセッションの作成と破棄を繰り返すことになる。</div>
+<div class="line">すると処理効率が下がり、性能劣化の原因になるので注意すること。</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</li>
+</ul>
+</li>
+</ul>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">本ガイドラインでは、Spring BootのAuto-configurationの使用を前提としており、
+メッセージ送信に使用する<code class="docutils literal"><span class="pre">JmsTemplate</span></code>、<code class="docutils literal"><span class="pre">JmsMessagingTemplate</span></code>は <code class="docutils literal"><span class="pre">JmsAutoConfiguration</span></code>にてBean定義される為、
+デフォルト設定のまま使用する場合は、Bean定義は不要である。</p>
+</div>
+<p>なお、<code class="docutils literal"><span class="pre">JmsTemplate</span></code>の設定については、Macchinetta Server Framework for Java (1.x) のガイドライン<a class="reference external" href="https://macchinetta.github.io/server-guideline/1.5.2.RELEASE/ja/ArchitectureInDetail/MessagingDetail/JMS.html#jmshowtousesyncsendmessage">メッセージを同期送信する方法</a>に詳しく紹介されている為、必要に応じて参照されたい。</p>
+<ul>
+<li><p class="first">送信対象のJavaBeanの実装</p>
+<div class="line-block">
+<div class="line">フロントサーバ、バックサーバの両アプリケーションで共用するオブジェクトの為、modelプロジェクトに作成する。</div>
+<div class="line">modelの共有についての詳細は、Macchinetta Server Framework for Java (1.x) のガイドライン <a class="reference external" href="https://macchinetta.github.io/server-guideline/1.5.2.RELEASE/ja/ArchitectureInDetail/MessagingDetail/JMS.html#jmsoverviewaboutprojectconfiguration">プロジェクト構成について</a>を参照されたい。</div>
+</div>
+<p>実装例を以下に示す。</p>
+<ul class="simple">
+<li>Reservation.java</li>
+</ul>
+<blockquote>
+<div><div class="highlight-java"><div class="highlight"><pre><span></span><span class="kn">package</span> <span class="nn">com.example.domain.model</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">java.io.Serializable</span><span class="o">;</span>
+
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">Reservation</span> <span class="kd">implements</span> <span class="n">Serializable</span> <span class="o">{</span> <span class="c1">// (1)</span>
+
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="kt">long</span> <span class="n">serialVersionUID</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1L</span><span class="o">;</span>
+
+    <span class="kd">private</span> <span class="n">String</span> <span class="n">reserveNo</span><span class="o">;</span>
+
+    <span class="c1">// omitted</span>
+
+    <span class="kd">public</span> <span class="n">String</span> <span class="nf">getReserveNo</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">reserveNo</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setReserveNo</span><span class="o">(</span><span class="n">String</span> <span class="n">reserveNo</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">reserveNo</span> <span class="o">=</span> <span class="n">reserveNo</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="c1">// omitted</span>
+
+<span class="o">}</span>
+</pre></div>
+</div>
+<table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">シリアライズして送信するため、<code class="docutils literal"><span class="pre">java.io.Serializable</span></code>インタフェース を実装する必要がある。</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+</li>
+<li><p class="first">同期送信を行うサービスクラスの実装</p>
+<p>予約情報を持つ<code class="docutils literal"><span class="pre">Reservation</span></code>オブジェクトをAmazon SQSキューに同期送信する。</p>
+<p>実装例を以下に示す。</p>
+<ul class="simple">
+<li>ReservationServiceImpl.java</li>
+</ul>
+<blockquote>
+<div><div class="highlight-java"><div class="highlight"><pre><span></span><span class="kn">package</span> <span class="nn">com.example.domain.service.reservation</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">javax.inject.Inject</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.jms.core.JmsMessagingTemplate</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.stereotype.Service</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">com.example.domain.model.Reservation</span><span class="o">;</span>
+
+<span class="nd">@Service</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">ReservationServiceImpl</span> <span class="kd">implements</span> <span class="n">ReservationService</span> <span class="o">{</span>
+
+    <span class="nd">@Inject</span>
+    <span class="n">JmsMessagingTemplate</span> <span class="n">jmsMessagingTemplate</span><span class="o">;</span>    <span class="c1">// (1)</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">sendMessage</span><span class="o">(</span><span class="n">Reservation</span> <span class="n">reservation</span><span class="o">)</span> <span class="o">{</span>
+
+       <span class="c1">// omitted</span>
+
+       <span class="n">jmsMessagingTemplate</span><span class="o">.</span><span class="na">convertAndSend</span><span class="o">(</span><span class="s">&quot;reservation-queue&quot;</span><span class="o">,</span> <span class="n">reservation</span><span class="o">);</span>  <span class="c1">// (2)</span>
+
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+<table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">JmsMessagingTemplate</span></code>をインジェクションする。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(2)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">JmsMessagingTemplate</span></code>の<code class="docutils literal"><span class="pre">convertAndSend</span></code>メソッドを使用して、引数のJavaBeanを<code class="docutils literal"><span class="pre">org.springframework.messaging.Message</span></code>インタフェースの実装クラスに変換し、指定したDestinationに対しメッセージを同期送信する。</div>
+<div class="line">本実装例では、Amazon SQSキューに送信する為、<code class="docutils literal"><span class="pre">com.amazon.sqs.javamessaging.message.SQSObjectMessage</span></code>に変換され、送信される。</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="sqshowtouseasyncreceivemessage">
+<span id="id25"></span><h3><a class="toc-backref" href="#id48">5.6.1.2.4. メッセージを非同期受信する方法</a><a class="headerlink" href="#sqshowtouseasyncreceivemessage" title="Permalink to this headline">¶</a></h3>
+<div class="line-block">
+<div class="line">Amazon SQSキューからメッセージを非同期受信する方法を説明する。</div>
+</div>
+<p>本ガイドラインでは、Macchinetta Server Framework for Java (1.x) のガイドライン <a class="reference external" href="https://macchinetta.github.io/server-guideline/1.5.2.RELEASE/ja/ArchitectureInDetail/MessagingDetail/JMS.html#jmshowtouseasyncreceivemessage">メッセージを非同期受信する方法</a>との差分について重点的に紹介している為、
+本ガイドラインと併せて、Macchinetta Server Framework for Java (1.x) のガイドラインも参照されたい。</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Amazon SQSはトランザクションをサポートしていない為、Macchinetta Server Framework for Java (1.x) のガイドライン <a class="reference external" href="https://macchinetta.github.io/server-guideline/1.5.2.RELEASE/ja/ArchitectureInDetail/MessagingDetail/JMS.html#jmshowtousetransactionmanagementforasyncreceive">トランザクション管理</a>で紹介されているような、
+メッセージングとDBのトランザクションを組み合わせる設計は行えない為、注意が必要である。</p>
+</div>
+<div class="section" id="sqshowtousesettingforasyncreceive">
+<span id="id28"></span><h4><a class="toc-backref" href="#id49">5.6.1.2.4.1. 基本的な非同期受信</a><a class="headerlink" href="#sqshowtousesettingforasyncreceive" title="Permalink to this headline">¶</a></h4>
+<div class="line-block">
+<div class="line"><code class="docutils literal"><span class="pre">&#64;JmsListener</span></code>アノテーションを利用した非同期受信の方法について説明する。</div>
+</div>
+<ul>
+<li><p class="first">Bean定義ファイルの設定</p>
+<p>非同期受信の実装には下記の設定が必要となる。</p>
+<ul class="simple">
+<li>JMS Namespaceを定義する。</li>
+<li><code class="docutils literal"><span class="pre">&#64;JmsListener</span></code>アノテーションを有効化する。</li>
+<li>DIコンテナで管理しているコンポーネントのメソッドに<code class="docutils literal"><span class="pre">&#64;JmsListener</span></code>アノテーションを指定する。</li>
+</ul>
+<p>記述例を以下に示す。</p>
+<ul class="simple">
+<li>applicationContext.xml</li>
+</ul>
+<blockquote>
+<div><div class="highlight-xml"><div class="highlight"><pre><span></span><span class="c">&lt;!-- (1) --&gt;</span>
+<span class="nt">&lt;beans</span> <span class="na">xmlns=</span><span class="s">&quot;http://www.springframework.org/schema/beans&quot;</span>
+    <span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
+    <span class="na">xmlns:jms=</span><span class="s">&quot;http://www.springframework.org/schema/jms&quot;</span>
+    <span class="na">xsi:schemaLocation=</span><span class="s">&quot;http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd</span>
+<span class="s">        http://www.springframework.org/schema/jms http://www.springframework.org/schema/jms/spring-jms.xsd&quot;</span><span class="nt">&gt;</span>
+
+    <span class="c">&lt;!-- (2) --&gt;</span>
+    <span class="nt">&lt;jms:annotation-driven</span> <span class="nt">/&gt;</span>
+
+    <span class="c">&lt;!-- (3) --&gt;</span>
+    <span class="nt">&lt;jms:listener-container</span>
+        <span class="na">factory-id=</span><span class="s">&quot;jmsListenerContainerFactory&quot;</span>
+        <span class="na">acknowledge=</span><span class="s">&quot;client&quot;</span> <span class="nt">/&gt;</span>
+</pre></div>
+</div>
+<table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="10%" />
+<col width="26%" />
+<col width="64%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">属性名</th>
+<th class="head">内容</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td>xmlns:jms</td>
+<td><div class="first last line-block">
+<div class="line">JMS Namespaceを定義する。</div>
+<div class="line">値として<code class="docutils literal"><span class="pre">http://www.springframework.org/schema/jms</span></code>を指定する。</div>
+<div class="line">JMS Namespaceの詳細については、<a class="reference external" href="http://docs.spring.io/autorepo/docs/spring-framework/4.3.23.RELEASE/spring-framework-reference/html/jms.html#jms-namespace">JMS Namespace Support</a>を参照されたい。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td>&#160;</td>
+<td>xsi:schemaLocation</td>
+<td><div class="first last line-block">
+<div class="line">スキーマのURLを指定する。</div>
+<div class="line">値に<code class="docutils literal"><span class="pre">http://www.springframework.org/schema/jms</span></code>と<code class="docutils literal"><span class="pre">http://www.springframework.org/schema/jms/spring-jms.xsd</span></code>を追加する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(2)</div>
+</div>
+</td>
+<td>-</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">&lt;jms:annotation-driven</span> <span class="pre">/&gt;</span></code>を利用して、<code class="docutils literal"><span class="pre">&#64;JmsListener</span></code>アノテーションや<code class="docutils literal"><span class="pre">&#64;SendTo</span></code>アノテーション等のJMS関連のアノテーション機能を有効化する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(3)</div>
+</div>
+</td>
+<td>-</td>
+<td><div class="first line-block">
+<div class="line"><code class="docutils literal"><span class="pre">&lt;jms:listener-container/&gt;</span></code>を利用して<code class="docutils literal"><span class="pre">DefaultMessageListenerContainer</span></code>を生成するファクトリへパラメータを与えることで、<code class="docutils literal"><span class="pre">DefaultMessageListenerContainer</span></code>の設定を行う。</div>
+<div class="line"><code class="docutils literal"><span class="pre">&lt;jms:listener-container/&gt;</span></code>の属性には、利用したい<code class="docutils literal"><span class="pre">ConnectionFactory</span></code>のBeanを指定できる<code class="docutils literal"><span class="pre">connection-factory</span></code>属性が存在する。<code class="docutils literal"><span class="pre">connection-factory</span></code>属性のデフォルト値は<code class="docutils literal"><span class="pre">connectionFactory</span></code>である。</div>
+<div class="line">この例では、<a class="reference internal" href="#sqshowtouseconnectionfactory"><span class="std std-ref">ConnectionFactoryの設定</span></a>で示した<code class="docutils literal"><span class="pre">ConnectionFactory</span></code>のBean(Bean名は<code class="docutils literal"><span class="pre">connectionFactory</span></code>)を利用するため、<code class="docutils literal"><span class="pre">connection-factory</span></code>属性を省略している。</div>
+<div class="line"><code class="docutils literal"><span class="pre">&lt;jms:listener-container/&gt;</span></code>には、ここで紹介した以外の属性も存在する。</div>
+<div class="line">詳細については、<a class="reference external" href="http://docs.spring.io/spring/docs/4.3.23.RELEASE/spring-framework-reference/html/jms.html#jms-namespace-listener-container-tbl">Attributes of the JMS &lt;listener-container&gt; element</a>を参照されたい。</div>
+</div>
+<div class="last admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">非同期受信の場合、<code class="docutils literal"><span class="pre">DefaultMessageListenerContainer</span></code>の内部に独自のキャッシュ機能が備わっているため、<code class="docutils literal"><span class="pre">CachingConnectionFactory</span></code>は使用してはいけない。
+詳細については、<a class="reference external" href="http://docs.spring.io/autorepo/docs/spring-framework/4.3.23.RELEASE/javadoc-api/org/springframework/jms/listener/DefaultMessageListenerContainer.html">DefaultMessageListenerContainerのJavadoc</a>を参照されたい。</p>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">factory-id</span></code></td>
+<td><div class="first last line-block">
+<div class="line">Bean定義を行う<code class="docutils literal"><span class="pre">DefaultJmsListenerContainerFactory</span></code>の名前を設定する。</div>
+<div class="line"><code class="docutils literal"><span class="pre">&#64;JmsListener</span></code>アノテーションがデフォルトでBean名<code class="docutils literal"><span class="pre">jmsListenerContainerFactory</span></code>を参照するため、<code class="docutils literal"><span class="pre">&lt;jms:listener-container/&gt;</span></code>が一つの場合はBean名を<code class="docutils literal"><span class="pre">jmsListenerContainerFactory</span></code>とすることを推奨する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">acknowledge</span></code></td>
+<td><div class="first line-block">
+<div class="line">メッセージ受信時の、Amazon SQSへの確認応答の返し方を設定する。Amazon SQSキューは、確認応答を受け取った際にキュー内のメッセージを削除する。</div>
+<div class="line"><code class="docutils literal"><span class="pre">acknowledge</span></code>属性のデフォルトは<code class="docutils literal"><span class="pre">auto</span></code>である。ここでは、<code class="docutils literal"><span class="pre">client</span></code>を設定している。</div>
+<div class="line"><code class="docutils literal"><span class="pre">client</span></code>を設定した場合は、リスナメソッドが正常終了した際に確認応答を返し、例外発生時にはメッセージがキューに戻される。</div>
+</div>
+<div class="last admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">acknowledgeモードはAmazon SQS、Spring JMS で意味合いが異なる為、注意が必要である。
+ここでは、<code class="docutils literal"><span class="pre">DefaultMessageListenerContainer</span></code>を使用する為、Spring JMSのacknowledgeモードに従って設定している。</p>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Amazon SQSはトランザクションをサポートしていない為、<code class="docutils literal"><span class="pre">transaction-manager</span></code>属性は設定できない。</p>
+</div>
+</div></blockquote>
+</li>
+<li><p class="first">リスナクラスの実装</p>
+</li>
+</ul>
+<blockquote>
+<div><div class="line-block">
+<div class="line">DIコンテナで管理しているコンポーネントのメソッドに<code class="docutils literal"><span class="pre">&#64;JmsListener</span></code>アノテーションを指定することで、指定したDestinationより非同期でメッセージを受信する。</div>
+<div class="line">また、<a class="reference internal" href="#usingsqswithjava"><span class="std std-ref">JavaアプリケーションからのAmazon SQSの利用</span></a>にて紹介した、標準キューの2重受信の検出についてもここで行う。</div>
+</div>
+<p>実装例を以下に示す。</p>
+<ul class="simple">
+<li>ReservationMessageListener.java</li>
+</ul>
+<blockquote>
+<div><div class="highlight-java"><div class="highlight"><pre><span></span><span class="kn">package</span> <span class="nn">com.example.listener.reservation</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">javax.inject.Inject</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.jms.annotation.JmsListener</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.jms.support.JmsHeaders</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.stereotype.Component</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">com.example.domain.common.exception.DuplicateReceivingException</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">com.example.domain.model.Reservation</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">com.example.domain.service.reservation.ReservationInspectionService</span><span class="o">;</span>
+
+<span class="nd">@Component</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">ReservationMessageListener</span> <span class="o">{</span>
+
+   <span class="nd">@Inject</span>
+   <span class="n">ReservationInspectionService</span> <span class="n">reservationInspectionService</span><span class="o">;</span>
+
+   <span class="nd">@JmsListener</span><span class="o">(</span><span class="n">destination</span> <span class="o">=</span> <span class="s">&quot;reservation-queue&quot;</span><span class="o">,</span> <span class="n">concurrency</span> <span class="o">=</span> <span class="s">&quot;5-10&quot;</span><span class="o">)</span>   <span class="c1">// (1)</span>
+   <span class="kd">public</span> <span class="kt">void</span> <span class="nf">receive</span><span class="o">(</span><span class="n">Reservation</span> <span class="n">reservation</span><span class="o">,</span>
+           <span class="nd">@Header</span><span class="o">(</span><span class="n">JmsHeaders</span><span class="o">.</span><span class="na">MESSAGE_ID</span><span class="o">)</span> <span class="n">String</span> <span class="n">messageId</span><span class="o">)</span> <span class="o">{</span> <span class="c1">// (2)</span>
+
+       <span class="k">try</span><span class="o">{</span>
+           <span class="n">reservationInspectionService</span><span class="o">.</span><span class="na">inspectAndNotify</span><span class="o">(</span><span class="n">reservation</span><span class="o">,</span> <span class="n">messageId</span><span class="o">);</span> <span class="c1">// (3)</span>
+       <span class="o">}</span><span class="k">catch</span><span class="o">(</span><span class="n">DuplicateReceivingException</span> <span class="n">e</span><span class="o">){</span> <span class="c1">// (4)</span>
+           <span class="k">return</span><span class="o">;</span>
+       <span class="o">}</span>
+      <span class="c1">// omitted</span>
+   <span class="o">}</span>
+
+<span class="o">}</span>
+</pre></div>
+</div>
+<table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><div class="first line-block">
+<div class="line">非同期受信用のメソッドに対し<code class="docutils literal"><span class="pre">&#64;JmsListener</span></code>アノテーションを設定する。</div>
+<div class="line"><code class="docutils literal"><span class="pre">destination</span></code>属性には、受信先のキュー名を指定する。</div>
+<div class="line"><code class="docutils literal"><span class="pre">concurrency</span></code>属性には、リスナメソッドの並列数の上限を指定する。記述例のように、下限と上限を設定することも可能である。</div>
+</div>
+<div class="last admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last"><code class="docutils literal"><span class="pre">concurrency</span></code>属性は、<code class="docutils literal"><span class="pre">&lt;jms:listener-container/&gt;</span></code>にて設定することも可能だが、
+記述例ではリスナメソッドごとに並列数を設定する設計を想定している為、<code class="docutils literal"><span class="pre">&#64;JmsListener</span></code>アノテーションに設定している。</p>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(2)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">後述する2重受信チェックに使用するJMSMessageIDを、<code class="docutils literal"><span class="pre">Header</span></code>アノテーションを使用してメソッド引数として受け取る。</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(3)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">メッセージ受信後に実行するサービスクラスのメソッドを呼び出す。</div>
+<div class="line">サービスクラス内にて2重受信チェックを行うため、受信メッセージのJMSMessageIDを引数として渡す。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(4)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">2重受信チェックの結果、受信したメッセージが処理済であった場合は、<code class="docutils literal"><span class="pre">return</span></code>してリスナメソッドを正常終了させる。</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+</div></blockquote>
+</div>
+<div class="section" id="sqshowtocheckduplicatereceiving">
+<span id="id29"></span><h4><a class="toc-backref" href="#id50">5.6.1.2.4.2. 2重受信チェック</a><a class="headerlink" href="#sqshowtocheckduplicatereceiving" title="Permalink to this headline">¶</a></h4>
+<div class="line-block">
+<div class="line">Amazon SQSの標準キューを利用する際に必要となる、2重受信チェックについて説明する。</div>
+<div class="line"><br /></div>
+<div class="line">Amazon SQSのドキュメント<a class="reference external" href="http://docs.aws.amazon.com/ja_jp/AWSSimpleQueueService/latest/SQSDeveloperGuide/standard-queues.html#standard-queues-at-least-once-delivery">少なくとも 1 回の配信</a>で示されている通り、標準キューを使用する場合は、アプリケーションがべき等性を持つように設計する必要がある。</div>
+<div class="line">べき等性を持たせる方法はいくつか存在するが、本ガイドラインではRDBの一意性制約を利用して実現する方法を紹介する。</div>
+<div class="line"><br /></div>
+<div class="line">処理済のメッセージを再度受信した場合のイメージを以下に示す。</div>
+</div>
+<blockquote>
+<div><div class="figure">
+<a class="reference internal image-reference" href="../../_images/AsynchronousProcessingDuplicateReceiving.png"><img alt="Screen image of unique message check." src="../../_images/AsynchronousProcessingDuplicateReceiving.png" style="width: 100%;" /></a>
+</div>
+<table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">バックサーバのアプリケーションは、SQSメッセージ(ID:AAAAAAAAAAAZ)を受信する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(2)</div>
+</div>
+</td>
+<td><div class="first line-block">
+<div class="line">バックサーバのアプリケーションは、2重受信チェック部品を使用してメッセージID:AAAAAAAAAAAZをRDBのメッセージID管理テーブルに登録した後、業務処理を実行する。</div>
+<div class="line">メッセージID管理テーブルは、メッセージIDカラムがユニークキーに設定されている前提。</div>
+</div>
+<div class="last admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">2重受信チェック部品は、<code class="docutils literal"><span class="pre">&#64;Transactional</span></code>が付与されたサービスクラスのメソッド内にて呼び出され、サービスクラスのトランザクションに参加する。その為、メッセージID挿入は、サービスクラスのメソッドが正常終了した時点でコミットされる。</p>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(3)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">バックサーバのアプリケーションは、何らかの原因により、(2)で受信したSQSメッセージ(ID:AAAAAAAAAAAZ)を再度受信する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(4)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">2重受信チェック部品は、メッセージID:AAAAAAAAAAAZをRDBのメッセージID管理テーブルに登録しようとするが、既に同じIDが登録されている為に挿入できず、2重受信と判断する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(5)</div>
+</div>
+</td>
+<td><div class="first line-block">
+<div class="line">バックサーバのアプリケーションは、以降の業務処理を行わずにリスナメソッドを正常終了させる。</div>
+</div>
+<div class="last admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">リスナメソッドを例外終了させた場合、Spring JMSのacknowledgeモード<code class="docutils literal"><span class="pre">client</span></code>の仕様により、メッセージが削除されずキューに戻されてしまう。
+2重受信した処理済メッセージをキューから削除する為、ここではリスナメソッドを正常終了させている。</p>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+<div class="line-block">
+<div class="line">2重受信チェックの実装例を以下に示す。</div>
+</div>
+<ul class="simple">
+<li>DuplicateMessageChecker.java</li>
+</ul>
+<blockquote>
+<div><div class="highlight-java"><div class="highlight"><pre><span></span><span class="kn">package</span> <span class="nn">com.example.domain.messaging</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">javax.inject.Inject</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.dao.DuplicateKeyException</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.transaction.annotation.Transactional</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">com.example.domain.repository.messaging.MessageIdRepository</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">com.example.domain.common.exception.DuplicateReceivingException</span><span class="o">;</span>
+
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">DuplicateMessageChecker</span> <span class="o">{</span>
+
+    <span class="nd">@Inject</span>
+    <span class="n">MessageIdRepository</span> <span class="n">repository</span><span class="o">;</span> <span class="c1">// (1)</span>
+
+    <span class="nd">@Transactional</span>  <span class="c1">// (2)</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">checkDuplicateMessage</span><span class="o">(</span><span class="n">String</span> <span class="n">messageId</span><span class="o">)</span> <span class="o">{</span>
+
+        <span class="k">try</span> <span class="o">{</span>
+
+            <span class="n">repository</span><span class="o">.</span><span class="na">register</span><span class="o">(</span><span class="n">messageId</span><span class="o">);</span> <span class="c1">// (3)</span>
+
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">DuplicateKeyException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span> <span class="c1">// (4)</span>
+
+            <span class="k">throw</span> <span class="k">new</span> <span class="n">DuplicateReceivingException</span><span class="o">(</span><span class="n">messageId</span><span class="o">);</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+<table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><div class="first line-block">
+<div class="line">メッセージIDをINSERTするリポジトリ <code class="docutils literal"><span class="pre">MessageIdRepository</span></code>をインジェクションする。</div>
+</div>
+<div class="last admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last"><code class="docutils literal"><span class="pre">MessageIdRepository</span></code>は単項目のINSERTを行うリポジトリの為、マッピングファイル等の記述例は割愛する。</p>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(2)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">メッセージIDをINSERTするトランザクションを業務処理のトランザクションに含める為、<code class="docutils literal"><span class="pre">&#64;Transactional</span></code>を付与する。</div>
+<div class="line"><code class="docutils literal"><span class="pre">propagation</span></code>属性には、デフォルト値の<code class="docutils literal"><span class="pre">REQUIRED</span></code>が使用される。</div>
+<div class="line">業務処理にて例外が発生した場合は、メッセージIDのINSERTもロールバックされる。</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(3)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">MessageIdRepository</span></code>の<code class="docutils literal"><span class="pre">register</span></code>メソッドを実行し、メッセージIDをメッセージID管理テーブルにINSERTする。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(4)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">一意性制約違反によって発生する<code class="docutils literal"><span class="pre">DuplicateKeyException</span></code>をcatchする。</div>
+<div class="line">2重受信発生を示す例外をthrowする。</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+<ul class="simple">
+<li>ReservationInspectionServiceImpl.java</li>
+</ul>
+<blockquote>
+<div><div class="highlight-java"><div class="highlight"><pre><span></span><span class="kn">package</span> <span class="nn">com.example.domain.service.reservation</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">javax.inject.Inject</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.stereotype.Service</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.transaction.annotation.Transactional</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">com.example.domain.common.messaging.DuplicateMessageChecker</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">com.example.domain.model.Reservation</span><span class="o">;</span>
+
+<span class="nd">@Service</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">ReservationInspectionServiceImpl</span> <span class="kd">implements</span>
+                                             <span class="n">ReservationInspectionService</span> <span class="o">{</span>
+
+    <span class="nd">@Inject</span>
+    <span class="n">DuplicateMessageChecker</span> <span class="n">duplicateMessageChecker</span><span class="o">;</span> <span class="c1">// (1)</span>
+
+    <span class="nd">@Transactional</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">inspectAndNotify</span><span class="o">(</span><span class="n">Reservation</span> <span class="n">reservation</span><span class="o">,</span> <span class="n">String</span> <span class="n">messageId</span><span class="o">)</span> <span class="o">{</span>
+
+        <span class="n">duplicateMessageChecker</span><span class="o">.</span><span class="na">checkDuplicateMessage</span><span class="o">(</span><span class="n">messageId</span><span class="o">);</span> <span class="c1">// (2)</span>
+
+        <span class="c1">// omitted</span>
+
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+<table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">2重受信チェックユーティリティ<code class="docutils literal"><span class="pre">DuplicateMessageChecker</span></code>をインジェクションする。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(2)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">DuplicateMessageChecker</span></code>を使用して、2重受信チェックを行う。</div>
+<div class="line">2重受信が発生していた場合には例外がthrowされる。</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+</div>
+<div class="section" id="sqshowtologgingtraceid">
+<span id="id31"></span><h4><a class="toc-backref" href="#id51">5.6.1.2.4.3. メッセージのトレース</a><a class="headerlink" href="#sqshowtologgingtraceid" title="Permalink to this headline">¶</a></h4>
+<div class="line-block">
+<div class="line">メッセージのトレーサビリティ向上の為、各ログにメッセージIDを出力させる方法を説明する。</div>
+<div class="line"><br /></div>
+<div class="line">メッセージIDを含めたログの例を、以下に示す。</div>
+</div>
+<div class="highlight-console"><div class="highlight"><pre><span></span><span class="go">date:2017-02-08 09:38:42     messageId:cad212f8-4e35-4d03-924f-5d5fe339a282  message:[START SERVICE] (omitted)</span>
+<span class="go">date:2017-02-08 09:38:43     messageId:cad212f8-4e35-4d03-924f-5d5fe339a282  message:[END SERVICE  ] (omitted)</span>
+<span class="go">date:2017-02-08 09:38:44     messageId:32b00a02-a851-4900-b5b8-72a44d42bedb  message:[START SERVICE] (omitted)</span>
+<span class="go">date:2017-02-08 09:38:45     messageId:92c76511-3564-4332-892b-6dadae2bc090  message:[START SERVICE] (omitted)</span>
+<span class="go">date:2017-02-08 09:38:45     messageId:92c76511-3564-4332-892b-6dadae2bc090  message:[END SERVICE  ] (omitted)</span>
+<span class="go">date:2017-02-08 09:38:45     messageId:32b00a02-a851-4900-b5b8-72a44d42bedb  message:[END SERVICE  ] (omitted)</span>
+</pre></div>
+</div>
+<div class="line-block">
+<div class="line">メッセージIDを出力させることで、不規則に出力された場合でも、ログを結びつけることができる。</div>
+<div class="line">上記の例だと、3行目と6行目は4,5行目を跨いでいるが、同じリクエストに関するログであることがわかる。</div>
+<div class="line"><br /></div>
+<div class="line">このような横断的なログ出力は、MDCを利用することで可能となる。MDCについては、Macchinetta Server Framework for Java (1.x) のガイドライン<a class="reference external" href="https://macchinetta.github.io/server-guideline/1.5.2.RELEASE/ja/ArchitectureInDetail/GeneralFuncDetail/Logging.html#mdc">MDCの使用</a>に詳しい利用法が記されている為、参照されたい。</div>
+</div>
+<p>MDCを用いてメッセージIDをログに埋め込む例を以下に示す。</p>
+<ul class="simple">
+<li>MessageIdLoggingInterceptor.java</li>
+</ul>
+<blockquote>
+<div><div class="highlight-java"><div class="highlight"><pre><span></span><span class="kn">package</span> <span class="nn">com.example.app.common.logging</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">org.aopalliance.intercept.MethodInterceptor</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.aopalliance.intercept.MethodInvocation</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.slf4j.MDC</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">com.example.domain.model.Reservation</span>
+
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">MessageIdLoggingInterceptor</span> <span class="kd">implements</span> <span class="n">MethodInterceptor</span> <span class="o">{</span>  <span class="c1">// (1)</span>
+
+     <span class="nd">@Override</span>
+     <span class="kd">public</span> <span class="n">Object</span> <span class="nf">invoke</span><span class="o">(</span><span class="n">MethodInvocation</span> <span class="n">invocation</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">Throwable</span> <span class="o">{</span>
+
+         <span class="n">String</span> <span class="n">key</span> <span class="o">=</span> <span class="s">&quot;messageId&quot;</span><span class="o">;</span>
+
+         <span class="n">Object</span><span class="o">[]</span> <span class="n">arguments</span> <span class="o">=</span> <span class="n">invocation</span><span class="o">.</span><span class="na">getArguments</span><span class="o">();</span>
+         <span class="n">Parameter</span><span class="o">[]</span> <span class="n">parameters</span> <span class="o">=</span> <span class="n">invocation</span><span class="o">.</span><span class="na">getMethod</span><span class="o">().</span><span class="na">getParameters</span><span class="o">();</span>
+
+         <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">parameters</span><span class="o">.</span><span class="na">length</span><span class="o">;</span> <span class="n">i</span><span class="o">++)</span> <span class="o">{</span>
+             <span class="n">Header</span> <span class="n">header</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">[</span><span class="n">i</span><span class="o">].</span><span class="na">getAnnotation</span><span class="o">(</span><span class="n">Header</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+
+             <span class="k">if</span> <span class="o">(</span><span class="n">header</span> <span class="o">!=</span> <span class="kc">null</span> <span class="o">&amp;&amp;</span> <span class="n">JmsHeaders</span><span class="o">.</span><span class="na">MESSAGE_ID</span><span class="o">.</span><span class="na">equals</span><span class="o">(</span><span class="n">header</span><span class="o">.</span><span class="na">value</span><span class="o">())</span> <span class="c1">// (2)</span>
+                     <span class="o">&amp;&amp;</span> <span class="n">arguments</span><span class="o">[</span><span class="n">i</span><span class="o">]</span> <span class="k">instanceof</span> <span class="n">String</span><span class="o">)</span> <span class="o">{</span>
+                 <span class="n">MDC</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="n">key</span><span class="o">,</span> <span class="o">((</span><span class="n">String</span><span class="o">)</span> <span class="n">arguments</span><span class="o">[</span><span class="n">i</span><span class="o">]));</span> <span class="c1">// (3)</span>
+                 <span class="k">break</span><span class="o">;</span>
+             <span class="o">}</span>
+         <span class="o">}</span>
+
+         <span class="n">Object</span> <span class="n">ret</span> <span class="o">=</span> <span class="n">invocation</span><span class="o">.</span><span class="na">proceed</span><span class="o">();</span>
+
+         <span class="n">MDC</span><span class="o">.</span><span class="na">remove</span><span class="o">(</span><span class="n">key</span><span class="o">);</span> <span class="c1">// (4)</span>
+
+         <span class="k">return</span> <span class="n">ret</span><span class="o">;</span>
+     <span class="o">}</span>
+
+<span class="o">}</span>
+</pre></div>
+</div>
+<table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">Spring AOPにてメッセージ埋め込み処理を差し込む為、<code class="docutils literal"><span class="pre">MethodInterceptor</span></code>インタフェースを実装する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(2)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">MethodInvocation</span></code>の<code class="docutils literal"><span class="pre">getArguments</span></code>メソッドを呼び出し、リスナメソッドの引数リストを取得する。</div>
+<div class="line">リスナメソッドの引数のうち、<code class="docutils literal"><span class="pre">Header</span></code>アノテーションにJMSMessageIDが指定されているものを取得する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(3)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">MDC</span></code>の<code class="docutils literal"><span class="pre">put</span></code>メソッドを使用して、メッセージIDを<code class="docutils literal"><span class="pre">messageId</span></code>というキーで登録する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(4)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">MDC</span></code>の<code class="docutils literal"><span class="pre">remove</span></code>メソッドを使用して、登録したメッセージIDを削除する。</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p><strong>removeメソッドをfinally句で呼び出さない理由について</strong></p>
+<p class="last">finally句でMDCのremoveメソッドを呼び出す作りにすると、例外発生時にMDCからメッセージIDがremoveされてしまい、
+Spring提供の例外ハンドラErrorHandler内でのログにメッセージIDが出力されなくなる。例外の起因となったメッセージが特定し辛くなる為、
+例外時にMDCの情報を削除する処理は、ErrorHandlerにて行うのが望ましい。</p>
+</div>
+</div></blockquote>
+<div class="line-block">
+<div class="line">作成した<code class="docutils literal"><span class="pre">MessageIdLoggingInterceptor</span></code>クラスを、Bean定義ファイルに設定する。</div>
+</div>
+<p>記述例を以下に示す。</p>
+<ul class="simple">
+<li>applicationContext.xml</li>
+</ul>
+<blockquote>
+<div><div class="highlight-xml"><div class="highlight"><pre><span></span><span class="c">&lt;!-- (1) --&gt;</span>
+<span class="nt">&lt;beans</span> <span class="na">xmlns=</span><span class="s">&quot;http://www.springframework.org/schema/beans&quot;</span>
+   <span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span> <span class="na">xmlns:context=</span><span class="s">&quot;http://www.springframework.org/schema/context&quot;</span>
+   <span class="na">xmlns:aop=</span><span class="s">&quot;http://www.springframework.org/schema/aop&quot;</span>
+   <span class="na">xsi:schemaLocation=</span><span class="s">&quot;http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd</span>
+<span class="s">       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd</span>
+<span class="s">       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd&quot;</span><span class="nt">&gt;</span>
+
+<span class="c">&lt;!-- (2) --&gt;</span>
+<span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;messageIdLoggingInterceptor&quot;</span> <span class="na">class=</span><span class="s">&quot;com.example.app.common.logging.MessageIdLoggingInterceptor&quot;</span> <span class="nt">/&gt;</span>
+
+<span class="c">&lt;!-- (3) --&gt;</span>
+<span class="nt">&lt;aop:config&gt;</span>
+    <span class="nt">&lt;aop:advisor</span> <span class="na">advice-ref=</span><span class="s">&quot;messageIdLoggingInterceptor&quot;</span>
+        <span class="na">pointcut=</span><span class="s">&quot;@annotation(org.springframework.jms.annotation.JmsListener)&quot;</span> <span class="nt">/&gt;</span>
+<span class="nt">&lt;/aop:config&gt;</span>
+</pre></div>
+</div>
+<table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="10%" />
+<col width="26%" />
+<col width="64%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">属性名</th>
+<th class="head">内容</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td>xmlns:aop</td>
+<td><div class="first last line-block">
+<div class="line">AOP Namespaceを定義する。</div>
+<div class="line">値として<code class="docutils literal"><span class="pre">http://www.springframework.org/schema/aop</span></code>を指定する。</div>
+<div class="line">AOP Namespaceの詳細については、<a class="reference external" href="http://docs.spring.io/autorepo/docs/spring-framework/4.3.23.RELEASE/spring-framework-reference/html/aop.html#aop-schema">Schema-based AOP support</a>を参照されたい。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td>&#160;</td>
+<td>xsi:schemaLocation</td>
+<td><div class="first last line-block">
+<div class="line">スキーマのURLを指定する。</div>
+<div class="line">値に<code class="docutils literal"><span class="pre">http://www.springframework.org/schema/aop</span></code>と<code class="docutils literal"><span class="pre">http://www.springframework.org/schema/aop/spring-aop.xsd</span></code>を追加する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(2)</div>
+</div>
+</td>
+<td>-</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">MessageIdLoggingInterceptor</span></code>をBean定義する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(3)</div>
+</div>
+</td>
+<td>-</td>
+<td><div class="first last line-block">
+<div class="line">(2)でBean定義した <code class="docutils literal"><span class="pre">MessageIdLoggingInterceptor</span></code>をアドバイスとして登録する。</div>
+<div class="line">ポイントカットには<code class="docutils literal"><span class="pre">&#64;annotation</span></code>指示子を使用し、<code class="docutils literal"><span class="pre">&#64;JmsListener</span></code>アノテーションが付与されたメソッドを指定する。</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="PriorityQueue.html" title="5.6.2. 非同期処理の実装（優先順位の設定）"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="5.6. キューイング活用"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Macchinetta Server Framework Cloud Extension Development Guideline 1.0.2.RELEASE documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >5. AWS連携</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" >5.6. キューイング活用</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2017 NTT Corporation.
+    Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.6.3.Theme by <a href="http://github.com/vkvn">vkvn</a>
+    </div>
+    
+    <script>
+    
+    $(function() {
+    	var $sidebar	= $('.sphinxsidebar'),
+    		$window		= $(window),
+    		offset		= $sidebar.offset(),
+    		topPadding	= 3,
+    		$scroll		= $('#scroll');
+    	
+    	$window.scroll(function() {
+    		if ($scroll.is(':checked')) {
+				if ($window.scrollTop() > offset.top) {
+					$sidebar.stop().animate({
+						marginTop:$window.scrollTop() - offset.top + topPadding
+					});
+				} else {
+					$sidebar.stop().animate({
+						marginTop:0
+					});
+				}
+			}
+		});
+    	
+    	var $navList = $('ul:first', $sidebar);
+    	$('li:first', $navList).addClass('open');
+    	
+    	$navList.treeview({
+    		persist: "location",
+    		collapsed: true,
+    		unique: false
+    	});
+    	
+	});
+    </script>
+  </body>
+</html>

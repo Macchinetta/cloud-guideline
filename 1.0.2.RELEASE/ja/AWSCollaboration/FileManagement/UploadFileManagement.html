@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>5.4.1. アップロードファイル管理 &#8212; Macchinetta Server Framework Cloud Extension Development Guideline 1.0.2.RELEASE documentation</title>
+    <link rel="stylesheet" href="../../_static/solar.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1.0.2.RELEASE',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="5.4.2. アップロードファイル管理(ダイレクトアップロード方式)" href="DirectFileUpload.html" />
+    <link rel="prev" title="5.4. ファイル管理" href="index.html" /><script src="../../_static/jquery.treeview.js" type="text/javascript"></script>
+<!-- <link href='http://fonts.googleapis.com/css?family=Source+Code+Pro|Open+Sans:300italic,400italic,700italic,400,300,700' rel='stylesheet' type='text/css'> -->
+<link href="../../_static/solarized-dark.css" rel="stylesheet">
+<link href="../../_static/jquery.treeview.css" rel="stylesheet">
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="DirectFileUpload.html" title="5.4.2. アップロードファイル管理(ダイレクトアップロード方式)"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="5.4. ファイル管理"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Macchinetta Server Framework Cloud Extension Development Guideline 1.0.2.RELEASE documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >5. AWS連携</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" accesskey="U">5.4. ファイル管理</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><label><input id="scroll" type="checkbox" checked> scroll sidebar</label>
+
+  <h3><a href="../../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">5.4.1. アップロードファイル管理</a><ul>
+<li><a class="reference internal" href="#overview">5.4.1.1. Overview</a><ul>
+<li><a class="reference internal" href="#s3">5.4.1.1.1. アプリケーションからS3へのアクセス</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#how-to-use">5.4.1.2. How to use</a><ul>
+<li><a class="reference internal" href="#id4">5.4.1.2.1. ライブラリの使い分け</a></li>
+<li><a class="reference internal" href="#spring-cloud-aws">5.4.1.2.2. Spring Cloud AWSの利用</a><ul>
+<li><a class="reference internal" href="#id5">5.4.1.2.2.1. 依存ライブラリの追加</a></li>
+<li><a class="reference internal" href="#id6">5.4.1.2.2.2. アプリケーションの設定</a></li>
+<li><a class="reference internal" href="#id7">5.4.1.2.2.3. マルチパートアップロードの利用設定</a></li>
+<li><a class="reference internal" href="#uploadfilemanagement-file-operation-imprements-label">5.4.1.2.2.4. ファイル操作の実装</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#how-to-extend">5.4.1.3. How to extend</a><ul>
+<li><a class="reference internal" href="#id11">5.4.1.3.1. 仮アップロード以外のファイル操作</a></li>
+<li><a class="reference internal" href="#housekeeping">5.4.1.3.2. 仮アップロード時の不要ファイルのHousekeeping</a><ul>
+<li><a class="reference internal" href="#id12">5.4.1.3.2.1. ライフサイクル管理の利用</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#appendix">5.4.1.4. Appendix</a><ul>
+<li><a class="reference internal" href="#id15">5.4.1.4.1. 高いリクエストレートが要求される場合の留意事項</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">5.4. ファイル管理</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="DirectFileUpload.html"
+                        title="next chapter">5.4.2. アップロードファイル管理(ダイレクトアップロード方式)</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/AWSCollaboration/FileManagement/UploadFileManagement.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="id1">
+<h1>5.4.1. アップロードファイル管理<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h1>
+<div class="contents local topic" id="id2">
+<p class="topic-title first">目次</p>
+<ul class="simple">
+<li><a class="reference internal" href="#overview" id="id17">Overview</a><ul>
+<li><a class="reference internal" href="#s3" id="id18">アプリケーションからS3へのアクセス</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#how-to-use" id="id19">How to use</a><ul>
+<li><a class="reference internal" href="#id4" id="id20">ライブラリの使い分け</a></li>
+<li><a class="reference internal" href="#spring-cloud-aws" id="id21">Spring Cloud AWSの利用</a><ul>
+<li><a class="reference internal" href="#id5" id="id22">依存ライブラリの追加</a></li>
+<li><a class="reference internal" href="#id6" id="id23">アプリケーションの設定</a></li>
+<li><a class="reference internal" href="#id7" id="id24">マルチパートアップロードの利用設定</a></li>
+<li><a class="reference internal" href="#uploadfilemanagement-file-operation-imprements-label" id="id25">ファイル操作の実装</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#how-to-extend" id="id26">How to extend</a><ul>
+<li><a class="reference internal" href="#id11" id="id27">仮アップロード以外のファイル操作</a></li>
+<li><a class="reference internal" href="#housekeeping" id="id28">仮アップロード時の不要ファイルのHousekeeping</a><ul>
+<li><a class="reference internal" href="#id12" id="id29">ライフサイクル管理の利用</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#appendix" id="id30">Appendix</a><ul>
+<li><a class="reference internal" href="#id15" id="id31">高いリクエストレートが要求される場合の留意事項</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="overview">
+<h2><a class="toc-backref" href="#id17">5.4.1.1. Overview</a><a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>本ガイドラインでは、Amazon Simple Storage Service（以降、S3）を使用した仮アップロードファイルの保存方法について説明する。</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>本ガイドラインでは、アップロードファイルをS3のストレージに保存する方法および留意点のみを説明する。</p>
+<p class="last">AWS環境におけるファイルアップロードの実装方法は Macchinetta Server Framework for Java (1.x) Development Guideline <a class="reference external" href="https://macchinetta.github.io/server-guideline/1.5.2.RELEASE/ja/ArchitectureInDetail/WebApplicationDetail/FileUpload.html">ファイルアップロード</a>  に記載の内容と基本的に同様であり、アップロードファイルの保存先をAWSが提供するストレージサービスであるS3に保存する点のみが異なる。</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">本ガイドラインでは、仮アップロードを目的としたオブジェクト保存方法の説明に主眼を置くため、S3のオブジェクトのバージョニングについては考慮しない。</p>
+</div>
+<p>AWS環境では、Auto Scalingを使用した動的なスケーリングが可能である。
+そのため、仮アップロードファイルはローカルストレージに保存せず、APサーバ外のストレージに保存する必要がある。
+AWS環境では、ストレージサービスとしてS3が提供されているため、仮アップロードファイルの保存先として活用できる。
+アプリケーションからS3へのアクセスは、Spring Cloud AWSまたはAmazon SDK for Javaを使用して行う。</p>
+<div class="figure">
+<a class="reference internal image-reference" href="../../_images/UploadFileManagementOverview.png"><img alt="Screen image of file upload on AWS." src="../../_images/UploadFileManagementOverview.png" style="width: 100%;" /></a>
+</div>
+<div class="section" id="s3">
+<h3><a class="toc-backref" href="#id18">5.4.1.1.1. アプリケーションからS3へのアクセス</a><a class="headerlink" href="#s3" title="Permalink to this headline">¶</a></h3>
+<p>アプリケーションからS3へアクセスする仕組みは以下の通り。</p>
+<div class="figure">
+<a class="reference internal image-reference" href="../../_images/UploadFileManagementS3AccessStructure.png"><img alt="Screen image of S3 access structure." src="../../_images/UploadFileManagementS3AccessStructure.png" style="width: 100%;" /></a>
+</div>
+<table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">S3へアクセスを行うクラスにインジェクションした<code class="docutils literal"><span class="pre">SimpleStorageResourceLoader</span></code>または<code class="docutils literal"><span class="pre">PathMatchingSimpleStorageResourcePatternResolver</span></code>を使用し、<code class="docutils literal"><span class="pre">SimpleStorageResource</span></code>を取得する。</div>
+<div class="line">取得を行う際、内部的にはAmazon SDK for Javaの<code class="docutils literal"><span class="pre">AmazonS3Client</span></code>を呼び出している。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(2)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">アプリケーションは<code class="docutils literal"><span class="pre">SimpleStorageResource</span></code>を使用してS3へのアクセスを行う。</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(3)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">SimpleStorageResource</span></code>は<code class="docutils literal"><span class="pre">AmazonS3Client</span></code>を使用してS3へのアクセスを行う。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(4)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">オブジェクトの削除などの保存/取得以外の操作を行う場合、S3へアクセスを行うクラスに<code class="docutils literal"><span class="pre">AmazonS3Client</span></code>をインジェクションして使用する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(5)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">AmazonS3Client</span></code>はS3に対してHTTPリクエストによるオブジェクト操作を行う。</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="section" id="how-to-use">
+<h2><a class="toc-backref" href="#id19">5.4.1.2. How to use</a><a class="headerlink" href="#how-to-use" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id4">
+<h3><a class="toc-backref" href="#id20">5.4.1.2.1. ライブラリの使い分け</a><a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<p>S3へのアクセスはSpring Cloud AWSまたはAmazon SDK for Javaを使用することで実装可能であるが、両者の使い分けについて説明する。</p>
+<p>Spring Cloud AWSによる実装では、Spring Frameworkが提供する<code class="docutils literal"><span class="pre">Resource</span></code>インタフェースによるリソースアクセスの抽象化が利用可能である。
+そのため、実装の標準化の観点からSpring Cloud AWSを使用して実装可能な機能については同ライブラリを使用して実装することが望ましい。
+<code class="docutils literal"><span class="pre">Resource</span></code>インタフェースの詳細については、Spring Framework Reference Documentation <a class="reference external" href="http://docs.spring.io/spring/docs/4.3.23.RELEASE/spring-framework-reference/htmlsingle/#resources">Resources</a> を参照されたい。</p>
+<p>ただし、Spring Cloud AWSでは以下のオブジェクト操作のみ実装可能である。</p>
+<ul class="simple">
+<li>S3へのオブジェクト保存</li>
+<li>S3からのオブジェクト取得</li>
+<li>AntパターンによるS3内のオブジェクト検索</li>
+</ul>
+<p>オブジェクトの削除やバケット操作などのSpring Cloud AWSでは実装不可能な機能についてはAmazon SDK for Javaを直接使用する必要がある。</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">ライブラリを併用する場合には実装が煩雑となるため、S3へのアクセスを行う部分はHelperクラスを作成して実装を集約することが望ましい。
+ファイル操作の実装方法については <a class="reference internal" href="#uploadfilemanagement-file-operation-imprements-label"><span class="std std-ref">ファイル操作の実装</span></a>を参照されたい。</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>Spring Cloud AWSではS3へのアクセスを行う際に<code class="docutils literal"><span class="pre">s3://</span></code>をプレフィックスとするバケット名とオブジェクトキーを含む文字列を使用する。</p>
+<p>例）s3://myBucket/myDirectory/myObject.txt</p>
+<p>一方、Amazon SDK for Javaでは、バケット名とオブジェクトキーをそれぞれ指定する必要がある。</p>
+<ul class="simple">
+<li>バケット名 ： myBucket</li>
+<li>オブジェクトキー ： myDirectory/myObject.txt</li>
+</ul>
+<p class="last">Helperクラスを作成する際は留意すること。</p>
+</div>
+</div>
+<div class="section" id="spring-cloud-aws">
+<h3><a class="toc-backref" href="#id21">5.4.1.2.2. Spring Cloud AWSの利用</a><a class="headerlink" href="#spring-cloud-aws" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id5">
+<h4><a class="toc-backref" href="#id22">5.4.1.2.2.1. 依存ライブラリの追加</a><a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h4>
+<p>Spring Cloud AWSを利用したS3へのアクセスを行うための依存ライブラリの追加を行う。</p>
+<ul>
+<li><p class="first"><code class="file docutils literal"><span class="pre">xxx-domain/pom.xml</span></code></p>
+<div class="highlight-xml"><div class="highlight"><pre><span></span><span class="c">&lt;!-- (1) --&gt;</span>
+<span class="nt">&lt;dependency&gt;</span>
+    <span class="nt">&lt;groupId&gt;</span>org.springframework.cloud<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>spring-cloud-context<span class="nt">&lt;/artifactId&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span>
+</pre></div>
+</div>
+</li>
+</ul>
+<blockquote>
+<div><table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">spring-cloud-context</span></code>の依存関係を追加する。</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+</div>
+<div class="section" id="id6">
+<h4><a class="toc-backref" href="#id23">5.4.1.2.2.2. アプリケーションの設定</a><a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h4>
+<p>Spring Frameworkの<code class="docutils literal"><span class="pre">Resource</span></code>インタフェースを利用したS3へのアクセスを行うためのBean定義を行う。
+Bean定義の詳細については、 Spring Cloud AWS <a class="reference external" href="http://cloud.spring.io/spring-cloud-static/spring-cloud-aws/1.2.1.RELEASE/#_resource_handling">Resource handling</a> を参照されたい。</p>
+<ul>
+<li><p class="first"><code class="file docutils literal"><span class="pre">xxx-domain/src/main/resources/META-INF/spring/xxx-domain.xml</span></code></p>
+<div class="highlight-xml"><div class="highlight"><pre><span></span><span class="c">&lt;!-- (1) --&gt;</span>
+<span class="nt">&lt;beans</span> <span class="na">xmlns=</span><span class="s">&quot;http://www.springframework.org/schema/beans&quot;</span>
+    <span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
+    <span class="na">xmlns:aws-context=</span><span class="s">&quot;http://www.springframework.org/schema/cloud/aws/context&quot;</span>
+    <span class="na">xsi:schemaLocation=</span><span class="s">&quot;http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd</span>
+<span class="s">        http://www.springframework.org/schema/cloud/aws/context http://www.springframework.org/schema/cloud/aws/context/spring-cloud-aws-context.xsd&quot;</span><span class="nt">&gt;</span>
+
+    <span class="c">&lt;!-- (2) --&gt;</span>
+    <span class="nt">&lt;aws-context:context-resource-loader/&gt;</span>
+</pre></div>
+</div>
+<table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="10%" />
+<col width="26%" />
+<col width="64%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">属性名</th>
+<th class="head">内容</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">xmlns:aws-context</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">AWS Context Namespaceを定義する。</div>
+<div class="line">値として<code class="docutils literal"><span class="pre">http://www.springframework.org/schema/cloud/aws/context</span></code>を指定する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">xsi:schemaLocation</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">スキーマのURLを指定する。</div>
+<div class="line">値に<code class="docutils literal"><span class="pre">http://www.springframework.org/schema/cloud/aws/context</span></code>と<code class="docutils literal"><span class="pre">http://www.springframework.org/schema/cloud/aws/context/spring-cloud-aws-context.xsd</span></code>を追加する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(2)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">-</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">&lt;aws-context:context-resource-loader/&gt;</span></code>を利用して<code class="docutils literal"><span class="pre">ResourceLoader</span></code>インタフェースを利用したS3へのアクセスを有効化する。</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</li>
+</ul>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Spring Cloud AWSを利用するための設定を行うことでAmazon SDK for Javaを利用するための設定も包含されるため、追加の設定は不要である。</p>
+</div>
+</div>
+<div class="section" id="id7">
+<h4><a class="toc-backref" href="#id24">5.4.1.2.2.3. マルチパートアップロードの利用設定</a><a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h4>
+<p>Spring Cloud AWSでは、S3の機能であるマルチパートアップロード(大容量オブジェクトの分割アップロード)をサポートしている。
+S3のマルチパートアップロードについては Amazon Simple Storage Service 開発者ガイド <a class="reference external" href="http://docs.aws.amazon.com/ja_jp/AmazonS3/latest/dev/mpuoverview.html">マルチパートアップロードの概要</a> を参照されたい。</p>
+<p>前述の設定に加えて以下の設定を行うことでマルチパートアップロードを有効にすることが出来る。</p>
+<ul>
+<li><p class="first"><code class="file docutils literal"><span class="pre">xxx-domain/src/main/resources/META-INF/spring/xxx-domain.xml</span></code></p>
+<div class="highlight-xml"><div class="highlight"><pre><span></span><span class="c">&lt;!-- (1) --&gt;</span>
+<span class="nt">&lt;beans</span> <span class="na">xmlns=</span><span class="s">&quot;http://www.springframework.org/schema/beans&quot;</span>
+    <span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
+    <span class="na">xmlns:aws-context=</span><span class="s">&quot;http://www.springframework.org/schema/cloud/aws/context&quot;</span>
+    <span class="na">xmlns:task=</span><span class="s">&quot;http://www.springframework.org/schema/task&quot;</span>
+    <span class="na">xsi:schemaLocation=</span><span class="s">&quot;http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd</span>
+<span class="s">        http://www.springframework.org/schema/cloud/aws/context http://www.springframework.org/schema/cloud/aws/context/spring-cloud-aws-context.xsd</span>
+<span class="s">        http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd&quot;</span><span class="nt">&gt;</span>
+
+    <span class="c">&lt;!-- (2) --&gt;</span>
+    <span class="nt">&lt;aws-context:context-resource-loader</span> <span class="na">task-executor=</span><span class="s">&quot;executor&quot;</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;task:executor</span> <span class="na">id=</span><span class="s">&quot;executor&quot;</span> <span class="na">pool-size=</span><span class="s">&quot;10&quot;</span> <span class="na">queue-capacity=</span><span class="s">&quot;0&quot;</span> <span class="na">rejection-policy=</span><span class="s">&quot;CALLER_RUNS&quot;</span> <span class="nt">/&gt;</span>
+</pre></div>
+</div>
+<table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="10%" />
+<col width="26%" />
+<col width="64%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">属性名</th>
+<th class="head">内容</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">xmlns:task</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">Task Namespaceを定義する。</div>
+<div class="line">値として<code class="docutils literal"><span class="pre">http://www.springframework.org/schema/task</span></code>を指定する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">xsi:schemaLocation</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">スキーマのURLを指定する。</div>
+<div class="line">値に<code class="docutils literal"><span class="pre">http://www.springframework.org/schema/task</span></code>と<code class="docutils literal"><span class="pre">http://www.springframework.org/schema/task/spring-task.xsd</span></code>を追加する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(2)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">-</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">マルチパートアップロードを行うための<code class="docutils literal"><span class="pre">task-executor</span></code>を定義する。</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</li>
+</ul>
+<p>詳細については Spring Cloud AWS <a class="reference external" href="http://cloud.spring.io/spring-cloud-static/spring-cloud-aws/1.2.1.RELEASE/#_uploading_multi_part_files">9.3.1. Uploading multi-part files</a> を参照されたい。</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p>マルチパートアップロードを有効にしている場合、</p>
+<ul class="simple">
+<li>5MB未満のファイルの場合：同期アップロード</li>
+<li>5MB以上のファイルの場合：5MB毎にマルチパートアップロード</li>
+</ul>
+<p>が行われる。
+設定したpool-sizeを上限に、5MB毎にスレッドが作成される。
+5MBのしきい値は外部から変更することはできない。</p>
+<p>各スレッド毎に最大5MBのメモリ消費が発生するため、サイズの大きなファイルの保存を行う場合は留意すること。
+また、キューイングされたリクエストもメモリを消費するため、<code class="docutils literal"><span class="pre">queue-capacity</span></code>の値にも留意する必要がある。</p>
+<p class="last">マルチパートアップロードの設定を行っていない場合は常に同期アップロードが実行される。</p>
+</div>
+</div>
+<div class="section" id="uploadfilemanagement-file-operation-imprements-label">
+<span id="id9"></span><h4><a class="toc-backref" href="#id25">5.4.1.2.2.4. ファイル操作の実装</a><a class="headerlink" href="#uploadfilemanagement-file-operation-imprements-label" title="Permalink to this headline">¶</a></h4>
+<p>仮アップロードを行う際のファイル操作の実装方法について説明する。</p>
+<ul>
+<li><p class="first">S3へのオブジェクト保存【Spring Cloud AWSを使用】</p>
+<p>S3バケット上の一時ディレクトリにオブジェクトを保存する。</p>
+<div class="highlight-java"><div class="highlight"><pre><span></span><span class="nd">@Inject</span>
+<span class="kd">private</span> <span class="n">ResourceLoader</span> <span class="n">resourceLoader</span><span class="o">;</span> <span class="c1">// (1)</span>
+
+<span class="c1">// omitted</span>
+
+<span class="n">MultipartFile</span> <span class="n">uploadFile</span> <span class="o">=</span> <span class="n">memberRegisterForm</span><span class="o">.</span><span class="na">getUploadFile</span><span class="o">();</span>
+<span class="n">String</span> <span class="n">bucketname</span> <span class="o">=</span> <span class="s">&quot;myBucket&quot;</span><span class="o">;</span>
+<span class="n">String</span> <span class="n">objectKey</span> <span class="o">=</span> <span class="s">&quot;tmpDirectory/uploadFile_&quot;</span> <span class="o">+</span> <span class="n">UUID</span><span class="o">.</span><span class="na">randomUUID</span><span class="o">().</span><span class="na">toString</span><span class="o">()</span> <span class="o">+</span> <span class="s">&quot;.jpg&quot;</span><span class="o">;</span>
+<span class="n">WritableResource</span> <span class="n">resource</span> <span class="o">=</span> <span class="o">(</span><span class="n">WritableResource</span><span class="o">)</span> <span class="k">this</span><span class="o">.</span><span class="na">resourceLoader</span><span class="o">.</span><span class="na">getResource</span><span class="o">(</span><span class="s">&quot;s3://&quot;</span> <span class="o">+</span> <span class="n">bucketname</span> <span class="o">+</span> <span class="s">&quot;/&quot;</span> <span class="o">+</span> <span class="n">objectKey</span><span class="o">);</span> <span class="c1">// (2)(3)</span>
+<span class="k">try</span> <span class="o">(</span><span class="n">InputStream</span> <span class="n">inputStream</span> <span class="o">=</span> <span class="n">uploadFile</span><span class="o">.</span><span class="na">getInputStream</span><span class="o">();</span> <span class="n">OutputStream</span> <span class="n">outputStream</span> <span class="o">=</span> <span class="n">resource</span><span class="o">.</span><span class="na">getOutputStream</span><span class="o">())</span> <span class="o">{</span> <span class="c1">// (4)</span>
+    <span class="n">IOUtils</span><span class="o">.</span><span class="na">copy</span><span class="o">(</span><span class="n">inputStream</span><span class="o">,</span> <span class="n">outputStream</span><span class="o">);</span>
+<span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">IOException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+    <span class="c1">// omitted</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+</li>
+</ul>
+<blockquote>
+<div><table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">ResourceLoader</span></code>のインジェクションを行う。</div>
+<div class="line"><code class="docutils literal"><span class="pre">&lt;aws-context:context-resource-loader/&gt;</span></code>が有効である場合、<code class="docutils literal"><span class="pre">ResourceLoader</span></code>として<code class="docutils literal"><span class="pre">PathMatchingSimpleStorageResourcePatternResolver</span></code>が使用される。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(2)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">S3へ保存するファイルパスを指定する。</div>
+<div class="line"><code class="docutils literal"><span class="pre">PathMatchingSimpleStorageResourcePatternResolver</span></code>は<code class="docutils literal"><span class="pre">s3://</span></code>の接頭辞が付与されたパスをS3へのアクセスと判断する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(3)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">WritableResource</span></code>を取得する。</div>
+<div class="line">S3へのアクセスを行う場合、<code class="docutils literal"><span class="pre">WritableResource</span></code>として<code class="docutils literal"><span class="pre">SimpleStorageResource</span></code>が取得される。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(4)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">WritableResource</span></code>に対して書き込みを行うことでS3へのファイルアップロードを行う。</div>
+<div class="line">本ガイドラインでは、<code class="docutils literal"><span class="pre">org.apache.commons.io.IOUtils</span></code>を使用して書き込みを行っている。</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p>S3のデータ整合性モデルについて</p>
+<p>S3では、高い可用性を実現するために、複数のサーバ間でレプリケーションを行っている。
+そのため、オブジェクトに対する変更が完全に反映されるまでの間に、変更を反映中のオブジェクトに対する参照を行った場合に意図しない結果が返却される可能性がある。
+S3へのアクセスを実装する際は、S3が提供するデータ整合性モデルを踏まえた実装を行う必要がある。
+S3のデータ整合性モデルについては、 Amazon Simple Storage Service ドキュメント 開発者ガイド <a class="reference external" href="https://docs.aws.amazon.com/ja_jp/AmazonS3/latest/dev/Introduction.html#ConsistencyModel">Amazon S3 のデータ整合性モデル</a> を参照されたい。</p>
+<p class="last">S3では、PUTおよびDELETEの上書きについては結果整合性、オブジェクトの新規作成については書き込み後の読み込み整合性が提供される。
+従って、ファイルの更新を行う場合はオブジェクトキーを変更して別のS3オブジェクトとしてPUTしたものを参照させることで更新前のファイルの参照を防ぐことが可能となる。
+その場合、オブジェクトキーに<code class="docutils literal"><span class="pre">UUID</span></code>を含めるなどでオブジェクトキーが重複しないように留意する必要がある。</p>
+</div>
+<ul>
+<li><p class="first">S3からのファイル取得【Spring Cloud AWSを使用】</p>
+<p>S3バケット上の一時ディレクトリに保存したオブジェクトを取得する。
+その後、仮アップロード時と同様に取得したオブジェクトを最終的な保存ディレクトリに保存する。</p>
+<div class="highlight-java"><div class="highlight"><pre><span></span><span class="nd">@Inject</span>
+<span class="kd">private</span> <span class="n">ResourceLoader</span> <span class="n">resourceLoader</span><span class="o">;</span> <span class="c1">// (1)</span>
+
+<span class="c1">// omitted</span>
+
+<span class="n">Resource</span> <span class="n">resource</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="na">resourceLoader</span><span class="o">.</span><span class="na">getResource</span><span class="o">(</span><span class="s">&quot;s3://&quot;</span> <span class="o">+</span> <span class="n">bucketname</span> <span class="o">+</span> <span class="s">&quot;/&quot;</span> <span class="o">+</span> <span class="n">objectKey</span><span class="o">);</span> <span class="c1">// (2)</span>
+
+<span class="c1">// omitted</span>
+</pre></div>
+</div>
+</li>
+</ul>
+<blockquote>
+<div><table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">ResourceLoader</span></code>のインジェクションを行う。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(2)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">S3上のパスを指定し、<code class="docutils literal"><span class="pre">Resource</span></code>を取得する。</div>
+<div class="line">取得した<code class="docutils literal"><span class="pre">Resource</span></code>に対して必要な処理を行う。</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">S3から取得したファイルをユーザにダウンロードさせる方法については、 Macchinetta Server Framework for Java (1.x) Development Guideline <a class="reference external" href="https://macchinetta.github.io/server-guideline/1.5.2.RELEASE/ja/ArchitectureInDetail/WebApplicationDetail/FileDownload.html">ファイルダウンロード</a>  を参照されたい。</p>
+</div>
+</div></blockquote>
+<ul>
+<li><p class="first">S3上の単一ファイル削除【Amazon SDK for Javaを使用】</p>
+<p>アップロードファイルの保存後、S3バケット上の一時ディレクトリに保存したオブジェクトを削除する。</p>
+<div class="highlight-java"><div class="highlight"><pre><span></span><span class="nd">@Inject</span>
+<span class="kd">private</span> <span class="n">AmazonS3</span> <span class="n">s3client</span><span class="o">;</span> <span class="c1">// (1)</span>
+
+<span class="c1">// omitted</span>
+
+<span class="n">s3client</span><span class="o">.</span><span class="na">deleteObject</span><span class="o">(</span><span class="n">bucketname</span><span class="o">,</span> <span class="n">objectKey</span><span class="o">);</span> <span class="c1">// (2)</span>
+</pre></div>
+</div>
+</li>
+</ul>
+<blockquote>
+<div><table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">AmazonS3</span></code>のインジェクションを行う。</div>
+<div class="line"><code class="docutils literal"><span class="pre">ResourceLoader</span></code>インタフェースを利用するために<code class="docutils literal"><span class="pre">&lt;aws-context:context-resource-loader/&gt;</span></code>を有効にしている場合、<code class="docutils literal"><span class="pre">ContextResourceLoaderBeanDefinitionParser</span></code>によりBean定義された<code class="docutils literal"><span class="pre">AmazonS3Client</span></code>が使用される。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(2)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">バケット名、オブジェクトキーを指定してファイルの削除を行う。</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+</div>
+</div>
+</div>
+<div class="section" id="how-to-extend">
+<h2><a class="toc-backref" href="#id26">5.4.1.3. How to extend</a><a class="headerlink" href="#how-to-extend" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id11">
+<h3><a class="toc-backref" href="#id27">5.4.1.3.1. 仮アップロード以外のファイル操作</a><a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h3>
+<p>代表的なファイル操作の例を以下に示す。</p>
+<ul>
+<li><p class="first">S3内のAntパターンによるオブジェクト検索【Spring Cloud AWSを使用】</p>
+<div class="highlight-java"><div class="highlight"><pre><span></span><span class="nd">@Inject</span>
+<span class="kd">private</span> <span class="n">ResourcePatternResolver</span> <span class="n">resourcePatternResolver</span><span class="o">;</span> <span class="c1">// (1)</span>
+
+<span class="c1">// omitted</span>
+
+<span class="n">Resource</span><span class="o">[]</span> <span class="n">result</span> <span class="o">=</span> <span class="n">resourcePatternResolver</span><span class="o">.</span><span class="na">getResources</span><span class="o">(</span><span class="s">&quot;s3://myBucket/*&quot;</span><span class="o">);</span> <span class="c1">// (2)</span>
+
+<span class="c1">// omitted</span>
+</pre></div>
+</div>
+</li>
+</ul>
+<blockquote>
+<div><table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">ResourcePatternResolver</span></code>のインジェクションを行う。</div>
+<div class="line"><code class="docutils literal"><span class="pre">ResourceLoader</span></code>インタフェースを利用するために<code class="docutils literal"><span class="pre">&lt;aws-context:context-resource-loader/&gt;</span></code>を有効にしている場合、<code class="docutils literal"><span class="pre">ContextResourceLoaderBeanDefinitionParser</span></code>によりBean定義された<code class="docutils literal"><span class="pre">ResourcePatternResolver</span></code>が使用される。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(2)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">S3のパスを指定し、<code class="docutils literal"><span class="pre">Resource</span></code>を配列形式で取得する。</div>
+<div class="line">検索に使用する文字列はAntパターンで指定する。</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+<ul>
+<li><p class="first">S3上の複数ファイル削除【Amazon SDK for Javaを使用】</p>
+<div class="highlight-java"><div class="highlight"><pre><span></span><span class="nd">@Inject</span>
+<span class="kd">private</span> <span class="n">AmazonS3</span> <span class="n">s3client</span><span class="o">;</span> <span class="c1">// (1)</span>
+
+<span class="c1">// omitted</span>
+
+<span class="c1">//(2)</span>
+<span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">deleteKeyList</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;();</span>
+<span class="c1">// omitted</span>
+<span class="n">List</span><span class="o">&lt;</span><span class="n">KeyVersion</span><span class="o">&gt;</span> <span class="n">targetKeys</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">KeyVersion</span><span class="o">&gt;();</span>
+<span class="k">for</span> <span class="o">(</span><span class="n">String</span> <span class="n">deleteKey</span> <span class="o">:</span> <span class="n">deleteKeyList</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">targetKeys</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="k">new</span> <span class="n">KeyVersion</span><span class="o">(</span><span class="n">deleteKey</span><span class="o">));</span>
+<span class="o">}</span>
+
+<span class="c1">//(3)</span>
+<span class="n">DeleteObjectsRequest</span> <span class="n">deleteObjectsRequest</span> <span class="o">=</span> <span class="k">new</span> <span class="n">DeleteObjectsRequest</span><span class="o">(</span><span class="s">&quot;myBucket&quot;</span><span class="o">);</span>
+<span class="n">deleteObjectsRequest</span><span class="o">.</span><span class="na">setKeys</span><span class="o">(</span><span class="n">targetKeys</span><span class="o">);</span>
+<span class="n">s3client</span><span class="o">.</span><span class="na">deleteObjects</span><span class="o">(</span><span class="n">deleteObjectsRequest</span><span class="o">);</span>
+</pre></div>
+</div>
+</li>
+</ul>
+<blockquote>
+<div><table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">AmazonS3</span></code>のインジェクションを行う。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(2)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">削除対象オブジェクトキーのリストを生成する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(3)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">削除対象のバケット名を指定して<code class="docutils literal"><span class="pre">DeleteObjectsRequest</span></code>を生成し、削除対象オブジェクトキーのリストを設定してファイルの削除を行う。</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p><code class="docutils literal"><span class="pre">AmazonS3Client</span></code>を使用する場合、ファイル削除の他にもバケット操作などのS3上の様々な操作が可能である。</p>
+<p class="last"><code class="docutils literal"><span class="pre">AmazonS3Client</span></code>の詳細については<code class="docutils literal"><span class="pre">AmazonS3Client</span></code>の <a class="reference external" href="http://docs.aws.amazon.com/AWSJavaSDK/latest/javadoc/com/amazonaws/services/s3/AmazonS3Client.html">JavaDoc</a> を参照されたい。</p>
+</div>
+</div>
+<div class="section" id="housekeeping">
+<h3><a class="toc-backref" href="#id28">5.4.1.3.2. 仮アップロード時の不要ファイルのHousekeeping</a><a class="headerlink" href="#housekeeping" title="Permalink to this headline">¶</a></h3>
+<p>仮アップロードの仕組みを使用してファイルのアップロードを行う場合に必要なHousekeepingについては、S3の仕組みを利用して行うことができる。</p>
+<div class="section" id="id12">
+<h4><a class="toc-backref" href="#id29">5.4.1.3.2.1. ライフサイクル管理の利用</a><a class="headerlink" href="#id12" title="Permalink to this headline">¶</a></h4>
+<p>S3では、バケット内のオブジェクトに対してライフサイクルを指定することができる。
+ライフサイクル設定を利用して、作成から一定期間を経過したファイルのアーカイブや削除を行えるため、この機能を利用してHousekeepingを行う。</p>
+<p>ライフサイクル管理の詳細については、 Amazon Simple Storage Service 開発者ガイド <a class="reference external" href="http://docs.aws.amazon.com/ja_jp/AmazonS3/latest/dev/object-lifecycle-mgmt.html">オブジェクトのライフサイクル管理</a> を参照されたい。</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>ライフサイクル管理において指定可能なターゲット（対象オブジェクト）は、バケット全体もしくはプレフィックス指定による絞込のみである。
+ワイルドカードによる指定などの複雑な制御は行えないため、バケットの構成やオブジェクトの配置に留意すること。</p>
+<p class="last">また、ターゲットに末尾が”/”であるプレフィックスを指定する場合、フォルダ配下のオブジェクトだけではなく、フォルダも削除される。</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">ライフサイクル管理でHousekeepingの要件を満たせない場合は、オブジェクトの削除機能を実装する必要がある。実装方法については Macchinetta Server Framework for Java (1.x) Development Guideline <a class="reference external" href="https://macchinetta.github.io/server-guideline/1.5.2.RELEASE/ja/ArchitectureInDetail/WebApplicationDetail/FileUpload.html#housekeeping">仮アップロード時の不要ファイルのHousekeeping</a>  を参照されたい。</p>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="appendix">
+<h2><a class="toc-backref" href="#id30">5.4.1.4. Appendix</a><a class="headerlink" href="#appendix" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id15">
+<h3><a class="toc-backref" href="#id31">5.4.1.4.1. 高いリクエストレートが要求される場合の留意事項</a><a class="headerlink" href="#id15" title="Permalink to this headline">¶</a></h3>
+<p>Amazon Simple Storage Service 開発者ガイドにおいて、リクエストレートが高い場合のオブジェクトキーの付与についてのガイドラインが記載されている。</p>
+<blockquote>
+<div>Amazon Simple Storage Service 開発者ガイド <a class="reference external" href="http://docs.aws.amazon.com/ja_jp/AmazonS3/latest/dev/request-rate-perf-considerations.html">リクエスト率およびリクエストパフォーマンスに関する留意事項</a></div></blockquote>
+<p>上記のガイドラインに従うことで、パフォーマンスの低下を防ぐことが可能である。</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="DirectFileUpload.html" title="5.4.2. アップロードファイル管理(ダイレクトアップロード方式)"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="5.4. ファイル管理"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Macchinetta Server Framework Cloud Extension Development Guideline 1.0.2.RELEASE documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >5. AWS連携</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" >5.4. ファイル管理</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2017 NTT Corporation.
+    Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.6.3.Theme by <a href="http://github.com/vkvn">vkvn</a>
+    </div>
+    
+    <script>
+    
+    $(function() {
+    	var $sidebar	= $('.sphinxsidebar'),
+    		$window		= $(window),
+    		offset		= $sidebar.offset(),
+    		topPadding	= 3,
+    		$scroll		= $('#scroll');
+    	
+    	$window.scroll(function() {
+    		if ($scroll.is(':checked')) {
+				if ($window.scrollTop() > offset.top) {
+					$sidebar.stop().animate({
+						marginTop:$window.scrollTop() - offset.top + topPadding
+					});
+				} else {
+					$sidebar.stop().animate({
+						marginTop:0
+					});
+				}
+			}
+		});
+    	
+    	var $navList = $('ul:first', $sidebar);
+    	$('li:first', $navList).addClass('open');
+    	
+    	$navList.treeview({
+    		persist: "location",
+    		collapsed: true,
+    		unique: false
+    	});
+    	
+	});
+    </script>
+  </body>
+</html>

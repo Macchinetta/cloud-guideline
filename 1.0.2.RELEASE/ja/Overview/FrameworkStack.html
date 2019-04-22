@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>2.1. フレームワークスタック &#8212; Macchinetta Server Framework Cloud Extension Development Guideline 1.0.2.RELEASE documentation</title>
+    <link rel="stylesheet" href="../_static/solar.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.0.2.RELEASE',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="2.2. クラウドネイティブなアプリケーション" href="CloudNativeApplication.html" />
+    <link rel="prev" title="2. アーキテクチャ概要" href="index.html" /><script src="../_static/jquery.treeview.js" type="text/javascript"></script>
+<!-- <link href='http://fonts.googleapis.com/css?family=Source+Code+Pro|Open+Sans:300italic,400italic,700italic,400,300,700' rel='stylesheet' type='text/css'> -->
+<link href="../_static/solarized-dark.css" rel="stylesheet">
+<link href="../_static/jquery.treeview.css" rel="stylesheet">
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="CloudNativeApplication.html" title="2.2. クラウドネイティブなアプリケーション"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="2. アーキテクチャ概要"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Macchinetta Server Framework Cloud Extension Development Guideline 1.0.2.RELEASE documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">2. アーキテクチャ概要</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><label><input id="scroll" type="checkbox" checked> scroll sidebar</label>
+
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">2.1. フレームワークスタック</a><ul>
+<li><a class="reference internal" href="#framework-name">2.1.1. Macchinetta Server Framework Cloud Extension 概要</a></li>
+<li><a class="reference internal" href="#software-framework">2.1.2. Software Frameworkの主な構成要素</a><ul>
+<li><a class="reference internal" href="#id3">2.1.2.1. セッションの外部管理</a></li>
+<li><a class="reference internal" href="#id4">2.1.2.2. キャッシュの管理</a></li>
+<li><a class="reference internal" href="#id5">2.1.2.3. 環境依存値の外部管理</a></li>
+<li><a class="reference internal" href="#id6">2.1.2.4. クラウドベンダ連携</a><ul>
+<li><a class="reference internal" href="#spring-boot">2.1.2.4.1. Spring Boot</a></li>
+<li><a class="reference internal" href="#amazon-web-service">2.1.2.4.2. Amazon Web Service</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id7">2.1.2.5. 共通ライブラリ</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#oss">2.1.3. 利用するOSSのバージョン</a></li>
+</ul>
+</li>
+</ul>
+
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">2. アーキテクチャ概要</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="CloudNativeApplication.html"
+                        title="next chapter">2.2. クラウドネイティブなアプリケーション</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/Overview/FrameworkStack.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="id1">
+<h1>2.1. フレームワークスタック<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h1>
+<div class="contents local topic" id="id2">
+<p class="topic-title first">目次</p>
+<ul class="simple">
+<li><a class="reference internal" href="#framework-name" id="id9">Macchinetta Server Framework Cloud Extension 概要</a></li>
+<li><a class="reference internal" href="#software-framework" id="id10">Software Frameworkの主な構成要素</a><ul>
+<li><a class="reference internal" href="#id3" id="id11">セッションの外部管理</a></li>
+<li><a class="reference internal" href="#id4" id="id12">キャッシュの管理</a></li>
+<li><a class="reference internal" href="#id5" id="id13">環境依存値の外部管理</a></li>
+<li><a class="reference internal" href="#id6" id="id14">クラウドベンダ連携</a><ul>
+<li><a class="reference internal" href="#spring-boot" id="id15">Spring Boot</a></li>
+<li><a class="reference internal" href="#amazon-web-service" id="id16">Amazon Web Service</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id7" id="id17">共通ライブラリ</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#oss" id="id18">利用するOSSのバージョン</a></li>
+</ul>
+</div>
+<div class="section" id="framework-name">
+<h2><a class="toc-backref" href="#id9">2.1.1. Macchinetta Server Framework Cloud Extension 概要</a><a class="headerlink" href="#framework-name" title="Permalink to this headline">¶</a></h2>
+<p>本ガイドラインで使用するSoftware Frameworkは、Macchinetta Server Framework for Java (1.x) で使用するものに加えて、クラウドベンダが提供するサービスと連携するためのOSSを組み合わせたものである。</p>
+<p>Macchinetta Server Framework for Java (1.x) で使用するSoftware Frameworkについては、 Macchinetta Server Framework for Java (1.x) <a class="reference external" href="https://macchinetta.github.io/server-guideline/1.5.2.RELEASE/ja/Overview/FrameworkStack.html">Development Guideline</a>  を参照されたい。</p>
+</div>
+<div class="section" id="software-framework">
+<h2><a class="toc-backref" href="#id10">2.1.2. Software Frameworkの主な構成要素</a><a class="headerlink" href="#software-framework" title="Permalink to this headline">¶</a></h2>
+<p>Macchinetta Server Framework Cloud Extension を構成するライブラリを以下に示す。
+本ガイドラインでは、Macchinetta Server Framework for Java (1.x) Development Guidelineで説明済みのライブラリについては説明を行わない。</p>
+<div class="figure">
+<a class="reference internal image-reference" href="../_images/FrameworkStackOverview.png"><img alt="Screen image of framework stack." src="../_images/FrameworkStackOverview.png" style="width: 100%;" /></a>
+</div>
+<div class="section" id="id3">
+<h3><a class="toc-backref" href="#id11">2.1.2.1. セッションの外部管理</a><a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<p>セッションの外部管理を行うフレームワークとして、Spring Sessionを利用する。</p>
+<ul class="simple">
+<li><a class="reference external" href="http://projects.spring.io/spring-session/">Spring Session</a></li>
+</ul>
+</div>
+<div class="section" id="id4">
+<h3><a class="toc-backref" href="#id12">2.1.2.2. キャッシュの管理</a><a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<p>Redisを使用したキャッシュの管理を行うフレームワークとして、Spring Data Redisを利用する。</p>
+<ul class="simple">
+<li><a class="reference external" href="http://projects.spring.io/spring-data-redis/">Spring Data Redis</a></li>
+</ul>
+</div>
+<div class="section" id="id5">
+<h3><a class="toc-backref" href="#id13">2.1.2.3. 環境依存値の外部管理</a><a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
+<p>環境依存値の外部管理を行うフレームワークとして、Spring Cloud Configを利用する。</p>
+<ul class="simple">
+<li><a class="reference external" href="https://cloud.spring.io/spring-cloud-config/">Spring Cloud Config</a></li>
+</ul>
+</div>
+<div class="section" id="id6">
+<h3><a class="toc-backref" href="#id14">2.1.2.4. クラウドベンダ連携</a><a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
+<p>クラウドベンダ連携を行うライブラリとして以下を利用する。</p>
+<div class="section" id="spring-boot">
+<h4><a class="toc-backref" href="#id15">2.1.2.4.1. Spring Boot</a><a class="headerlink" href="#spring-boot" title="Permalink to this headline">¶</a></h4>
+<p>以下の目的でSpring Bootを導入している。</p>
+<ul class="simple">
+<li><a class="reference external" href="http://projects.spring.io/spring-cloud/">Spring Cloud Dalston</a> の利用</li>
+<li><a class="reference external" href="http://docs.spring.io/spring-boot/docs/1.5.20.RELEASE/reference/htmlsingle/#production-ready">Spring Boot Actuator</a> の利用</li>
+</ul>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Spring CloudはSpring Bootに依存した実装となっている。</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">本ガイドラインでは、Macchinetta Server Framework for Java (1.x)  Development Guidelineで説明しているアプリケーション・アーキテクチャおよびノウハウを使用してクラウドネイティブなアプリケーションを開発するための方法を説明している。そのため、Spring Boot機能の利用は限定的なものとし、Spring Bootを使用することにより生じる制約や実装方法の相違点については適宜補足説明を行う。</p>
+</div>
+</div>
+<div class="section" id="amazon-web-service">
+<h4><a class="toc-backref" href="#id16">2.1.2.4.2. Amazon Web Service</a><a class="headerlink" href="#amazon-web-service" title="Permalink to this headline">¶</a></h4>
+<p>Amazon Web Serviceとの連携を行うフレームワークとして以下を利用する。</p>
+<ul class="simple">
+<li><a class="reference external" href="https://cloud.spring.io/spring-cloud-aws/">Spring Cloud for Amazon Web Services</a></li>
+<li><a class="reference external" href="https://github.com/derjust/spring-data-dynamodb">Spring Data DynamoDB</a></li>
+<li><a class="reference external" href="https://aws.amazon.com/jp/sdk-for-java/">AWS SDK for Java</a></li>
+</ul>
+</div>
+</div>
+<div class="section" id="id7">
+<h3><a class="toc-backref" href="#id17">2.1.2.5. 共通ライブラリ</a><a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h3>
+<p>Macchinetta Server Framework Cloud Extension で利用する共通ライブラリは、Macchinetta Server Framework for Java (1.x) の共通ライブラリと同様である。</p>
+</div>
+</div>
+<div class="section" id="oss">
+<h2><a class="toc-backref" href="#id18">2.1.3. 利用するOSSのバージョン</a><a class="headerlink" href="#oss" title="Permalink to this headline">¶</a></h2>
+<p>Macchinetta Server Framework Cloud Extension 1.0.2 で利用するOSSの一覧を以下に示す。
+Macchinetta Server Framework for Java (1.x) Development Guideline <a class="reference external" href="https://macchinetta.github.io/server-guideline/1.5.2.RELEASE/ja/Overview/FrameworkStack.html#oss">利用するOSSのバージョン</a> において説明済みのOSSについては記載しない。</p>
+<p>Macchinetta Server Framework Cloud Extension と Macchinetta Server Framework for Java (1.x) のバージョンの対応関係は、<a class="reference internal" href="CloudNativeApplication.html#cloud-native-application-framework-relation"><span class="std std-ref">Macchinetta Server Framework for Java (1.x) との関係</span></a> を参照されたい。</p>
+<div class="admonition tip">
+<p class="first admonition-title">Tip</p>
+<p>Macchinetta Server Framework for Java (1.x) と同様に、 <a class="reference external" href="http://platform.spring.io/platform/">Spring IO platform</a>にて依存関係を解決可能なライブラリについては原則として、Spring IO platformの定義に準じている。使用するSpring IO platformのバージョンは Macchinetta Server Framework for Java (1.x) に準じる。</p>
+<p><a class="reference external" href="http://projects.spring.io/spring-cloud/">Spring Cloud</a>関連のライブラリについては、<code class="docutils literal"><span class="pre">spring-cloud-dependencies</span></code>による定義に準じている。使用する<code class="docutils literal"><span class="pre">spring-cloud-dependencies</span></code>のバージョンは、依存関係を解決されるライブラリのバージョンが可能な限りSpring IO platformと同一となるようバージョンを選定し、Dalston.SR5としている。</p>
+<p class="last">上記に該当しないライブラリについては、個別にバージョンを指定している。</p>
+</div>
+<table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="16%" />
+<col width="26%" />
+<col width="26%" />
+<col width="16%" />
+<col width="5%" />
+<col width="5%" />
+<col width="5%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head stub">Type</th>
+<th class="head">GroupId</th>
+<th class="head">ArtifactId</th>
+<th class="head">Version</th>
+<th class="head">Spring IO platform</th>
+<th class="head">Spring Cloud</th>
+<th class="head">Remarks</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><th class="stub">セッション管理</th>
+<td>org.springframework.session</td>
+<td>spring-session</td>
+<td>1.3.5.RELEASE</td>
+<td>*</td>
+<td>&#160;</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-odd"><th class="stub">セッション管理</th>
+<td>redis.clients</td>
+<td>jedis</td>
+<td>2.9.3</td>
+<td>*</td>
+<td>&#160;</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-even"><th class="stub">キャッシュ管理</th>
+<td>org.springframework.data</td>
+<td>spring-data-keyvalue</td>
+<td>1.2.20.RELEASE</td>
+<td>*</td>
+<td>&#160;</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-odd"><th class="stub">キャッシュ管理</th>
+<td>org.springframework.data</td>
+<td>spring-data-redis</td>
+<td>1.8.20.RELEASE</td>
+<td>*</td>
+<td>&#160;</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-even"><th class="stub">Spring Boot</th>
+<td>org.springframework.boot</td>
+<td>spring-boot</td>
+<td>1.5.20.RELEASE</td>
+<td>*</td>
+<td>*</td>
+<td>*1</td>
+</tr>
+<tr class="row-odd"><th class="stub">Spring Boot</th>
+<td>org.springframework.boot</td>
+<td>spring-boot-actuator</td>
+<td>1.5.20.RELEASE</td>
+<td>*</td>
+<td>*</td>
+<td>*1</td>
+</tr>
+<tr class="row-even"><th class="stub">Spring Boot</th>
+<td>org.springframework.boot</td>
+<td>spring-boot-autoconfigure</td>
+<td>1.5.20.RELEASE</td>
+<td>*</td>
+<td>*</td>
+<td>*1</td>
+</tr>
+<tr class="row-odd"><th class="stub">Spring Boot</th>
+<td>org.springframework.boot</td>
+<td>spring-boot-starter</td>
+<td>1.5.20.RELEASE</td>
+<td>*</td>
+<td>*</td>
+<td>*1</td>
+</tr>
+<tr class="row-even"><th class="stub">Spring Boot</th>
+<td>org.springframework.boot</td>
+<td>spring-boot-starter-actuator</td>
+<td>1.5.20.RELEASE</td>
+<td>*</td>
+<td>*</td>
+<td>*1</td>
+</tr>
+<tr class="row-odd"><th class="stub">Spring Boot</th>
+<td>org.springframework.boot</td>
+<td>spring-boot-starter-logging</td>
+<td>1.5.20.RELEASE</td>
+<td>*</td>
+<td>*</td>
+<td>*1</td>
+</tr>
+<tr class="row-even"><th class="stub">Spring Boot</th>
+<td>org.slf4j</td>
+<td>jul-to-slf4j</td>
+<td>1.7.26</td>
+<td>*</td>
+<td>&#160;</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-odd"><th class="stub">Spring Boot</th>
+<td>org.yaml</td>
+<td>snakeyaml</td>
+<td>1.17</td>
+<td>*</td>
+<td>&#160;</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-even"><th class="stub">Spring Boot</th>
+<td>org.slf4j</td>
+<td>log4j-over-slf4j</td>
+<td>1.7.26</td>
+<td>*</td>
+<td>&#160;</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-odd"><th class="stub">環境依存値外部管理</th>
+<td>org.springframework.cloud</td>
+<td>spring-cloud-commons</td>
+<td>1.2.5.RELEASE</td>
+<td>&#160;</td>
+<td>*</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-even"><th class="stub">環境依存値外部管理</th>
+<td>org.springframework.cloud</td>
+<td>spring-cloud-config-client</td>
+<td>1.4.6.RELEASE</td>
+<td>&#160;</td>
+<td>*</td>
+<td>*7</td>
+</tr>
+<tr class="row-odd"><th class="stub">環境依存値外部管理</th>
+<td>org.springframework.cloud</td>
+<td>spring-cloud-config-server</td>
+<td>1.4.6.RELEASE</td>
+<td>&#160;</td>
+<td>*</td>
+<td>*7</td>
+</tr>
+<tr class="row-even"><th class="stub">環境依存値外部管理</th>
+<td>org.springframework.cloud</td>
+<td>spring-cloud-context</td>
+<td>1.2.5.RELEASE</td>
+<td>&#160;</td>
+<td>*</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-odd"><th class="stub">クラウドベンダ連携</th>
+<td>org.springframework.cloud</td>
+<td>spring-cloud-aws-actuator</td>
+<td>1.2.1.RELEASE</td>
+<td>&#160;</td>
+<td>*</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-even"><th class="stub">クラウドベンダ連携</th>
+<td>org.springframework.cloud</td>
+<td>spring-cloud-aws-autoconfigure</td>
+<td>1.2.1.RELEASE</td>
+<td>&#160;</td>
+<td>*</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-odd"><th class="stub">クラウドベンダ連携</th>
+<td>org.springframework.cloud</td>
+<td>spring-cloud-aws-context</td>
+<td>1.2.1.RELEASE</td>
+<td>&#160;</td>
+<td>*</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-even"><th class="stub">クラウドベンダ連携</th>
+<td>org.springframework.cloud</td>
+<td>spring-cloud-aws-core</td>
+<td>1.2.1.RELEASE</td>
+<td>&#160;</td>
+<td>*</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-odd"><th class="stub">クラウドベンダ連携</th>
+<td>org.springframework.cloud</td>
+<td>spring-cloud-aws-jdbc</td>
+<td>1.2.1.RELEASE</td>
+<td>&#160;</td>
+<td>*</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-even"><th class="stub">クラウドベンダ連携</th>
+<td>org.springframework.cloud</td>
+<td>spring-cloud-aws-messaging</td>
+<td>1.2.1.RELEASE</td>
+<td>&#160;</td>
+<td>*</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-odd"><th class="stub">クラウドベンダ連携</th>
+<td>org.springframework.cloud</td>
+<td>spring-cloud-starter-aws</td>
+<td>1.2.1.RELEASE</td>
+<td>&#160;</td>
+<td>*</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-even"><th class="stub">クラウドベンダ連携</th>
+<td>com.amazonaws</td>
+<td>aws-java-sdk-cloudformation</td>
+<td>1.11.125</td>
+<td>&#160;</td>
+<td>*</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-odd"><th class="stub">クラウドベンダ連携</th>
+<td>com.amazonaws</td>
+<td>aws-java-sdk-cloudwatch</td>
+<td>1.11.125</td>
+<td>&#160;</td>
+<td>*</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-even"><th class="stub">クラウドベンダ連携</th>
+<td>com.amazonaws</td>
+<td>aws-java-sdk-core</td>
+<td>1.11.125</td>
+<td>&#160;</td>
+<td>*</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-odd"><th class="stub">クラウドベンダ連携</th>
+<td>com.amazonaws</td>
+<td>aws-java-sdk-ec2</td>
+<td>1.11.125</td>
+<td>&#160;</td>
+<td>*</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-even"><th class="stub">クラウドベンダ連携</th>
+<td>com.amazonaws</td>
+<td>aws-java-sdk-iam</td>
+<td>1.11.125</td>
+<td>&#160;</td>
+<td>*</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-odd"><th class="stub">クラウドベンダ連携</th>
+<td>com.amazonaws</td>
+<td>aws-java-sdk-kms</td>
+<td>1.11.125</td>
+<td>&#160;</td>
+<td>*</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-even"><th class="stub">クラウドベンダ連携</th>
+<td>com.amazonaws</td>
+<td>aws-java-sdk-rds</td>
+<td>1.11.125</td>
+<td>&#160;</td>
+<td>*</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-odd"><th class="stub">クラウドベンダ連携</th>
+<td>com.amazonaws</td>
+<td>aws-java-sdk-s3</td>
+<td>1.11.125</td>
+<td>&#160;</td>
+<td>*</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-even"><th class="stub">クラウドベンダ連携</th>
+<td>com.amazonaws</td>
+<td>aws-java-sdk-ses</td>
+<td>1.11.125</td>
+<td>&#160;</td>
+<td>*</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-odd"><th class="stub">クラウドベンダ連携</th>
+<td>com.amazonaws</td>
+<td>jmespath-java</td>
+<td>1.11.125</td>
+<td>&#160;</td>
+<td>*</td>
+<td>*2</td>
+</tr>
+<tr class="row-even"><th class="stub">クラウドベンダ連携</th>
+<td>com.amazonaws</td>
+<td>aws-java-sdk-sns</td>
+<td>1.11.125</td>
+<td>&#160;</td>
+<td>*</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-odd"><th class="stub">クラウドベンダ連携</th>
+<td>com.amazonaws</td>
+<td>aws-java-sdk-sqs</td>
+<td>1.11.125</td>
+<td>&#160;</td>
+<td>*</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-even"><th class="stub">クラウドベンダ連携</th>
+<td>com.amazonaws</td>
+<td>aws-java-sdk-sqs</td>
+<td>1.11.125</td>
+<td>&#160;</td>
+<td>*</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-odd"><th class="stub">クラウドベンダ連携</th>
+<td>org.apache.tomcat</td>
+<td>tomcat-jdbc</td>
+<td>8.5.40</td>
+<td>*</td>
+<td>*</td>
+<td>*2 *6</td>
+</tr>
+<tr class="row-even"><th class="stub">クラウドベンダ連携</th>
+<td>org.apache.commons</td>
+<td>commons-codec</td>
+<td>1.10</td>
+<td>*</td>
+<td>*</td>
+<td>*2 *3</td>
+</tr>
+<tr class="row-odd"><th class="stub">クラウドベンダ連携</th>
+<td>org.apache.commons</td>
+<td>commons-logging</td>
+<td>1.2</td>
+<td>*</td>
+<td>*</td>
+<td>*2 *3</td>
+</tr>
+<tr class="row-even"><th class="stub">クラウドベンダ連携</th>
+<td>org.apache.httpcomponents</td>
+<td>httpclient</td>
+<td>4.5.8</td>
+<td>*</td>
+<td>*</td>
+<td>*2 *4</td>
+</tr>
+<tr class="row-odd"><th class="stub">クラウドベンダ連携</th>
+<td>org.apache.httpcomponents</td>
+<td>httpcore</td>
+<td>4.4.11</td>
+<td>*</td>
+<td>*</td>
+<td>*2 *4</td>
+</tr>
+<tr class="row-even"><th class="stub">クラウドベンダ連携</th>
+<td>com.fasterxml.jackson.dataformat</td>
+<td>jackson-dataformat-cbor</td>
+<td>2.8.11</td>
+<td>*</td>
+<td>*</td>
+<td>*2 *3</td>
+</tr>
+<tr class="row-odd"><th class="stub">クラウドベンダ連携</th>
+<td>com.sun.mail</td>
+<td>javax.mail</td>
+<td>1.5.6</td>
+<td>*</td>
+<td>*</td>
+<td>*5</td>
+</tr>
+<tr class="row-even"><th class="stub">クラウドベンダ連携</th>
+<td>com.amazonaws</td>
+<td>amazon-sqs-java-messaging-lib</td>
+<td>1.0.1</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>*5</td>
+</tr>
+<tr class="row-odd"><th class="stub">クラウドベンダ連携</th>
+<td>org.apache.geronimo.specs</td>
+<td>geronimo-jms_1.1_spec</td>
+<td>1.1.1</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>*5</td>
+</tr>
+<tr class="row-even"><th class="stub">クラウドベンダ連携</th>
+<td>com.github.derjust</td>
+<td>spring-data-dynamodb</td>
+<td>4.5.0</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>*5</td>
+</tr>
+<tr class="row-odd"><th class="stub">クラウドベンダ連携</th>
+<td>com.amazonaws</td>
+<td>aws-java-sdk-dynamodb</td>
+<td>1.11.125</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>*5</td>
+</tr>
+<tr class="row-even"><th class="stub">クラウドベンダ連携</th>
+<td>software.amazon.ion</td>
+<td>ion-java</td>
+<td>1.0.2</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>*2</td>
+</tr>
+</tbody>
+</table>
+<ol class="arabic">
+<li><div class="first line-block">
+<div class="line">Spring IO platformにより定義しているバージョンを優先しているライブラリ。</div>
+</div>
+</li>
+<li><div class="first line-block">
+<div class="line">Spring Cloud for Amazon Web ServicesまたはAWS SDK for Javaが個別に依存しているライブラリ</div>
+</div>
+</li>
+<li><div class="first line-block">
+<div class="line">Spring IO platformと<code class="docutils literal"><span class="pre">spring-cloud-dependencies</span></code>のバージョン定義が同一であるライブラリ</div>
+</div>
+</li>
+<li><div class="first line-block">
+<div class="line">Spring IO platformによりバージョンが定義されているが、<code class="docutils literal"><span class="pre">spring-cloud-dependencies</span></code>によるバージョン定義を優先しているライブラリ</div>
+</div>
+</li>
+<li><div class="first line-block">
+<div class="line">クラウドベンダ連携のために個別に導入するライブラリ</div>
+</div>
+</li>
+<li><div class="first line-block">
+<div class="line">Spring IO platformによりバージョンが定義されているが、個別にバージョン定義を更新しているライブラリ</div>
+</div>
+</li>
+</ol>
+<blockquote>
+<div><ul class="simple">
+<li><code class="docutils literal"><span class="pre">tomcat-jdbc</span></code>の詳細は <a class="reference internal" href="../Introduction/Introduction.html"><span class="doc">このドキュメントが示すこと</span></a> を参照のこと。</li>
+</ul>
+</div></blockquote>
+<ol class="arabic" start="7">
+<li><div class="first line-block">
+<div class="line"><code class="docutils literal"><span class="pre">spring-cloud-dependencies</span></code>によりバージョンが定義されているが、個別にバージョン定義を更新しているライブラリ</div>
+</div>
+</li>
+</ol>
+<blockquote>
+<div><ul class="simple">
+<li><code class="docutils literal"><span class="pre">spring-cloud-config-client</span></code>、 <code class="docutils literal"><span class="pre">spring-cloud-config-server</span></code>の詳細は <a class="reference internal" href="../ImplementationAtEachLayer/EnvironmentValuesExternalManagement.html"><span class="doc">環境依存値の外部管理</span></a> を参照のこと。</li>
+</ul>
+</div></blockquote>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="CloudNativeApplication.html" title="2.2. クラウドネイティブなアプリケーション"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="2. アーキテクチャ概要"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Macchinetta Server Framework Cloud Extension Development Guideline 1.0.2.RELEASE documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >2. アーキテクチャ概要</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2017 NTT Corporation.
+    Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.6.3.Theme by <a href="http://github.com/vkvn">vkvn</a>
+    </div>
+    
+    <script>
+    
+    $(function() {
+    	var $sidebar	= $('.sphinxsidebar'),
+    		$window		= $(window),
+    		offset		= $sidebar.offset(),
+    		topPadding	= 3,
+    		$scroll		= $('#scroll');
+    	
+    	$window.scroll(function() {
+    		if ($scroll.is(':checked')) {
+				if ($window.scrollTop() > offset.top) {
+					$sidebar.stop().animate({
+						marginTop:$window.scrollTop() - offset.top + topPadding
+					});
+				} else {
+					$sidebar.stop().animate({
+						marginTop:0
+					});
+				}
+			}
+		});
+    	
+    	var $navList = $('ul:first', $sidebar);
+    	$('li:first', $navList).addClass('open');
+    	
+    	$navList.treeview({
+    		persist: "location",
+    		collapsed: true,
+    		unique: false
+    	});
+    	
+	});
+    </script>
+  </body>
+</html>

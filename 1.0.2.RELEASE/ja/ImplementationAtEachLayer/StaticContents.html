@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>3.5. 静的コンテンツの配信 &#8212; Macchinetta Server Framework Cloud Extension Development Guideline 1.0.2.RELEASE documentation</title>
+    <link rel="stylesheet" href="../_static/solar.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.0.2.RELEASE',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="3.6. データ永続層のスケール性の確保" href="PersistenceLayerScalability.html" />
+    <link rel="prev" title="3.4.4. インターネットストレージ内ファイルの効率的な検索" href="FileManagement/StorageFileSearch.html" /><script src="../_static/jquery.treeview.js" type="text/javascript"></script>
+<!-- <link href='http://fonts.googleapis.com/css?family=Source+Code+Pro|Open+Sans:300italic,400italic,700italic,400,300,700' rel='stylesheet' type='text/css'> -->
+<link href="../_static/solarized-dark.css" rel="stylesheet">
+<link href="../_static/jquery.treeview.css" rel="stylesheet">
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="PersistenceLayerScalability.html" title="3.6. データ永続層のスケール性の確保"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="FileManagement/StorageFileSearch.html" title="3.4.4. インターネットストレージ内ファイルの効率的な検索"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Macchinetta Server Framework Cloud Extension Development Guideline 1.0.2.RELEASE documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">3. アプリケーション開発</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><label><input id="scroll" type="checkbox" checked> scroll sidebar</label>
+
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">3.5. 静的コンテンツの配信</a><ul>
+<li><a class="reference internal" href="#overview">3.5.1. Overview</a><ul>
+<li><a class="reference internal" href="#cdn">3.5.1.1. CDNによる静的コンテンツの配信</a><ul>
+<li><a class="reference internal" href="#impl-sc-cdn-image">3.5.1.1.1. CDNによる配信イメージ</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#impl-sc-cdn-update-contents">3.5.1.2. CDN利用時の静的コンテンツの更新</a><ul>
+<li><a class="reference internal" href="#impl-sc-cdn-clear-cache-update-contents">3.5.1.2.1. キャッシュクリア方式</a></li>
+<li><a class="reference internal" href="#impl-sc-cdn-update-contents-version">3.5.1.2.2. コンテンツバージョン管理方式</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#how-to-use">3.5.2. How to use</a><ul>
+<li><a class="reference internal" href="#id7">3.5.2.1. 静的コンテンツの配信</a></li>
+<li><a class="reference internal" href="#id8">3.5.2.2. 静的コンテンツの更新</a><ul>
+<li><a class="reference internal" href="#id9">3.5.2.2.1. キャッシュクリア方式</a></li>
+<li><a class="reference internal" href="#impl-sc-cdn-update-how-to-use-contents-version">3.5.2.2.2. コンテンツバージョン管理方式</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#impl-sc-contents-delivery-network-vendor">3.5.2.3. クラウドベンダの利用</a><ul>
+<li><a class="reference internal" href="#amazon-web-service">3.5.2.3.1. Amazon Web Service</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#appendix">3.5.3. Appendix</a><ul>
+<li><a class="reference internal" href="#id12">3.5.3.1. 動的ページ内で読み込んでいる静的コンテンツを更新した場合の反映方法</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="FileManagement/StorageFileSearch.html"
+                        title="previous chapter">3.4.4. インターネットストレージ内ファイルの効率的な検索</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="PersistenceLayerScalability.html"
+                        title="next chapter">3.6. データ永続層のスケール性の確保</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/ImplementationAtEachLayer/StaticContents.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="id1">
+<h1>3.5. 静的コンテンツの配信<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h1>
+<div class="contents local topic" id="id2">
+<p class="topic-title first">目次</p>
+<ul class="simple">
+<li><a class="reference internal" href="#overview" id="id13">Overview</a><ul>
+<li><a class="reference internal" href="#cdn" id="id14">CDNによる静的コンテンツの配信</a><ul>
+<li><a class="reference internal" href="#impl-sc-cdn-image" id="id15">CDNによる配信イメージ</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#impl-sc-cdn-update-contents" id="id16">CDN利用時の静的コンテンツの更新</a><ul>
+<li><a class="reference internal" href="#impl-sc-cdn-clear-cache-update-contents" id="id17">キャッシュクリア方式</a></li>
+<li><a class="reference internal" href="#impl-sc-cdn-update-contents-version" id="id18">コンテンツバージョン管理方式</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#how-to-use" id="id19">How to use</a><ul>
+<li><a class="reference internal" href="#id7" id="id20">静的コンテンツの配信</a></li>
+<li><a class="reference internal" href="#id8" id="id21">静的コンテンツの更新</a><ul>
+<li><a class="reference internal" href="#id9" id="id22">キャッシュクリア方式</a></li>
+<li><a class="reference internal" href="#impl-sc-cdn-update-how-to-use-contents-version" id="id23">コンテンツバージョン管理方式</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#impl-sc-contents-delivery-network-vendor" id="id24">クラウドベンダの利用</a><ul>
+<li><a class="reference internal" href="#amazon-web-service" id="id25">Amazon Web Service</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#appendix" id="id26">Appendix</a><ul>
+<li><a class="reference internal" href="#id12" id="id27">動的ページ内で読み込んでいる静的コンテンツを更新した場合の反映方法</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="overview">
+<span id="impl-sc-overview"></span><h2><a class="toc-backref" href="#id13">3.5.1. Overview</a><a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>本ガイドラインでは、クラウド環境における静的コンテンツ（画像、 CSS、JavaScript…etc)の配信について、クラウドベンダに依存しない共通的な事項を説明する。</p>
+<div class="section" id="cdn">
+<span id="impl-sc-contents-delivery-network"></span><h3><a class="toc-backref" href="#id14">3.5.1.1. CDNによる静的コンテンツの配信</a><a class="headerlink" href="#cdn" title="Permalink to this headline">¶</a></h3>
+<p>CDN(コンテンツデリバリーネットワーク)とは、コンテンツをネットワーク経由で配信するために最適化されたネットワークのことである。
+画像や動画、CSSなどの静的コンテンツが配置されているサーバ（オリジンサーバ）から、別の複数のサーバ（エッジサーバ）にキャッシュし、
+アクセスするユーザを最寄りのエッジサーバに誘導し配信することで最適なネットワークを実現する。</p>
+<p>CDNを用いることで下記が期待できる。</p>
+<ul class="simple">
+<li><strong>世界中にある最適なエッジサーバにユーザを誘導することで高速な配信を行えること</strong></li>
+<li><strong>コンテンツをエッジサーバでキャッシュしてオリジンサーバの負荷を減らし、可用性を高めること</strong></li>
+</ul>
+<div class="section" id="impl-sc-cdn-image">
+<span id="id3"></span><h4><a class="toc-backref" href="#id15">3.5.1.1.1. CDNによる配信イメージ</a><a class="headerlink" href="#impl-sc-cdn-image" title="Permalink to this headline">¶</a></h4>
+<p>ここでは、CDNを利用しない場合とCDNを利用した場合の配信イメージを紹介する。</p>
+<ul class="simple">
+<li>CDNを利用しない配信</li>
+</ul>
+<div class="figure">
+<a class="reference internal image-reference" href="../_images/StaticContentsNonCDN.png"><img alt="../_images/StaticContentsNonCDN.png" src="../_images/StaticContentsNonCDN.png" style="width: 50%;" /></a>
+</div>
+<table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="6%" />
+<col width="94%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">APサーバ内に配置された静的コンテンツを動的コンテンツとともに配信する。</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<ul class="simple">
+<li>CDNを利用した配信</li>
+</ul>
+<p>APサーバから静的コンテンツを排除し、オリジンサーバに配置する。
+エッジサーバは静的コンテンツをキャッシュし、クライアントへ静的コンテンツを配信する。</p>
+<div class="figure">
+<a class="reference internal image-reference" href="../_images/StaticContentsCDN.png"><img alt="../_images/StaticContentsCDN.png" src="../_images/StaticContentsCDN.png" style="width: 60%;" /></a>
+</div>
+<table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="6%" />
+<col width="94%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">複数存在するエッジサーバはオリジンサーバから取得したデータをキャッシュする。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(2)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">エンドユーザに最適なエッジサーバからデータを配信する。</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="section" id="impl-sc-cdn-update-contents">
+<span id="id4"></span><h3><a class="toc-backref" href="#id16">3.5.1.2. CDN利用時の静的コンテンツの更新</a><a class="headerlink" href="#impl-sc-cdn-update-contents" title="Permalink to this headline">¶</a></h3>
+<p>オリジンサーバの静的コンテンツを更新した場合、エッジサーバ上の静的コンテンツがキャッシュタイムアウトするまで、更新前の静的コンテンツを配信してしまう。</p>
+<p>キャッシュタイムアウトを待つことなくクライアントに更新後の静的コンテンツを配信する方式を紹介する。</p>
+<table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="30%" />
+<col width="70%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">方式名</th>
+<th class="head">概要</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">キャッシュクリア方式</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">エッジサーバのキャッシュをクリアすることで、
+キャッシュタイムアウトを待たずに更新後の静的コンテンツをクライアントに配信する方式である。
+更新する静的コンテンツ間に依存関係が存在しない時(例：単一で差し替え可能な画像など)に有効である。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">コンテンツバージョン管理方式</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">静的コンテンツをバージョン管理して、整合性を保った状態で更新を行うための方式である。
+更新する静的コンテンツ間に依存関係が存在する時(例：JavaScriptで別ファイルの関数を呼び出している場合など)に有効な方式である。</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p>依存関係のある静的コンテンツを更新する場合と、リアルタイムに更新した静的コンテンツを反映することが必要な場合は、<a class="reference internal" href="#impl-sc-cdn-clear-cache-update-contents"><span class="std std-ref">キャッシュクリア方式</span></a> は使用できない。</p>
+<ul>
+<li><dl class="first docutils">
+<dt>依存関係のある静的コンテンツを更新する場合</dt>
+<dd><div class="first last line-block">
+<div class="line">2つ以上の静的コンテンツが同時にキャッシュクリアされる保証はないため、クライアントのアクセスタイミングによっては、新旧のコンテンツが混在した状態で配信されてしまう。そのため、コンテンツの依存関係に不整合が起きる可能性がある。</div>
+</div>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>リアルタイムに更新した静的コンテンツを反映する場合</dt>
+<dd><div class="first last line-block">
+<div class="line">キャッシュクリアに必要な時間はCDNのベンダ依存となり、リアルタイムにキャッシュクリアできない可能性がある。</div>
+</div>
+</dd>
+</dl>
+</li>
+</ul>
+<p class="last">依存関係のある静的コンテンツを更新する場合と、リアルタイムに更新した静的コンテンツを反映する場合は、<a class="reference internal" href="#impl-sc-cdn-update-contents-version"><span class="std std-ref">コンテンツバージョン管理方式</span></a> で行う。</p>
+</div>
+<div class="section" id="impl-sc-cdn-clear-cache-update-contents">
+<span id="id5"></span><h4><a class="toc-backref" href="#id17">3.5.1.2.1. キャッシュクリア方式</a><a class="headerlink" href="#impl-sc-cdn-clear-cache-update-contents" title="Permalink to this headline">¶</a></h4>
+<p>キャッシュクリア方式とは、エッジサーバのキャッシュをクリアすることで、
+キャッシュタイムアウトを待たずに更新後の静的コンテンツをクライアントに配信する方式である。</p>
+<div class="figure">
+<a class="reference internal image-reference" href="../_images/StaticContentsClearCache1.png"><img alt="../_images/StaticContentsClearCache1.png" src="../_images/StaticContentsClearCache1.png" style="width: 60%;" /></a>
+</div>
+<table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="6%" />
+<col width="94%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">オリジンサーバに保存されている静的コンテンツを更新する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(2)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">エッジサーバにある(1)で更新した静的コンテンツのキャッシュをクリアする。</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(3)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">クライアントがエッジサーバにアクセスする。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(4)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">エッジサーバに静的コンテンツのキャッシュがないため、オリジンサーバから静的コンテンツを取得する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(5)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">エッジサーバは更新後の静的コンテンツをキャッシュし、クライアントに更新後の静的コンテンツを配信する。</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="impl-sc-cdn-update-contents-version">
+<span id="id6"></span><h4><a class="toc-backref" href="#id18">3.5.1.2.2. コンテンツバージョン管理方式</a><a class="headerlink" href="#impl-sc-cdn-update-contents-version" title="Permalink to this headline">¶</a></h4>
+<p>静的コンテンツをバージョン管理して、整合性を保った状態で更新を行うための方式である。</p>
+<p>更新対象の静的コンテンツをバージョン別フォルダに入れておくなどし、バージョンごとに静的コンテンツへのパスが異なるようにする。更新時には、依存元(更新対象の静的コンテンツを参照している静的コンテンツ)で、更新後の静的コンテンツを利用するようにパスを書き換える。その後、エッジサーバから依存元のキャッシュをクリアする。</p>
+<p>依存関係のある静的コンテンツへのパスを整合性のある状態で切り替えることで、更新前と更新後の静的コンテンツが混在した状態でクライアントが取得することを防ぎ、整合性のとれた状態で静的コンテンツを配信する。</p>
+<p>以下に例として、JavaScriptファイル(main.jsでsub.jsの関数を呼び出している)をバージョン別フォルダに配置し、HTMLファイルでJavaScriptファイルを読み込んでいる時のイメージを示す。</p>
+<ul class="simple">
+<li>v1リリース時</li>
+</ul>
+<div class="figure">
+<a class="reference internal image-reference" href="../_images/StaticContentsChangePathDeliver_11.png"><img alt="../_images/StaticContentsChangePathDeliver_11.png" src="../_images/StaticContentsChangePathDeliver_11.png" style="width: 60%;" /></a>
+</div>
+<table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="6%" />
+<col width="94%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">HTMLファイルでは、v1フォルダ配下にあるJavaScriptファイルを読み込むように記述する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(2)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">(1)でのHTMLファイルの記述に従い、v1フォルダ配下のJavaScriptファイルをエッジサーバのキャッシュ、キャッシュがなければ、オリジンサーバから取得する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(3)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">エッジサーバはコンテンツをクライアントに配信する</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<ul class="simple">
+<li>v2リリース時</li>
+</ul>
+<div class="figure">
+<a class="reference internal image-reference" href="../_images/StaticContentsChangePathDeliver_21.png"><img alt="../_images/StaticContentsChangePathDeliver_21.png" src="../_images/StaticContentsChangePathDeliver_21.png" style="width: 60%;" /></a>
+</div>
+<table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="6%" />
+<col width="94%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">オリジンサーバ上のHTMLファイルを、v2フォルダ配下にあるJavaScriptファイルを読み込むように更新する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(2)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">エッジサーバのHTMLファイルのキャッシュをクリアする。</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(3)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">クライアントがHTMLファイルを取得しようとすると、エッジサーバにHTMLファイルのキャッシュがないため、オリジンサーバから更新後のHTMLファイルを取得し、エッジサーバにキャッシュして配信する。
+HTMLファイルがキャッシュクリアされる前に、クライアントがHTMLファイルを読み込んだ場合でも、JavaScriptファイルは、HTMLファイルに記述したパスに従って読み込むため、整合性が保たれる。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(4)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">(1)でのHTMLファイルの記述に従い、v2フォルダ配下のJavaScriptファイルをエッジサーバのキャッシュ、キャッシュがなければ、オリジンサーバから取得する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(5)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">エッジサーバはコンテンツをクライアントへ配信する。</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="section" id="how-to-use">
+<h2><a class="toc-backref" href="#id19">3.5.2. How to use</a><a class="headerlink" href="#how-to-use" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id7">
+<h3><a class="toc-backref" href="#id20">3.5.2.1. 静的コンテンツの配信</a><a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h3>
+<p>CDNを利用した静的コンテンツの配信方法は、利用するクラウドベンダによって異なるため、<a class="reference internal" href="#impl-sc-contents-delivery-network-vendor"><span class="std std-ref">クラウドベンダの利用</span></a> を参照されたい。</p>
+</div>
+<div class="section" id="id8">
+<h3><a class="toc-backref" href="#id21">3.5.2.2. 静的コンテンツの更新</a><a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id9">
+<h4><a class="toc-backref" href="#id22">3.5.2.2.1. キャッシュクリア方式</a><a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h4>
+<p>オリジンサーバのコンテンツを更新した上でエッジサーバのキャッシュをクリアする手順である。実際のエッジサーバのキャッシュクリアの手順はクラウドベンダによって異なるため、<a class="reference internal" href="#impl-sc-contents-delivery-network-vendor"><span class="std std-ref">クラウドベンダの利用</span></a> を参照されたい。</p>
+</div>
+<div class="section" id="impl-sc-cdn-update-how-to-use-contents-version">
+<span id="id10"></span><h4><a class="toc-backref" href="#id23">3.5.2.2.2. コンテンツバージョン管理方式</a><a class="headerlink" href="#impl-sc-cdn-update-how-to-use-contents-version" title="Permalink to this headline">¶</a></h4>
+<p>静的コンテンツをバージョン管理する手順を説明する。</p>
+<p>静的コンテンツのリリース時に、バージョン別フォルダに格納する。
+例として、HTMLファイルで依存関係のあるコンテンツ(例：JavaScritptのvalidation.jsでcommon.jsの関数を呼び出している)を読み込んでいる場合で説明する。</p>
+<p>コンテンツのフォルダ構成例を以下に示す。</p>
+<ul class="simple">
+<li>静的コンテンツのフォルダ構成例</li>
+</ul>
+<div class="highlight-text"><div class="highlight"><pre><span></span>${originRoot}
+└─resources
+    ├─html
+    ├─image
+    ├─v1
+    │  ├─css
+    │  └─js
+    └─v2
+       ├─css
+       └─js
+</pre></div>
+</div>
+<ul class="simple">
+<li><dl class="first docutils">
+<dt>v1リリース時</dt>
+<dd><ol class="first last arabic">
+<li>オリジンサーバのv1フォルダ配下に静的コンテンツを配置する。</li>
+<li>HTMLファイルでは、v1フォルダ配下にある静的コンテンツを読み込むようにパスを設定して配置する。</li>
+</ol>
+</dd>
+</dl>
+</li>
+<li>v1リリース時のHTMLファイル記述例</li>
+</ul>
+<div class="highlight-html"><div class="highlight"><pre><span></span><span class="p">&lt;</span><span class="nt">script</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;text/javascript&quot;</span> <span class="na">src</span><span class="o">=</span><span class="s">&quot;https://cdn.net/resources/v1/js/common.js&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">script</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;text/javascript&quot;</span> <span class="na">src</span><span class="o">=</span><span class="s">&quot;https://cdn.net/resources/v1/js/validation.js&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><dl class="first docutils">
+<dt>v2リリース時</dt>
+<dd><ol class="first last arabic">
+<li>オリジンサーバのv2フォルダ配下に依存関係のある静的コンテンツを配置する。</li>
+<li>HTMLファイルでは、読み込む静的コンテンツのパスをv2フォルダ配下のコンテンツへと書き換えて配置する。</li>
+<li>エッジサーバにあるHTMLのキャッシュをクリアする。</li>
+</ol>
+</dd>
+</dl>
+</li>
+<li>v2リリース時のHTMLファイル記述例</li>
+</ul>
+<div class="highlight-html"><div class="highlight"><pre><span></span><span class="p">&lt;</span><span class="nt">script</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;text/javascript&quot;</span> <span class="na">src</span><span class="o">=</span><span class="s">&quot;https://cdn.net/resources/v2/js/common.js&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">script</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;text/javascript&quot;</span> <span class="na">src</span><span class="o">=</span><span class="s">&quot;https://cdn.net/resources/v2/js/validation.js&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+</pre></div>
+</div>
+<p>v3リリース以降もv2リリース時と同様にv3,v4,v5,…とバージョン別フォルダ配下に静的コンテンツを配置して、
+HTMLファイルに記述している静的コンテンツのパスを切り替えることで、更新後の静的コンテンツをキャッシュタイムアウトを待たずにクライアントに配信する。</p>
+</div>
+</div>
+<div class="section" id="impl-sc-contents-delivery-network-vendor">
+<span id="id11"></span><h3><a class="toc-backref" href="#id24">3.5.2.3. クラウドベンダの利用</a><a class="headerlink" href="#impl-sc-contents-delivery-network-vendor" title="Permalink to this headline">¶</a></h3>
+<p>クラウドベンダ提供のCDNサービスを利用する場合のガイドラインについて、記載箇所を示しておく。</p>
+<div class="section" id="amazon-web-service">
+<h4><a class="toc-backref" href="#id25">3.5.2.3.1. Amazon Web Service</a><a class="headerlink" href="#amazon-web-service" title="Permalink to this headline">¶</a></h4>
+<p>クラウドベンダとしてAWSを使用する場合の静的コンテンツの配信は、
+<a class="reference internal" href="../AWSCollaboration/StaticContents.html"><span class="doc">静的コンテンツの配信</span></a> を、
+キャッシュクリアの方法については、<a class="reference internal" href="../AWSCollaboration/StaticContents.html#sc-access-cache-clear"><span class="std std-ref">Amazon CloudFront利用時のAmazon S3上のコンテンツの更新</span></a> を参照されたい。</p>
+</div>
+</div>
+</div>
+<div class="section" id="appendix">
+<h2><a class="toc-backref" href="#id26">3.5.3. Appendix</a><a class="headerlink" href="#appendix" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id12">
+<h3><a class="toc-backref" href="#id27">3.5.3.1. 動的ページ内で読み込んでいる静的コンテンツを更新した場合の反映方法</a><a class="headerlink" href="#id12" title="Permalink to this headline">¶</a></h3>
+<p>JSP等の動的ページと併せてCDNを利用する場合は、静的コンテンツのパスをDBで管理すると、静的コンテンツの更新のためだけに再デプロイする必要がなくなり、DBの値を書き換えるだけで更新後の静的コンテンツを即時反映することが可能になる。</p>
+<p>静的コンテンツは、バージョン別フォルダ配下に配置するなどし、バージョンが変わるごとにパスが異なるようにする。動的ページではDBから静的コンテンツへのパスを読み込むように設定する。静的コンテンツを更新するたびに、DBに設定している静的コンテンツへのパスを書き換える。</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="PersistenceLayerScalability.html" title="3.6. データ永続層のスケール性の確保"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="FileManagement/StorageFileSearch.html" title="3.4.4. インターネットストレージ内ファイルの効率的な検索"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Macchinetta Server Framework Cloud Extension Development Guideline 1.0.2.RELEASE documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >3. アプリケーション開発</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2017 NTT Corporation.
+    Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.6.3.Theme by <a href="http://github.com/vkvn">vkvn</a>
+    </div>
+    
+    <script>
+    
+    $(function() {
+    	var $sidebar	= $('.sphinxsidebar'),
+    		$window		= $(window),
+    		offset		= $sidebar.offset(),
+    		topPadding	= 3,
+    		$scroll		= $('#scroll');
+    	
+    	$window.scroll(function() {
+    		if ($scroll.is(':checked')) {
+				if ($window.scrollTop() > offset.top) {
+					$sidebar.stop().animate({
+						marginTop:$window.scrollTop() - offset.top + topPadding
+					});
+				} else {
+					$sidebar.stop().animate({
+						marginTop:0
+					});
+				}
+			}
+		});
+    	
+    	var $navList = $('ul:first', $sidebar);
+    	$('li:first', $navList).addClass('open');
+    	
+    	$navList.treeview({
+    		persist: "location",
+    		collapsed: true,
+    		unique: false
+    	});
+    	
+	});
+    </script>
+  </body>
+</html>

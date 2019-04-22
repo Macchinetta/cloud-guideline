@@ -1,0 +1,2195 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>2.2. クラウドネイティブなアプリケーション &#8212; Macchinetta Server Framework Cloud Extension Development Guideline 1.0.2.RELEASE documentation</title>
+    <link rel="stylesheet" href="../_static/solar.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.0.2.RELEASE',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="3. アプリケーション開発" href="../ImplementationAtEachLayer/index.html" />
+    <link rel="prev" title="2.1. フレームワークスタック" href="FrameworkStack.html" /><script src="../_static/jquery.treeview.js" type="text/javascript"></script>
+<!-- <link href='http://fonts.googleapis.com/css?family=Source+Code+Pro|Open+Sans:300italic,400italic,700italic,400,300,700' rel='stylesheet' type='text/css'> -->
+<link href="../_static/solarized-dark.css" rel="stylesheet">
+<link href="../_static/jquery.treeview.css" rel="stylesheet">
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../ImplementationAtEachLayer/index.html" title="3. アプリケーション開発"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="FrameworkStack.html" title="2.1. フレームワークスタック"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Macchinetta Server Framework Cloud Extension Development Guideline 1.0.2.RELEASE documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">2. アーキテクチャ概要</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><label><input id="scroll" type="checkbox" checked> scroll sidebar</label>
+
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">2.2. クラウドネイティブなアプリケーション</a><ul>
+<li><a class="reference internal" href="#id3">2.2.1. クラウドネイティブなアプリケーションとは</a><ul>
+<li><a class="reference internal" href="#aws">2.2.1.1. AWSクラウドデザインパターンとの対応</a></li>
+<li><a class="reference internal" href="#twelve-factor-app">2.2.1.2. Twelve-Factor Appとの対応</a></li>
+<li><a class="reference internal" href="#id13">2.2.1.3. クラウドネイティブ成熟度モデルとの対応</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#base-framework-name">2.2.2. Macchinetta Server Framework for Java (1.x) との関係</a><ul>
+<li><a class="reference internal" href="#id14">2.2.2.1. バージョンの対応関係</a></li>
+<li><a class="reference internal" href="#id15">2.2.2.2. 機能の対応状況</a><ul>
+<li><a class="reference internal" href="#id16">2.2.2.2.1. 共通ライブラリ</a></li>
+<li><a class="reference internal" href="#id18">2.2.2.2.2. 提供機能</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="FrameworkStack.html"
+                        title="previous chapter">2.1. フレームワークスタック</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../ImplementationAtEachLayer/index.html"
+                        title="next chapter">3. アプリケーション開発</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/Overview/CloudNativeApplication.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="id1">
+<h1>2.2. クラウドネイティブなアプリケーション<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h1>
+<div class="contents local topic" id="id2">
+<p class="topic-title first">目次</p>
+<ul class="simple">
+<li><a class="reference internal" href="#id3" id="id19">クラウドネイティブなアプリケーションとは</a><ul>
+<li><a class="reference internal" href="#aws" id="id20">AWSクラウドデザインパターンとの対応</a></li>
+<li><a class="reference internal" href="#twelve-factor-app" id="id21">Twelve-Factor Appとの対応</a></li>
+<li><a class="reference internal" href="#id13" id="id22">クラウドネイティブ成熟度モデルとの対応</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#base-framework-name" id="id23">Macchinetta Server Framework for Java (1.x) との関係</a><ul>
+<li><a class="reference internal" href="#id14" id="id24">バージョンの対応関係</a></li>
+<li><a class="reference internal" href="#id15" id="id25">機能の対応状況</a><ul>
+<li><a class="reference internal" href="#id16" id="id26">共通ライブラリ</a></li>
+<li><a class="reference internal" href="#id18" id="id27">提供機能</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="id3">
+<h2><a class="toc-backref" href="#id19">2.2.1. クラウドネイティブなアプリケーションとは</a><a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
+<p>本ガイドラインにおけるクラウドネイティブなアプリケーションについて説明する。</p>
+<p>クラウドネイティブなアプリケーションとは、クラウド基盤の伸縮性に対応し、必要なタイミングでリソースを増減可能な伸縮性を持ったアプリケーションである。
+APサーバをステートレスな構造とし、クラウドベンダが提供する機能による動的なスケーリングを可能とする。
+加えて、本ガイドラインでは動的なスケールが不可である領域の負荷分散を行う方式を提供する。</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">本ガイドラインでは、クラウド基盤の伸縮性に対応するための代表的なアプリケーション構造についてのみ説明を行う。
+基盤レイヤなどのアプリケーション以外の要素については説明しない。</p>
+</div>
+<p>本ガイドラインで説明する内容は以下のとおり。
+アプリケーションの要件に応じて、必要な要素を実装すること。</p>
+<div class="figure">
+<a class="reference internal image-reference" href="../_images/CloudNativeApplicationOverview.png"><img alt="Screen image of cloud native application." src="../_images/CloudNativeApplicationOverview.png" style="width: 100%;" /></a>
+</div>
+<table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="10%" />
+<col width="30%" />
+<col width="30%" />
+<col width="30%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">項目</th>
+<th class="head">概要</th>
+<th class="head">アプリケーションでの対応要否</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">①</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><a class="reference internal" href="../ImplementationAtEachLayer/SessionManagement.html"><span class="doc">セッション外部管理</span></a></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">セッション情報をクラウドベンダが提供するキャッシュサービス上で管理し、APサーバをステートレスな構造とする。</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">セッションを利用するアプリケーションについては対応必須。RESTful Web Serviceなどの、セッションを利用しないアプリケーションでは対応不要。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">②</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><a class="reference internal" href="../ImplementationAtEachLayer/FileManagement/UploadFileManagement.html"><span class="doc">アップロードファイル管理</span></a></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">アップロードファイルをクラウドベンダが提供するストレージサービス上で管理し、APサーバをステートレスな構造とする。</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">仮アップロードなどのアプリケーションが処理中の状態をファイルで保持するアプリケーションについては対応必須。</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">③</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><a class="reference internal" href="../ImplementationAtEachLayer/PersistenceLayerScalability.html"><span class="doc">データ永続層のスケール性の確保</span></a></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">データ永続層についてスケール可能なアプリケーション構造とする。</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">データ永続層にRDBを利用し、将来的なスケール性を確保する要件がある場合に対応する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">④</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><a class="reference internal" href="../ImplementationAtEachLayer/Queuing/AsynchronousProcessing.html"><span class="doc">非同期実行（共通編）</span></a></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">高負荷処理をメッセージサービスにより非同期実行し、レスポンスタイムを確保する。</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">レスポンスタイムを優先し、高負荷処理を別サーバで非同期実行させる要件がある場合に対応する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">⑤</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><a class="reference internal" href="../ImplementationAtEachLayer/EnvironmentValuesExternalManagement.html"><span class="doc">環境依存値の外部管理</span></a></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">環境依存値をアプリケーション内部に保持せず、外部のコンフィグサーバで管理する。</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">システム内の複数サーバ間での設定値の共有や、同一アプリケーションでの稼働環境(本番環境・ステージング環境・開発環境など)の切り替えを行う場合に対応する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">⑥</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><a class="reference internal" href="../ImplementationAtEachLayer/HealthCheck.html"><span class="doc">ヘルスチェック</span></a></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">クラウドベンダが提供するヘルスチェックに加えて、アプリケーションからヘルスチェックを行う。</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">クラウドベンダ機能の他に、アプリケーションからヘルスチェックを行う要件がある場合に対応する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">⑦</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><a class="reference internal" href="../ImplementationAtEachLayer/LogManagement.html"><span class="doc">ログ管理</span></a></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">クラウド基盤の伸縮性に対応したログ管理を行う。</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">アプリケーションからログ出力を行う場合は対応必須。</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="section" id="aws">
+<h3><a class="toc-backref" href="#id20">2.2.1.1. AWSクラウドデザインパターンとの対応</a><a class="headerlink" href="#aws" title="Permalink to this headline">¶</a></h3>
+<p>本ガイドラインで説明する内容とAWSクラウドデザインパターンとの対応について説明する。</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>AWSクラウドデザインパターンとは、代表的なクラウドベンダであるAmazon Web Service（AWS）を利用したシステムアーキテクチャ設計を行う際のノウハウが整理されたドキュメントである。
+AWS利用者へ向けた内容であるが、クラウドネイティブなアプリケーションを開発するにあたって汎用的な考え方が網羅されている。</p>
+<p class="last">詳細については、 <a class="reference external" href="http://aws.clouddesignpattern.org/index.php">AWSクラウドデザインパターン</a> を参照されたい。</p>
+</div>
+<p>本ガイドラインにおける <a class="reference internal" href="../ImplementationAtEachLayer/index.html"><span class="doc">アプリケーション開発</span></a> の各節とAWSクラウドデザインパターンの対応関係は以下のとおり。
+なお、フレームワークの役割と関連性が薄い一部のデザインパターンは省略している。</p>
+<table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="20%" />
+<col width="40%" />
+<col width="20%" />
+<col width="20%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">カテゴリ</th>
+<th class="head">AWSクラウドデザインパターン</th>
+<th class="head">本ガイドラインでの対応(共通)</th>
+<th class="head">本ガイドラインでの対応(AWS)</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line"><a class="reference external" href="http://aws.clouddesignpattern.org/index.php/%E3%82%AB%E3%83%86%E3%82%B4%E3%83%AA:CDP:%E5%9F%BA%E6%9C%AC%E3%81%AE%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3">基本のパターン</a></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><a class="reference external" href="http://aws.clouddesignpattern.org/index.php/CDP:Scale_Out%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3">Scale Outパターン（サーバ数の動的増減）</a></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">なし</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><a class="reference internal" href="../AWSCollaboration/AutoScale.html"><span class="doc">オートスケーリングの利用</span></a></div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line"><a class="reference external" href="http://aws.clouddesignpattern.org/index.php/%E3%82%AB%E3%83%86%E3%82%B4%E3%83%AA:CDP:%E5%8F%AF%E7%94%A8%E6%80%A7%E3%82%92%E5%90%91%E4%B8%8A%E3%81%99%E3%82%8B%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3">可用性を向上するパターン</a></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><a class="reference external" href="http://aws.clouddesignpattern.org/index.php/CDP:Multi-Server%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3">Multi-Serverパターン（サーバの冗長化）</a></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><a class="reference internal" href="../ImplementationAtEachLayer/HealthCheck.html"><span class="doc">ヘルスチェック</span></a></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">共通のみ</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><a class="reference external" href="http://aws.clouddesignpattern.org/index.php/CDP:Deep_Health_Check%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3">Deep Health Checkパターン（システムのヘルスチェック）</a></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><a class="reference internal" href="../ImplementationAtEachLayer/HealthCheck.html"><span class="doc">ヘルスチェック</span></a></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">共通のみ</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line"><a class="reference external" href="http://aws.clouddesignpattern.org/index.php/%E3%82%AB%E3%83%86%E3%82%B4%E3%83%AA:CDP:%E5%8B%95%E7%9A%84%E3%82%B3%E3%83%B3%E3%83%86%E3%83%B3%E3%83%84%E3%82%92%E5%87%A6%E7%90%86%E3%81%99%E3%82%8B%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3">動的コンテンツを処理するパターン</a></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><a class="reference external" href="http://aws.clouddesignpattern.org/index.php/CDP:State_Sharing%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3">State Sharingパターン（ステート情報の共有）</a></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><a class="reference internal" href="../ImplementationAtEachLayer/SessionManagement.html"><span class="doc">セッション外部管理</span></a></div>
+<div class="line"><a class="reference internal" href="../ImplementationAtEachLayer/FileManagement/UploadFileManagement.html"><span class="doc">アップロードファイル管理</span></a></div>
+<div class="line"><a class="reference internal" href="../ImplementationAtEachLayer/LogManagement.html"><span class="doc">ログ管理</span></a></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><a class="reference internal" href="../AWSCollaboration/FileManagement/UploadFileManagement.html"><span class="doc">アップロードファイル管理</span></a></div>
+<div class="line"><a class="reference internal" href="../AWSCollaboration/LogManagement.html"><span class="doc">ログ管理</span></a></div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><a class="reference external" href="http://aws.clouddesignpattern.org/index.php/CDP:URL_Rewriting%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3">URL Rewritingパターン（静的コンテンツの退避）</a></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">なし</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><a class="reference internal" href="../AWSCollaboration/StaticContents.html"><span class="doc">静的コンテンツの配信</span></a></div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line"><a class="reference external" href="http://aws.clouddesignpattern.org/index.php/%E3%82%AB%E3%83%86%E3%82%B4%E3%83%AA:CDP:%E9%9D%99%E7%9A%84%E3%82%B3%E3%83%B3%E3%83%86%E3%83%B3%E3%83%84%E3%82%92%E5%87%A6%E7%90%86%E3%81%99%E3%82%8B%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3">静的コンテンツを処理するパターン</a></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><a class="reference external" href="http://aws.clouddesignpattern.org/index.php/CDP:Web_Storage%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3">Web Storageパターン（可用性の高いインターネットストレージ活用）</a></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><a class="reference internal" href="../ImplementationAtEachLayer/FileManagement/UploadFileManagement.html"><span class="doc">アップロードファイル管理</span></a></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><a class="reference internal" href="../AWSCollaboration/FileManagement/UploadFileManagement.html"><span class="doc">アップロードファイル管理</span></a></div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><a class="reference external" href="http://aws.clouddesignpattern.org/index.php/CDP:Direct_Hosting%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3">Direct Hostingパターン（インターネットストレージで直接ホスティング）</a></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">なし</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">なし</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><a class="reference external" href="http://aws.clouddesignpattern.org/index.php/CDP:Private_Distribution%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3">Private Distributionパターン（特定ユーザへのデータ配布）</a></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">なし</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">なし</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><a class="reference external" href="http://aws.clouddesignpattern.org/index.php/CDP:Cache_Distribution%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3">Cache Distributionパターン（ユーザに物理的に近い位置へのデータ配置）</a></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">なし</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><a class="reference internal" href="../AWSCollaboration/StaticContents.html"><span class="doc">静的コンテンツの配信</span></a></div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><a class="reference external" href="http://aws.clouddesignpattern.org/index.php/CDP:Rename_Distribution%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3">Rename Distributionパターン（変更遅延のない配信）</a></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">なし</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">なし</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><a class="reference external" href="http://aws.clouddesignpattern.org/index.php/CDP:Private_Cache_Distribution%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3">Private Cache Distributionパターン（CDNを用いたプライベート配信）</a></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">なし</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">なし</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line"><a class="reference external" href="http://aws.clouddesignpattern.org/index.php/%E3%82%AB%E3%83%86%E3%82%B4%E3%83%AA:CDP:%E3%83%87%E3%83%BC%E3%82%BF%E3%82%92%E3%82%A2%E3%83%83%E3%83%97%E3%83%AD%E3%83%BC%E3%83%89%E3%81%99%E3%82%8B%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3">データをアップロードするパターン</a></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><a class="reference external" href="http://aws.clouddesignpattern.org/index.php/CDP:Write_Proxy%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3">Write Proxyパターン（インターネットストレージへの高速アップロード）</a></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><a class="reference internal" href="../ImplementationAtEachLayer/FileManagement/UploadFileManagement.html"><span class="doc">アップロードファイル管理</span></a></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><a class="reference internal" href="../AWSCollaboration/FileManagement/UploadFileManagement.html"><span class="doc">アップロードファイル管理</span></a></div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><a class="reference external" href="http://aws.clouddesignpattern.org/index.php/CDP:Storage_Index%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3">Storage Indexパターン（インターネットストレージの効率化）</a></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><a class="reference internal" href="../ImplementationAtEachLayer/FileManagement/StorageFileSearch.html"><span class="doc">インターネットストレージ内ファイルの効率的な検索</span></a></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><a class="reference internal" href="../AWSCollaboration/FileManagement/StorageFileSearch.html"><span class="doc">インターネットストレージ内ファイルの効率的な検索</span></a></div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><a class="reference external" href="http://aws.clouddesignpattern.org/index.php/CDP:Direct_Object_Upload%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3">Direct Object Uploadパターン（アップロード手順の簡略化）</a></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">なし</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">なし</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line"><a class="reference external" href="http://aws.clouddesignpattern.org/index.php/%E3%82%AB%E3%83%86%E3%82%B4%E3%83%AA:CDP:%E3%83%AA%E3%83%AC%E3%83%BC%E3%82%B7%E3%83%A7%E3%83%8A%E3%83%AB%E3%83%87%E3%83%BC%E3%82%BF%E3%83%99%E3%83%BC%E3%82%B9%E3%81%AE%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3">リレーショナルデータベースのパターン</a></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><a class="reference external" href="http://aws.clouddesignpattern.org/index.php/CDP:Read_Replica%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3">Read Replicaパターン（読込専用レプリカによる負荷分散）</a></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><a class="reference internal" href="../ImplementationAtEachLayer/PersistenceLayerScalability.html"><span class="doc">データ永続層のスケール性の確保</span></a></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><a class="reference internal" href="../AWSCollaboration/DatabaseReadReplica.html"><span class="doc">データベースリードレプリカ</span></a></div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><a class="reference external" href="http://aws.clouddesignpattern.org/index.php/CDP:Inmemory_DB_Cache%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3">Inmemory DB Cacheパターン（頻度の高いデータのキャッシュ化）</a></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><a class="reference internal" href="../ImplementationAtEachLayer/PersistenceLayerScalability.html"><span class="doc">データ永続層のスケール性の確保</span></a></div>
+<div class="line"><a class="reference internal" href="../ArchitectureInDetail/DataAccessDetail/CacheAbstraction.html"><span class="doc">キャッシュの抽象化（Cache Abstraction）</span></a></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">共通のみ</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><a class="reference external" href="http://aws.clouddesignpattern.org/index.php/CDP:Sharding_Write%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3">Sharding Writeパターン（書き込みの効率化）</a></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><a class="reference internal" href="../ImplementationAtEachLayer/PersistenceLayerScalability.html"><span class="doc">データ永続層のスケール性の確保</span></a></div>
+<div class="line"><a class="reference internal" href="../ArchitectureInDetail/DataAccessDetail/DataAccessMyBatis3.html"><span class="doc">データベースシャーディング</span></a></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><a class="reference internal" href="../AWSCollaboration/DatabaseSharding.html"><span class="doc">データベースシャーディング</span></a></div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line"><a class="reference external" href="http://aws.clouddesignpattern.org/index.php/%E3%82%AB%E3%83%86%E3%82%B4%E3%83%AA:CDP:%E9%9D%9E%E5%90%8C%E6%9C%9F%E5%87%A6%E7%90%86/%E3%83%90%E3%83%83%E3%83%81%E5%87%A6%E7%90%86%E3%81%AE%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3">非同期処理/バッチ処理のパターン</a></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><a class="reference external" href="http://aws.clouddesignpattern.org/index.php/CDP:Queuing_Chain%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3">Queuing Chainパターン（システムの疎結合化）</a></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><a class="reference internal" href="../ImplementationAtEachLayer/Queuing/AsynchronousProcessing.html"><span class="doc">非同期実行（共通編）</span></a></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><a class="reference internal" href="../AWSCollaboration/Queuing/AsynchronousProcessing.html"><span class="doc">非同期処理の実装（共通編）</span></a></div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><a class="reference external" href="http://aws.clouddesignpattern.org/index.php/CDP:Priority_Queue%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3">Priority Queueパターン（優先順位の設定）</a></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">なし</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">なし</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><a class="reference external" href="http://aws.clouddesignpattern.org/index.php/CDP:Fanout%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3">Fanoutパターン（複数種類の処理を非同期かつ並列に実行）</a></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">なし</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">なし</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line"><a class="reference external" href="http://aws.clouddesignpattern.org/index.php/%E3%82%AB%E3%83%86%E3%82%B4%E3%83%AA:CDP:%E9%81%8B%E7%94%A8%E4%BF%9D%E5%AE%88%E3%81%AE%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3">運用保守のパターン</a></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><a class="reference external" href="http://aws.clouddesignpattern.org/index.php/CDP:Bootstrap%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3">Bootstrapパターン（起動設定の自動取得）</a></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><a class="reference internal" href="../ImplementationAtEachLayer/EnvironmentValuesExternalManagement.html"><span class="doc">環境依存値の外部管理</span></a></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">共通のみ</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><a class="reference external" href="http://aws.clouddesignpattern.org/index.php/CDP:Cloud_DI%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3">Cloud DIパターン（変更が多い部分の外出し）</a></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><a class="reference internal" href="../ImplementationAtEachLayer/EnvironmentValuesExternalManagement.html"><span class="doc">環境依存値の外部管理</span></a></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">共通のみ</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><a class="reference external" href="http://aws.clouddesignpattern.org/index.php/CDP:Monitoring_Integration%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3">Monitoring Integrationパターン（モニタリングツールの一元化）</a></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">なし</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><a class="reference internal" href="../AWSCollaboration/AutoScale.html"><span class="doc">オートスケーリングの利用</span></a></div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><a class="reference external" href="http://aws.clouddesignpattern.org/index.php/CDP:Log_Aggregation_%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3">Log Aggregation パターン(ログの集約)</a></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><a class="reference internal" href="../ImplementationAtEachLayer/LogManagement.html"><span class="doc">ログ管理</span></a></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><a class="reference internal" href="../AWSCollaboration/LogManagement.html"><span class="doc">ログ管理</span></a></div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="twelve-factor-app">
+<h3><a class="toc-backref" href="#id21">2.2.1.2. Twelve-Factor Appとの対応</a><a class="headerlink" href="#twelve-factor-app" title="Permalink to this headline">¶</a></h3>
+<p>本ガイドラインで説明する内容とTwelve-Factor Appとの対応について説明する。</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>Twelve-Factor Appとは、モダンなクラウドアプリケーション開発のベストプラクティスの一つである。</p>
+<p class="last">詳細については、 <a class="reference external" href="https://12factor.net/ja/">The Twelve-Factor App</a> を参照されたい。</p>
+</div>
+<p>本ガイドラインにおける <a class="reference internal" href="../ImplementationAtEachLayer/index.html"><span class="doc">アプリケーション開発</span></a> の各節とTwelve-Factor Appの各要素との対応関係は以下のとおり。</p>
+<table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="20%" />
+<col width="40%" />
+<col width="40%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Twelve-Factor App</th>
+<th class="head">本ガイドラインでの対応(共通)</th>
+<th class="head">本ガイドラインでの対応(AWS)</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line"><a class="reference external" href="https://12factor.net/ja/codebase">I. コードベース</a></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">フレームワークのスコープ外</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">フレームワークのスコープ外</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line"><a class="reference external" href="https://12factor.net/ja/dependencies">II. 依存関係</a></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">Maven等のツールで解決</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">共通のみ</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line"><a class="reference external" href="https://12factor.net/ja/config">III. 設定</a></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><a class="reference internal" href="../ImplementationAtEachLayer/EnvironmentValuesExternalManagement.html"><span class="doc">環境依存値の外部管理</span></a></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">共通のみ</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line"><a class="reference external" href="https://12factor.net/ja/backing-services">IV. バックエンドサービス</a></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><a class="reference internal" href="../ArchitectureInDetail/DataAccessDetail/CacheAbstraction.html"><span class="doc">キャッシュの抽象化（Cache Abstraction）</span></a></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><a class="reference internal" href="../AWSCollaboration/FileManagement/UploadFileManagement.html"><span class="doc">アップロードファイル管理</span></a></div>
+<div class="line"><a class="reference internal" href="../AWSCollaboration/DatabaseSharding.html"><span class="doc">データベースシャーディング</span></a></div>
+<div class="line"><a class="reference internal" href="../AWSCollaboration/Queuing/AsynchronousProcessing.html"><span class="doc">非同期処理の実装（共通編）</span></a></div>
+<div class="line"><a class="reference internal" href="../AWSCollaboration/MailSending.html"><span class="doc">メール送信</span></a></div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line"><a class="reference external" href="https://12factor.net/ja/build-release-run">V. ビルド、リリース、実行</a></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">フレームワークのスコープ外</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">フレームワークのスコープ外</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line"><a class="reference external" href="https://12factor.net/ja/processes">VI. プロセス</a></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><a class="reference internal" href="../ImplementationAtEachLayer/SessionManagement.html"><span class="doc">セッション外部管理</span></a></div>
+<div class="line"><a class="reference internal" href="../ImplementationAtEachLayer/FileManagement/UploadFileManagement.html"><span class="doc">アップロードファイル管理</span></a></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><a class="reference internal" href="../AWSCollaboration/FileManagement/UploadFileManagement.html"><span class="doc">アップロードファイル管理</span></a></div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line"><a class="reference external" href="https://12factor.net/ja/port-binding">VII. ポートバインディング</a></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">なし</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">なし</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line"><a class="reference external" href="https://12factor.net/ja/concurrency">VIII. 並行性</a></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><a class="reference internal" href="../ImplementationAtEachLayer/SessionManagement.html"><span class="doc">セッション外部管理</span></a></div>
+<div class="line"><a class="reference internal" href="../ImplementationAtEachLayer/FileManagement/UploadFileManagement.html"><span class="doc">アップロードファイル管理</span></a></div>
+<div class="line"><a class="reference internal" href="../ImplementationAtEachLayer/PersistenceLayerScalability.html"><span class="doc">データ永続層のスケール性の確保</span></a></div>
+<div class="line"><a class="reference internal" href="../ImplementationAtEachLayer/Queuing/AsynchronousProcessing.html"><span class="doc">非同期実行（共通編）</span></a></div>
+<div class="line"><a class="reference internal" href="../ArchitectureInDetail/DataAccessDetail/DataAccessMyBatis3.html"><span class="doc">データベースシャーディング</span></a></div>
+<div class="line"><a class="reference internal" href="../ArchitectureInDetail/DataAccessDetail/CacheAbstraction.html"><span class="doc">キャッシュの抽象化（Cache Abstraction）</span></a></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><a class="reference internal" href="../AWSCollaboration/DatabaseSharding.html"><span class="doc">データベースシャーディング</span></a></div>
+<div class="line"><a class="reference internal" href="../AWSCollaboration/DatabaseReadReplica.html"><span class="doc">データベースリードレプリカ</span></a></div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line"><a class="reference external" href="https://12factor.net/ja/disposability">IX. 廃棄容易性</a></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><a class="reference internal" href="../ImplementationAtEachLayer/SessionManagement.html"><span class="doc">セッション外部管理</span></a></div>
+<div class="line"><a class="reference internal" href="../ImplementationAtEachLayer/FileManagement/UploadFileManagement.html"><span class="doc">アップロードファイル管理</span></a></div>
+<div class="line"><a class="reference internal" href="../ImplementationAtEachLayer/LogManagement.html"><span class="doc">ログ管理</span></a></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><a class="reference internal" href="../AWSCollaboration/LogManagement.html"><span class="doc">ログ管理</span></a></div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line"><a class="reference external" href="https://12factor.net/ja/dev-prod-parity">X. 開発/本番一致</a></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">フレームワークのスコープ外</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">フレームワークのスコープ外</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line"><a class="reference external" href="https://12factor.net/ja/logs">XI. ログ</a></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><a class="reference internal" href="../ImplementationAtEachLayer/LogManagement.html"><span class="doc">ログ管理</span></a></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">なし</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line"><a class="reference external" href="https://12factor.net/ja/admin-processes">XII. 管理プロセス</a></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">なし</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">なし</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="id13">
+<h3><a class="toc-backref" href="#id22">2.2.1.3. クラウドネイティブ成熟度モデルとの対応</a><a class="headerlink" href="#id13" title="Permalink to this headline">¶</a></h3>
+<p>Springを開発、提供しているPivotal社が提示している
+<a class="reference external" href="http://www.slideshare.net/Pivotal/the-cloud-native-journey-58445711">クラウドネイティブ成熟度モデル（Cloud Native Maturity Model）</a>と本フレームワークの対応関係を示す。</p>
+<table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="10%" />
+<col width="30%" />
+<col width="30%" />
+<col width="30%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">成熟度</th>
+<th class="head">Pivotal社が提示する要件</th>
+<th class="head">本ガイドラインでの対応(共通)</th>
+<th class="head">本ガイドラインでの対応(AWS)</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">Cloud Native</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">Microservices architecture</div>
+<div class="line">API-first design</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">なし</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">なし</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">Cloud Resilient</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">Fault-tolerant and resilient design</div>
+<div class="line">Cloud-agnostic runtime implementation</div>
+<div class="line">Bundled metrics and monitoring</div>
+<div class="line">Proactive failure testing</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><a class="reference internal" href="../ImplementationAtEachLayer/HealthCheck.html"><span class="doc">ヘルスチェック</span></a></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><a class="reference internal" href="../AWSCollaboration/AutoScale.html"><span class="doc">オートスケーリングの利用</span></a></div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">Cloud Friendly</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">12 factor App methodology</div>
+<div class="line">Horizontally scalable</div>
+<div class="line">Leverages platform for high availability</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><a class="reference internal" href="../ImplementationAtEachLayer/SessionManagement.html"><span class="doc">セッション外部管理</span></a></div>
+<div class="line"><a class="reference internal" href="../ImplementationAtEachLayer/PersistenceLayerScalability.html"><span class="doc">データ永続層のスケール性の確保</span></a></div>
+<div class="line"><a class="reference internal" href="../ArchitectureInDetail/DataAccessDetail/DataAccessMyBatis3.html"><span class="doc">データベースシャーディング</span></a></div>
+<div class="line"><a class="reference internal" href="../ArchitectureInDetail/DataAccessDetail/CacheAbstraction.html"><span class="doc">キャッシュの抽象化（Cache Abstraction）</span></a></div>
+<div class="line"><a class="reference internal" href="../ImplementationAtEachLayer/Queuing/AsynchronousProcessing.html"><span class="doc">非同期実行（共通編）</span></a></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><a class="reference internal" href="../AWSCollaboration/DatabaseSharding.html"><span class="doc">データベースシャーディング</span></a></div>
+<div class="line"><a class="reference internal" href="../AWSCollaboration/Queuing/AsynchronousProcessing.html"><span class="doc">非同期処理の実装（共通編）</span></a></div>
+<div class="line"><a class="reference internal" href="../AWSCollaboration/DatabaseReadReplica.html"><span class="doc">データベースリードレプリカ</span></a></div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">Cloud Ready</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">No permanent disk access</div>
+<div class="line">Self-contained application</div>
+<div class="line">Platform-managed ports and networking</div>
+<div class="line">Consumes platform-managed backing services</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><a class="reference internal" href="../ImplementationAtEachLayer/FileManagement/UploadFileManagement.html"><span class="doc">アップロードファイル管理</span></a></div>
+<div class="line"><a class="reference internal" href="../ImplementationAtEachLayer/EnvironmentValuesExternalManagement.html"><span class="doc">環境依存値の外部管理</span></a></div>
+<div class="line"><a class="reference internal" href="../ImplementationAtEachLayer/LogManagement.html"><span class="doc">ログ管理</span></a></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><a class="reference internal" href="../AWSCollaboration/FileManagement/UploadFileManagement.html"><span class="doc">アップロードファイル管理</span></a></div>
+<div class="line"><a class="reference internal" href="../AWSCollaboration/StaticContents.html"><span class="doc">静的コンテンツの配信</span></a></div>
+<div class="line"><a class="reference internal" href="../AWSCollaboration/MailSending.html"><span class="doc">メール送信</span></a></div>
+<div class="line"><a class="reference internal" href="../AWSCollaboration/LogManagement.html"><span class="doc">ログ管理</span></a></div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="section" id="base-framework-name">
+<span id="cloud-native-application-framework-relation"></span><h2><a class="toc-backref" href="#id23">2.2.2. Macchinetta Server Framework for Java (1.x) との関係</a><a class="headerlink" href="#base-framework-name" title="Permalink to this headline">¶</a></h2>
+<p>Macchinetta Server Framework Cloud Extension は Macchinetta Server Framework for Java (1.x) を拡張し、クラウドネイティブなアプリケーションを開発するためのベストプラクティスを提供するものである。
+Macchinetta Server Framework for Java (1.x) が提供するライブラリやノウハウについては原則として踏襲するものとし、必要に応じて拡張を行う。</p>
+<div class="section" id="id14">
+<h3><a class="toc-backref" href="#id24">2.2.2.1. バージョンの対応関係</a><a class="headerlink" href="#id14" title="Permalink to this headline">¶</a></h3>
+<p>Macchinetta Server Framework Cloud Extension と Macchinetta Server Framework for Java (1.x) のバージョンの対応関係を以下に示す。</p>
+<table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Macchinetta Server Framework Cloud Extension</th>
+<th class="head">Macchinetta Server Framework for Java (1.x)</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">1.0.2</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">1.5.2</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="id15">
+<h3><a class="toc-backref" href="#id25">2.2.2.2. 機能の対応状況</a><a class="headerlink" href="#id15" title="Permalink to this headline">¶</a></h3>
+<p>本ガイドラインにおける Macchinetta Server Framework for Java (1.x) が提供する機能の対応状況について説明する。</p>
+<div class="section" id="id16">
+<h4><a class="toc-backref" href="#id26">2.2.2.2.1. 共通ライブラリ</a><a class="headerlink" href="#id16" title="Permalink to this headline">¶</a></h4>
+<p>Macchinetta Server Framework for Java (1.x) が提供する<a class="reference external" href="https://macchinetta.github.io/server-guideline/1.5.2.RELEASE/ja/Overview/FrameworkStack.html#frameworkstack-common-library">共通ライブラリ</a>の対応状況は以下の通り。</p>
+<table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="14%" />
+<col width="24%" />
+<col width="38%" />
+<col width="24%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head"><div class="first last line-block">
+<div class="line">プロジェクト名</div>
+</div>
+</th>
+<th class="head"><div class="first last line-block">
+<div class="line">分類</div>
+</div>
+</th>
+<th class="head"><div class="first last line-block">
+<div class="line">部品名</div>
+</div>
+</th>
+<th class="head"><div class="first last line-block">
+<div class="line">対応状況(AWS)</div>
+</div>
+</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">terasoluna-gfw-common</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">例外ハンドリング</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">例外クラス</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">検証済み</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">例外クラス</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">検証済み</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">例外コード</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">検証済み</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">例外ログ出力インターセプタ</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">検証済み</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">システム時刻</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">システム時刻ファクトリ</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">検証済み</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">コードリスト</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">コードリスト</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">検証済み</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">データベースアクセス（共通編）</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">クエリエスケープ</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">未検証</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">シーケンサ</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">未検証</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">terasoluna-gfw-string</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">文字列処理</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">半角全角変換</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">未検証</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">terasoluna-gfw-codepoints</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">文字列処理</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">コードポイントチェック</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">未検証</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">入力チェック</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">コードポイントチェック用Bean Validation制約アノテーション</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">未検証</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">terasoluna-gfw-validator</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">入力チェック</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">バイト長チェック用Bean Validation制約アノテーション</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">未検証</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">フィールド値比較相関チェック用Bean Validation制約アノテーション</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">未検証</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">terasoluna-gfw-jodatime</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">システム時刻</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">Joda Time用システム時刻ファクトリ</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">検証済み</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">terasoluna-gfw-web</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">二重送信防止</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">トランザクショントークンチェック</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">検証済み（制約有り） *1</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">例外ハンドリング</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">例外ハンドラ</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">検証済み</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">例外ログ出力インターセプタ</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">検証済み</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">コードリスト</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">コードリスト埋込インターセプタ</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">検証済み</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">ファイルダウンロード</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">汎用ダウンロードView</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">未検証</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">ロギング</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">トラッキングID格納用サーブレットフィルタ</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">検証済み</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">汎用MDC格納用サーブレットフィルタ</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">検証済み</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">MDCクリア用サーブレットフィルタ</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">検証済み</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">terasoluna-gfw-web-jsp</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">二重送信防止</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">トランザクショントークン出力用のJSPタグ</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">検証済み</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">ページネーション</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">ページネーションリンク表示用のJSPタグ</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">検証済み</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">メッセージ管理</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">結果メッセージ表示用のJSPタグ</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">検証済み</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">EL Functions</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">XSS対策用EL関数</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">検証済み</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">URL用EL関数</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">未検証</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">DOM変換用EL関数</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">未検証</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">ユーティリティEL関数</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">未検証</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">terasoluna-gfw-security-web</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">ロギング</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">認証ユーザ名格納用サーブレットフィルタ</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">検証済み</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<ol class="arabic simple">
+<li>二重送信防止に関する制約の内容については、<a class="reference internal" href="../ImplementationAtEachLayer/SessionManagement.html#limit-session-management"><span class="std std-ref">制約事項</span></a> を参照されたい。</li>
+</ol>
+</div>
+<div class="section" id="id18">
+<h4><a class="toc-backref" href="#id27">2.2.2.2.2. 提供機能</a><a class="headerlink" href="#id18" title="Permalink to this headline">¶</a></h4>
+<p>Macchinetta Server Framework for Java (1.x) <a class="reference external" href="https://macchinetta.github.io/server-guideline/1.5.2.RELEASE/ja/index.html">Development Guideline</a>が提供する機能の対応状況は以下の通り。</p>
+<table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="33%" />
+<col width="33%" />
+<col width="33%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head"><div class="first last line-block">
+<div class="line">分類</div>
+</div>
+</th>
+<th class="head"><div class="first last line-block">
+<div class="line">機能名</div>
+</div>
+</th>
+<th class="head"><div class="first last line-block">
+<div class="line">対応状況(AWS)</div>
+</div>
+</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">Webアプリ開発機能</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">入力チェック</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">検証済み</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">例外ハンドリング</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">検証済み</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">セッション管理</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">未検証</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">ページネーション</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">検証済み</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">二重送信防止</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">検証済み（制約有り） *1</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">メッセージ管理</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">検証済み</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">国際化</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">未検証</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">コードリスト</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">検証済み</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">ファイルアップロード</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">検証済み（拡張有り）</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">ファイルダウンロード</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">未検証</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">Tilesによる画面レイアウト</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">検証済み（制約有り） *2</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">共通ライブラリが提供するJSP Tag Library と EL Functions</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">検証済み</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">Ajax</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">未検証</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">ヘルスチェック</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">検証済み(拡張有り)</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">Web Service</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">RESTful Web Service</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">未検証</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">RESTクライアント（HTTPクライアント）</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">未検証</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">SOAP Web Service（サーバ/クライアント）</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">未検証</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">データアクセス</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">データベースアクセス（共通編）</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">検証済み</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">データベースアクセス（MyBatis3編）</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">検証済み（拡張有り）</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">排他制御</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">検証済み</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">アプリケーション形態に依存しない汎用機能</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">ロギング</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">検証済み</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">プロパティ管理</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">検証済み（拡張有り）</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">日付操作(JSR-310 Date and Time API)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">未検証</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">日付操作(Joda Time)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">検証済み</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">システム時刻</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">検証済み</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">文字列処理</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">未検証</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">Beanマッピング(Dozer)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">検証済み</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">メッセージ連携</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">E-mail送信(SMTP)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">検証済み</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">JMS(Java Message Service)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">検証済み（拡張有り）</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">セキュリティ対策</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">Spring Security概要</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">検証済み</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">認証</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">検証済み</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">認可</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">検証済み</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">セッション管理</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">未検証</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">CSRF対策</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">検証済み</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">ブラウザのセキュリティ対策機能との連携</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">未検証</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">XSS対策</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">検証済み</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">暗号化</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">未検証</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">OAuth</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">未検証</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<ol class="arabic simple">
+<li>二重送信防止に関する制約の内容については、<a class="reference internal" href="../ImplementationAtEachLayer/SessionManagement.html#limit-session-management"><span class="std std-ref">制約事項</span></a> を参照されたい。</li>
+<li>Tilesによる画面レイアウトに関する制約の内容については、<a class="reference internal" href="../ImplementationAtEachLayer/CreateWebApplicationProject.html#create-project-constrait-webmvc-tiles"><span class="std std-ref">ViewResolverが上書きされViewの解決ができない</span></a> を参照されたい。</li>
+</ol>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../ImplementationAtEachLayer/index.html" title="3. アプリケーション開発"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="FrameworkStack.html" title="2.1. フレームワークスタック"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Macchinetta Server Framework Cloud Extension Development Guideline 1.0.2.RELEASE documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >2. アーキテクチャ概要</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2017 NTT Corporation.
+    Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.6.3.Theme by <a href="http://github.com/vkvn">vkvn</a>
+    </div>
+    
+    <script>
+    
+    $(function() {
+    	var $sidebar	= $('.sphinxsidebar'),
+    		$window		= $(window),
+    		offset		= $sidebar.offset(),
+    		topPadding	= 3,
+    		$scroll		= $('#scroll');
+    	
+    	$window.scroll(function() {
+    		if ($scroll.is(':checked')) {
+				if ($window.scrollTop() > offset.top) {
+					$sidebar.stop().animate({
+						marginTop:$window.scrollTop() - offset.top + topPadding
+					});
+				} else {
+					$sidebar.stop().animate({
+						marginTop:0
+					});
+				}
+			}
+		});
+    	
+    	var $navList = $('ul:first', $sidebar);
+    	$('li:first', $navList).addClass('open');
+    	
+    	$navList.treeview({
+    		persist: "location",
+    		collapsed: true,
+    		unique: false
+    	});
+    	
+	});
+    </script>
+  </body>
+</html>

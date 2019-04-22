@@ -1,0 +1,1239 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>3.8. 環境依存値の外部管理 &#8212; Macchinetta Server Framework Cloud Extension Development Guideline 1.0.2.RELEASE documentation</title>
+    <link rel="stylesheet" href="../_static/solar.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.0.2.RELEASE',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="3.9. ヘルスチェック" href="HealthCheck.html" />
+    <link rel="prev" title="3.7.2. 非同期実行（優先順位の設定）" href="Queuing/PriorityQueue.html" /><script src="../_static/jquery.treeview.js" type="text/javascript"></script>
+<!-- <link href='http://fonts.googleapis.com/css?family=Source+Code+Pro|Open+Sans:300italic,400italic,700italic,400,300,700' rel='stylesheet' type='text/css'> -->
+<link href="../_static/solarized-dark.css" rel="stylesheet">
+<link href="../_static/jquery.treeview.css" rel="stylesheet">
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="HealthCheck.html" title="3.9. ヘルスチェック"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="Queuing/PriorityQueue.html" title="3.7.2. 非同期実行（優先順位の設定）"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Macchinetta Server Framework Cloud Extension Development Guideline 1.0.2.RELEASE documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">3. アプリケーション開発</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><label><input id="scroll" type="checkbox" checked> scroll sidebar</label>
+
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">3.8. 環境依存値の外部管理</a><ul>
+<li><a class="reference internal" href="#overview">3.8.1. Overview</a><ul>
+<li><a class="reference internal" href="#id3">3.8.1.1. 外部管理方式</a><ul>
+<li><a class="reference internal" href="#id4">3.8.1.1.1. 設定ファイル分割方針</a></li>
+<li><a class="reference internal" href="#id5">3.8.1.1.2. 一元管理設定項目方針</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#how-to-use">3.8.2. How to use</a><ul>
+<li><a class="reference internal" href="#config-server">3.8.2.1. Config Serverの構築</a></li>
+<li><a class="reference internal" href="#id6">3.8.2.2. アプリケーションの設定</a><ul>
+<li><a class="reference internal" href="#id7">3.8.2.2.1. Config Serverの設定</a></li>
+<li><a class="reference internal" href="#config-client">3.8.2.2.2. Config Clientの設定</a></li>
+<li><a class="reference internal" href="#id8">3.8.2.2.3. 環境依存値の利用方法</a></li>
+<li><a class="reference internal" href="#id9">3.8.2.2.4. プロファイルによるログ設定の切り替え方法</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#how-to-extend">3.8.3. How to extend</a><ul>
+<li><a class="reference internal" href="#id10">3.8.3.1. 設定のリフレッシュ機能</a></li>
+<li><a class="reference internal" href="#id11">3.8.3.2. クラウドベンダ連携</a><ul>
+<li><a class="reference internal" href="#id12">3.8.3.2.1. 環境リポジトリの登録</a></li>
+<li><a class="reference internal" href="#id13">3.8.3.2.2. 環境リポジトリの実装</a></li>
+<li><a class="reference internal" href="#id14">3.8.3.2.3. 拡張環境リポジトリの設定</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#appendix">3.8.4. Appendix</a><ul>
+<li><a class="reference internal" href="#customizeprojectforconfigserver">3.8.4.1. Config Server用にプロジェクトの設定を変更する</a></li>
+<li><a class="reference internal" href="#config">3.8.4.2. configプロジェクトの作成</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="Queuing/PriorityQueue.html"
+                        title="previous chapter">3.7.2. 非同期実行（優先順位の設定）</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="HealthCheck.html"
+                        title="next chapter">3.9. ヘルスチェック</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/ImplementationAtEachLayer/EnvironmentValuesExternalManagement.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="id1">
+<h1>3.8. 環境依存値の外部管理<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h1>
+<div class="contents local topic" id="id2">
+<p class="topic-title first">目次</p>
+<ul class="simple">
+<li><a class="reference internal" href="#overview" id="id16">Overview</a><ul>
+<li><a class="reference internal" href="#id3" id="id17">外部管理方式</a><ul>
+<li><a class="reference internal" href="#id4" id="id18">設定ファイル分割方針</a></li>
+<li><a class="reference internal" href="#id5" id="id19">一元管理設定項目方針</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#how-to-use" id="id20">How to use</a><ul>
+<li><a class="reference internal" href="#config-server" id="id21">Config Serverの構築</a></li>
+<li><a class="reference internal" href="#id6" id="id22">アプリケーションの設定</a><ul>
+<li><a class="reference internal" href="#id7" id="id23">Config Serverの設定</a></li>
+<li><a class="reference internal" href="#config-client" id="id24">Config Clientの設定</a></li>
+<li><a class="reference internal" href="#id8" id="id25">環境依存値の利用方法</a></li>
+<li><a class="reference internal" href="#id9" id="id26">プロファイルによるログ設定の切り替え方法</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#how-to-extend" id="id27">How to extend</a><ul>
+<li><a class="reference internal" href="#id10" id="id28">設定のリフレッシュ機能</a></li>
+<li><a class="reference internal" href="#id11" id="id29">クラウドベンダ連携</a><ul>
+<li><a class="reference internal" href="#id12" id="id30">環境リポジトリの登録</a></li>
+<li><a class="reference internal" href="#id13" id="id31">環境リポジトリの実装</a></li>
+<li><a class="reference internal" href="#id14" id="id32">拡張環境リポジトリの設定</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#appendix" id="id33">Appendix</a><ul>
+<li><a class="reference internal" href="#customizeprojectforconfigserver" id="id34">Config Server用にプロジェクトの設定を変更する</a></li>
+<li><a class="reference internal" href="#config" id="id35">configプロジェクトの作成</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="overview">
+<h2><a class="toc-backref" href="#id16">3.8.1. Overview</a><a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>本ガイドラインでは、環境依存値の外部管理を行う方法について説明する。 同一アプリケーションを複数サーバで稼動するシステムでは、環境依存値を一元管理して、稼働環境毎(本番環境・ステージング環境・開発環境など)に接続情報などの切り替えを行う。 環境依存値の外部管理は、Spring Cloud Configの機能を利用して実現する。</p>
+<div class="section" id="id3">
+<h3><a class="toc-backref" href="#id17">3.8.1.1. 外部管理方式</a><a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<p>クラウド環境に複数のアプリケーションを配置して環境依存値を共有する場合に、 アプリケーションはConfig Clientとして、Config Server側に設定値の問い合わせを行い起動時に利用する。環境毎の切り替えは、Spring Profileを使用してConfig Clientとなるアプリケーションを起動することで、Config ServerはSpring Profileに応じた環境設定値を返却する。</p>
+<p>開発環境のアプリケーションと本番環境のアプリケーションが、それぞれの設定値をConfig Serverから取得するイメージを以下に示す。</p>
+<div class="figure">
+<a class="reference internal image-reference" href="../_images/EnvironmentValuesExternalManagementOverview.png"><img alt="Screen image of environment values external management." src="../_images/EnvironmentValuesExternalManagementOverview.png" style="width: 100%;" /></a>
+</div>
+<table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">開発用アプリケーションは、Config Serverに設定値の問合せを行う。</div>
+<div class="line">開発用アプリケーションの<code class="docutils literal"><span class="pre">spring.profiles.active</span></code>には、開発用である事を示すプロファイル名(ここでは<code class="docutils literal"><span class="pre">development</span></code>)が指定されている。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(2)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">本番用アプリケーションは、Config Serverに設定値の問合せを行う。</div>
+<div class="line">本番用アプリケーションの<code class="docutils literal"><span class="pre">spring.profiles.active</span></code>には、本番用である事を示すプロファイル名(ここでは<code class="docutils literal"><span class="pre">production</span></code>)が指定されている。</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(3)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">Config Serverは、環境リポジトリから開発環境向けの設定値を取得し、開発用アプリケーションに返却する。</div>
+<div class="line">環境リポジトリでは、プロファイル名を含んだ.ymlファイルと.propertiesファイルにて、プロファイルごとの設定値を管理している。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(4)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">Config Serverは、環境リポジトリから本番環境向けの設定値を取得し、本番用アプリケーションに返却する。</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Config Serverは、アプリケーションの環境設定値を保持しているため、SPOFにならないように注意が必要。
+具体的な構成としては、手前にLoad Balancerなどを配備して、冗長化を行うなどの対策が必要。</p>
+</div>
+<div class="section" id="id4">
+<h4><a class="toc-backref" href="#id18">3.8.1.1.1. 設定ファイル分割方針</a><a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h4>
+<p>設定ファイルは、 フレームワーク の設定と アプリケーションの設定で2分割する。</p>
+<ul class="simple">
+<li>フレームワーク の設定は <code class="docutils literal"><span class="pre">application-{環境プロファイル名}.yml</span></code>に記載</li>
+<li>アプリケーション設定は <code class="docutils literal"><span class="pre">[</span> <span class="pre">アプリケーション名]-{環境プロファイル名}.properties</span></code>に記載</li>
+</ul>
+</div>
+<div class="section" id="id5">
+<h4><a class="toc-backref" href="#id19">3.8.1.1.2. 一元管理設定項目方針</a><a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li>フレームワーク の設定項目は、主に環境依存値となる接続情報やログ出力先などを管理</li>
+<li>アプリケーションの設定項目は、運用時に変更が必要な項目のみ管理</li>
+</ul>
+<blockquote>
+<div><div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">運用時に変更が必要となる閾値などのチューニングパラメータ等を管理すること。</p>
+</div>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">変更頻度の低いマスタデータなどは対象外とすること。</p>
+</div>
+</div></blockquote>
+</div>
+</div>
+</div>
+<div class="section" id="how-to-use">
+<h2><a class="toc-backref" href="#id20">3.8.2. How to use</a><a class="headerlink" href="#how-to-use" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="config-server">
+<h3><a class="toc-backref" href="#id21">3.8.2.1. Config Serverの構築</a><a class="headerlink" href="#config-server" title="Permalink to this headline">¶</a></h3>
+<p>Spring Frameworkから提供されている「Spring Cloud Config Server」機能を使用した、環境依存値の一元管理方法について説明する。
+「Spring Cloud Config Server」の構築の詳細については、<a class="reference external" href="http://cloud.spring.io/spring-cloud-static/spring-cloud-config/1.3.3.RELEASE/single/spring-cloud-config.html">公式リファレンスの”Spring Cloud Config Server”</a>を参照されたい。</p>
+<p>pom.xmlで必要なjarを設定する。</p>
+<ul class="simple">
+<li><code class="file docutils literal"><span class="pre">pom.xml</span></code></li>
+</ul>
+<blockquote>
+<div><div class="highlight-xml"><div class="highlight"><pre><span></span><span class="nt">&lt;dependency&gt;</span>
+    <span class="nt">&lt;groupId&gt;</span>org.springframework.cloud<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>spring-cloud-config-server<span class="nt">&lt;/artifactId&gt;</span>
+    <span class="nt">&lt;version&gt;</span>1.4.6.RELEASE<span class="nt">&lt;/version&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last"><code class="docutils literal"><span class="pre">spring-cloud-dependencies</span></code>に含まれる <code class="docutils literal"><span class="pre">spring-cloud-config-server</span></code>の <code class="docutils literal"><span class="pre">1.3.4.RELEASE</span></code>には
+ディレクトリトラバーサル攻撃への脆弱性が存在しているためバージョンを <code class="docutils literal"><span class="pre">1.4.6.RELEASE</span></code>に指定する。
+詳細については、 <a class="reference external" href="https://pivotal.io/security/cve-2019-3799">CVE-2019-3799 - Directory Traversal with spring-cloud-config-server</a>を
+参照されたい。なお、 <code class="docutils literal"><span class="pre">spring-cloud-config-client</span></code>を利用する場合は <code class="docutils literal"><span class="pre">spring-cloud-config-server</span></code>と
+同様にバージョンを <code class="docutils literal"><span class="pre">1.4.6.RELEASE</span></code>に指定する。</p>
+</div>
+</div></blockquote>
+<p>Spring Bootの起動クラスを作成する。</p>
+<ul class="simple">
+<li><code class="file docutils literal"><span class="pre">ConfigServer.java</span></code></li>
+</ul>
+<blockquote>
+<div><div class="highlight-java"><div class="highlight"><pre><span></span><span class="nd">@SpringBootApplication</span>
+<span class="nd">@EnableConfigServer</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">ConfigServer</span> <span class="o">{</span>
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">SpringApplication</span><span class="o">.</span><span class="na">run</span><span class="o">(</span><span class="n">ConfigServer</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="n">args</span><span class="o">);</span>
+    <span class="o">}</span>
+
+<span class="o">}</span>
+</pre></div>
+</div>
+</div></blockquote>
+<p>上記のpom.xmlおよびSpring Bootの起動クラスは、Config Server用のプロジェクトに配置する。
+Config Server用のプロジェクトを作成する方法ついては、<a class="reference internal" href="#customizeprojectforconfigserver"><span class="std std-ref">Config Server用にプロジェクトの設定を変更する</span></a>にて紹介している。併せて参照されたい。</p>
+</div>
+<div class="section" id="id6">
+<h3><a class="toc-backref" href="#id22">3.8.2.2. アプリケーションの設定</a><a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id7">
+<h4><a class="toc-backref" href="#id23">3.8.2.2.1. Config Serverの設定</a><a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h4>
+<p>Spring Boot Applicatonで構築したConfig Serverに、以下の設定を行う。</p>
+<ul class="simple">
+<li><code class="file docutils literal"><span class="pre">application.yml</span></code></li>
+</ul>
+<blockquote>
+<div><div class="highlight-yaml"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">server</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">port</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">8888</span> <span class="c1"># (1)</span>
+<span class="l l-Scalar l-Scalar-Plain">spring</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">cloud</span><span class="p p-Indicator">:</span>
+    <span class="l l-Scalar l-Scalar-Plain">config</span><span class="p p-Indicator">:</span>
+      <span class="l l-Scalar l-Scalar-Plain">server</span><span class="p p-Indicator">:</span>
+        <span class="l l-Scalar l-Scalar-Plain">git</span><span class="p p-Indicator">:</span> <span class="c1">#(2)</span>
+          <span class="l l-Scalar l-Scalar-Plain">uri</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">http://xx.xx.xxx.xx/git/xxx/xxx.git</span> <span class="c1">#(3)</span>
+          <span class="l l-Scalar l-Scalar-Plain">username</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">xxxxxxxx</span> <span class="c1">#(4)</span>
+          <span class="l l-Scalar l-Scalar-Plain">password</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">xxxxxxxx</span> <span class="c1">#(5)</span>
+          <span class="l l-Scalar l-Scalar-Plain">clone-on-start</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span> <span class="c1">#(6)</span>
+          <span class="l l-Scalar l-Scalar-Plain">searchPaths</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">xxx-env/configs/repository</span> <span class="c1">#(7)</span>
+</pre></div>
+</div>
+<table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">server.port</span></code>にサーバの起動ポートを設定する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(2)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">spring.cloud.config.server.git</span></code>は、Spring Profileで変更可能な環境リポジトリを表す。Spring Profileに何も設定しないで起動した場合はgitが使用される。他には、<code class="docutils literal"><span class="pre">native</span></code>や<code class="docutils literal"><span class="pre">subversion</span></code>が設定可能。</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(3)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">spring.cloud.config.server.git.uri</span></code>は、対象となる環境リポジトリのURIを設定する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(4)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">spring.cloud.config.server.username</span></code>は、環境リポジトリに対して認証が必要な場合にユーザを設定する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(5)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">spring.cloud.config.server.password</span></code>は、環境リポジトリに対して認証が必要な場合にパスワードを設定する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(6)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">spring.cloud.config.server.clone-on-start</span></code>は、環境リポジトリからのcloneのタイミングを設定する。trueを設定した場合はConfig Server起動時に、falseを設定した場合はアプリケーションからの初回Configuration要求時に、それぞれcloneが実行される。設定ミスなどによる環境リポジトリへのアクセスエラーを起動時に早期検出したい場合は、trueを設定するとよい。</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(7)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">spring.cloud.config.server.searchPaths</span></code>は、サブディレクトリに設定ファイルを格納した場合に、検索するパターンを設定する。</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+</div>
+<div class="section" id="config-client">
+<h4><a class="toc-backref" href="#id24">3.8.2.2.2. Config Clientの設定</a><a class="headerlink" href="#config-client" title="Permalink to this headline">¶</a></h4>
+<p>Config Clientとなるアプリケーションに、以下の設定を行う。</p>
+<ul class="simple">
+<li><code class="file docutils literal"><span class="pre">bootstrap.yml</span></code></li>
+</ul>
+<blockquote>
+<div><div class="highlight-yaml"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">spring</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">cloud</span><span class="p p-Indicator">:</span>
+    <span class="l l-Scalar l-Scalar-Plain">config</span><span class="p p-Indicator">:</span>
+      <span class="l l-Scalar l-Scalar-Plain">uri</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">http://localhost:8888</span> <span class="c1">#(1)</span>
+      <span class="l l-Scalar l-Scalar-Plain">fail-fast</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">false</span> <span class="c1">#(2)</span>
+      <span class="l l-Scalar l-Scalar-Plain">enabled</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span> <span class="c1">#(3)</span>
+</pre></div>
+</div>
+<table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">spring.cloud.config.url</span></code>にConfig ServerのURLを設定する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(2)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">spring.cloud.config.fail-fast</span></code>は、Config Serverに接続できない時に、起動させない場合はtrueを設定する。そうでない場合は、falseを設定する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(3)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">spring.cloud.config.enabled</span></code>は、Config Serverからの設定取得を無効にするにはfalseを設定する。デフォルト値がtrueの為、有効にする場合は設定する必要はない。</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">開発時など、Config Serverへの接続が不可能な状態の場合は、<code class="docutils literal"><span class="pre">spring.cloud.config.enabled</span></code>にfalseを設定する、または<code class="docutils literal"><span class="pre">spring.cloud.config.fail-fast</span></code>にtrueを設定することで、Config ClientとなるアプリケーションをConfig Serverなしで起動できる。</p>
+</div>
+</div></blockquote>
+</div>
+<div class="section" id="id8">
+<h4><a class="toc-backref" href="#id25">3.8.2.2.3. 環境依存値の利用方法</a><a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h4>
+<p>環境依存な値をConfig Serverより取得して、アプリケーションで利用する場合の方法を示す。
+以下の例では、ファイルをアップロードするS3バケットを開発環境と本番環境で切り替えている。</p>
+<ul class="simple">
+<li><code class="file docutils literal"><span class="pre">application-development.yml</span></code></li>
+</ul>
+<blockquote>
+<div><div class="highlight-yaml"><div class="highlight"><pre><span></span><span class="c1"># upload directories</span>
+  <span class="l l-Scalar l-Scalar-Plain">upload</span><span class="p p-Indicator">:</span>
+    <span class="l l-Scalar l-Scalar-Plain">bucketName</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">xxx-upload-private-dev</span> <span class="c1">#(1)</span>
+    <span class="l l-Scalar l-Scalar-Plain">temporaryDirectory</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">tmp/</span>
+    <span class="l l-Scalar l-Scalar-Plain">saveDirectory</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">save/</span>
+</pre></div>
+</div>
+</div></blockquote>
+<ul class="simple">
+<li><code class="file docutils literal"><span class="pre">application-production.yml</span></code></li>
+</ul>
+<blockquote>
+<div><div class="highlight-yaml"><div class="highlight"><pre><span></span><span class="c1"># upload directories</span>
+  <span class="l l-Scalar l-Scalar-Plain">upload</span><span class="p p-Indicator">:</span>
+    <span class="l l-Scalar l-Scalar-Plain">bucketName</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">xxx-upload-private-production</span> <span class="c1">#(2)</span>
+    <span class="l l-Scalar l-Scalar-Plain">temporaryDirectory</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">tmp/</span>
+    <span class="l l-Scalar l-Scalar-Plain">saveDirectory</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">save/</span>
+</pre></div>
+</div>
+</div></blockquote>
+<ul class="simple">
+<li><code class="file docutils literal"><span class="pre">MemberRegisterServiceImpl.java</span></code></li>
+</ul>
+<blockquote>
+<div><div class="highlight-java"><div class="highlight"><pre><span></span><span class="nd">@Service</span>
+<span class="nd">@Transactional</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">MemberRegisterServiceImpl</span> <span class="kd">implements</span> <span class="n">MemberRegisterService</span> <span class="o">{</span>
+
+    <span class="cm">/**</span>
+<span class="cm">     * S3バケット。</span>
+<span class="cm">     */</span>
+    <span class="nd">@Value</span><span class="o">(</span><span class="s">&quot;${upload.bucketName}&quot;</span><span class="o">)</span>
+    <span class="kd">private</span> <span class="n">String</span> <span class="n">bucketName</span><span class="o">;</span> <span class="c1">// (3)</span>
+
+    <span class="o">...</span>
+
+    <span class="nd">@Override</span>
+    <span class="nd">@Transactional</span>
+    <span class="kd">public</span> <span class="n">Member</span> <span class="nf">register</span><span class="o">(</span><span class="n">Member</span> <span class="n">member</span><span class="o">)</span> <span class="o">{</span>
+      <span class="o">...</span>
+
+        <span class="c1">// ファイル保存を行う。</span>
+        <span class="n">s3Helper</span><span class="o">.</span><span class="na">fileCopy</span><span class="o">(</span><span class="n">bucketName</span><span class="o">,</span> <span class="n">tmpDirectory</span><span class="o">,</span> <span class="n">member</span><span class="o">.</span><span class="na">getPhotoFileName</span><span class="o">(),</span>
+                <span class="n">bucketName</span><span class="o">,</span> <span class="n">saveDirectory</span><span class="o">,</span> <span class="n">member</span><span class="o">.</span><span class="na">getCustomerNo</span><span class="o">()</span> <span class="o">+</span> <span class="s">&quot;_&quot;</span> <span class="o">+</span> <span class="n">UUID</span>
+                        <span class="o">.</span><span class="na">randomUUID</span><span class="o">().</span><span class="na">toString</span><span class="o">()</span> <span class="o">+</span> <span class="s">&quot;.jpg&quot;</span><span class="o">);</span> <span class="c1">// (4)</span>
+
+        <span class="o">...</span>
+
+        <span class="k">return</span> <span class="n">member</span><span class="o">;</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+<table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">開発環境の設定ファイル<code class="docutils literal"><span class="pre">application-development.yml</span></code>に開発用のファイルアップロードバケットを設定する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(2)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">本番環境の設定ファイル<code class="docutils literal"><span class="pre">application-production.yml</span></code>に本番用のファイルアップロードバケットを設定する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(3)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">起動時に指定したプロファイル（<code class="docutils literal"><span class="pre">spring.profiles.active</span></code>）に応じた<code class="docutils literal"><span class="pre">upload.bucketName</span></code>を取得する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(4)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">(3)で取得した<code class="docutils literal"><span class="pre">bucketName</span></code>を使用してファイル保存を実施する。</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">環境毎の設定ファイルは、Spring Profileを使用した制御を行う為、Config Clientとなるアプリケーションを配備するサーバの起動パラメータで <code class="docutils literal"><span class="pre">-Dspring.profiles.active=development</span></code>の様に、アクティブなプロファイルを指定する必要がある。</p>
+</div>
+</div></blockquote>
+</div>
+<div class="section" id="id9">
+<h4><a class="toc-backref" href="#id26">3.8.2.2.4. プロファイルによるログ設定の切り替え方法</a><a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h4>
+<p>Spring Bootが提供するLogback統合の仕組みにより、Config Serverの設定値をLogbackに反映することが可能である。</p>
+<p>本ガイドラインでは、Spring Profileにより、環境ごとにLogback設定の切り替えを行う方法を説明する。
+これによりLogbackの設定の一部を環境に応じて切り替えることが可能となる。</p>
+<p>Logback設定ファイルの記述例を以下に示す。</p>
+<ul class="simple">
+<li><code class="file docutils literal"><span class="pre">logback-spring.xml</span></code></li>
+</ul>
+<blockquote>
+<div><div class="highlight-xml"><div class="highlight"><pre><span></span><span class="nt">&lt;configuration&gt;</span>
+   ...
+   <span class="nt">&lt;springProfile</span> <span class="na">name=</span><span class="s">&quot;production&quot;</span><span class="nt">&gt;</span>  <span class="c">&lt;!-- (1) --&gt;</span>
+      <span class="nt">&lt;root&gt;</span>
+          <span class="nt">&lt;level</span> <span class="na">value=</span><span class="s">&quot;warn&quot;</span> <span class="nt">/&gt;</span>
+          <span class="nt">&lt;appender-ref</span> <span class="na">ref=</span><span class="s">&quot;APPLICATION_LOG_FILE&quot;</span> <span class="nt">/&gt;</span>
+      <span class="nt">&lt;/root&gt;</span>
+   <span class="nt">&lt;/springProfile&gt;</span>
+
+   <span class="nt">&lt;springProfile</span> <span class="na">name=</span><span class="s">&quot;default, local, development, ci&quot;</span><span class="nt">&gt;</span>
+     <span class="nt">&lt;root&gt;</span>
+         <span class="nt">&lt;level</span> <span class="na">value=</span><span class="s">&quot;info&quot;</span> <span class="nt">/&gt;</span>
+         <span class="nt">&lt;appender-ref</span> <span class="na">ref=</span><span class="s">&quot;STDOUT&quot;</span> <span class="nt">/&gt;</span>
+         <span class="nt">&lt;appender-ref</span> <span class="na">ref=</span><span class="s">&quot;APPLICATION_LOG_FILE&quot;</span> <span class="nt">/&gt;</span>
+     <span class="nt">&lt;/root&gt;</span>
+   <span class="nt">&lt;/springProfile&gt;</span>
+<span class="nt">&lt;/configuration&gt;</span>
+</pre></div>
+</div>
+<table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">springProfile</span></code>要素で、環境単位で定義を変更したい箇所を囲むことで、プロファイル単位の設定をすることができる。<code class="docutils literal"><span class="pre">name</span></code>属性は、対象となるプロファイル名を指定する。</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+<p>また、以下の様に、includeを使用してファイル全体を切り替えることも可能である。</p>
+<ul class="simple">
+<li><code class="file docutils literal"><span class="pre">logback-spring.xml</span></code></li>
+</ul>
+<blockquote>
+<div><div class="highlight-xml"><div class="highlight"><pre><span></span><span class="nt">&lt;configuration&gt;</span>
+   <span class="nt">&lt;springProfile</span> <span class="na">name=</span><span class="s">&quot;development&quot;</span><span class="nt">&gt;</span>
+      <span class="nt">&lt;include</span> <span class="na">resource=</span><span class="s">&quot;logback-development-logger.xml&quot;</span><span class="nt">/&gt;</span>
+   <span class="nt">&lt;/springProfile&gt;</span>
+
+   <span class="nt">&lt;springProfile</span> <span class="na">name=</span><span class="s">&quot;production&quot;</span><span class="nt">&gt;</span>
+      <span class="nt">&lt;include</span> <span class="na">resource=</span><span class="s">&quot;logback-production-logger.xml&quot;</span><span class="nt">/&gt;</span>
+   <span class="nt">&lt;/springProfile&gt;</span>
+<span class="nt">&lt;/configuration&gt;</span>
+</pre></div>
+</div>
+</div></blockquote>
+</div>
+</div>
+</div>
+<div class="section" id="how-to-extend">
+<h2><a class="toc-backref" href="#id27">3.8.3. How to extend</a><a class="headerlink" href="#how-to-extend" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id10">
+<h3><a class="toc-backref" href="#id28">3.8.3.1. 設定のリフレッシュ機能</a><a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h3>
+<p>アプリケーション起動中に、Config Serverの設定変更を反映させるrefreshエンドポイントを利用することで実現する。
+変更のタイミングでPOSTアクセスを行うことで変更が反映される。</p>
+<ul class="simple">
+<li>リフレッシュ対象は以下</li>
+</ul>
+<blockquote>
+<div><ul class="simple">
+<li><code class="docutils literal"><span class="pre">&#64;ConfigurationProperties</span></code>アノテーションが付与されているクラス</li>
+<li><code class="docutils literal"><span class="pre">&#64;RefreshScope</span></code>アノテーションが付与されているBean</li>
+<li>Log Level (Spring の設定を使用している場合のみ)</li>
+</ul>
+</div></blockquote>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Config ClientとなるアプリケーションをSpring Bootに内包されたTomcatではなく、外部のTomcatにデプロイした場合は、リフレッシュ機能は無効となる。
+また、DIコンテナの再起動が発生するリスタート機能も同様に無効となる。</p>
+</div>
+</div>
+<div class="section" id="id11">
+<h3><a class="toc-backref" href="#id29">3.8.3.2. クラウドベンダ連携</a><a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h3>
+<p>Spring Cloud Config Serverの環境リポジトリに、クラウドベンダのクラウドストレージを指定する場合の拡張方法を示す。
+実装例として、環境リポジトリにAWSのS3を利用する場合の拡張例を紹介する。</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Spring Cloud Config Serverは、Spring Profileを指定しないで起動した場合は、環境リポジトリにGitHubを利用する。</p>
+</div>
+<div class="section" id="id12">
+<h4><a class="toc-backref" href="#id30">3.8.3.2.1. 環境リポジトリの登録</a><a class="headerlink" href="#id12" title="Permalink to this headline">¶</a></h4>
+<p>Spring Profileに応じた環境リポジトリの登録を行う。</p>
+<ul class="simple">
+<li><code class="file docutils literal"><span class="pre">CustomEnvironmentRepositoryConfiguration.java</span></code></li>
+</ul>
+<blockquote>
+<div><div class="highlight-java"><div class="highlight"><pre><span></span><span class="nd">@Configuration</span>
+<span class="nd">@EnableConfigurationProperties</span><span class="o">(</span><span class="n">ConfigServerProperties</span><span class="o">.</span><span class="na">class</span><span class="o">)</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">CustomEnvironmentRepositoryConfiguration</span> <span class="o">{</span>
+
+    <span class="nd">@Configuration</span>
+    <span class="nd">@Profile</span><span class="o">(</span><span class="s">&quot;s3&quot;</span><span class="o">)</span> <span class="c1">// (1)</span>
+    <span class="kd">protected</span> <span class="kd">static</span> <span class="kd">class</span> <span class="nc">S3RepositoryConfiguration</span> <span class="o">{</span>
+
+        <span class="nd">@Inject</span>
+        <span class="kd">private</span> <span class="n">ConfigurableEnvironment</span> <span class="n">environment</span><span class="o">;</span>
+
+        <span class="nd">@Bean</span>
+        <span class="kd">public</span> <span class="n">EnvironmentRepository</span> <span class="nf">environmentRepository</span><span class="o">()</span> <span class="o">{</span>
+            <span class="k">return</span> <span class="k">new</span> <span class="n">S3EnvironmentRepository</span><span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="na">environment</span><span class="o">);</span> <span class="c1">// (2)</span>
+        <span class="o">}</span>
+
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+<table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">&#64;Profile</span></code>を付与して、Spring Profileが対象の環境リポジトリを表す識別子の場合に適用される様に設定する。サンプルでは、AWSのS3を対象している。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(2)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">Spring Profileが、対象の環境リポジトリを表す識別子の場合に、対応する環境リポジトリをBean登録する。</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+</div>
+<div class="section" id="id13">
+<h4><a class="toc-backref" href="#id31">3.8.3.2.2. 環境リポジトリの実装</a><a class="headerlink" href="#id13" title="Permalink to this headline">¶</a></h4>
+<p>Spring Profileに応じた環境リポジトリの実装を行う。</p>
+<ul class="simple">
+<li><code class="file docutils literal"><span class="pre">S3EnvironmentRepository.java</span></code></li>
+</ul>
+<blockquote>
+<div><div class="highlight-java"><div class="highlight"><pre><span></span><span class="nd">@ConfigurationProperties</span><span class="o">(</span><span class="s">&quot;spring.cloud.config.server.s3&quot;</span><span class="o">)</span> <span class="c1">// (1)</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">S3EnvironmentRepository</span> <span class="kd">extends</span> <span class="n">AbstractScmEnvironmentRepository</span>
+                                                                             <span class="kd">implements</span>
+                                                                             <span class="n">EnvironmentRepository</span><span class="o">,</span>
+                                                                             <span class="n">SearchPathLocator</span><span class="o">,</span>
+                                                                             <span class="n">InitializingBean</span> <span class="o">{</span> <span class="c1">// (2)</span>
+
+    <span class="kd">private</span> <span class="kd">static</span> <span class="n">Log</span> <span class="n">logger</span> <span class="o">=</span> <span class="n">LogFactory</span>
+            <span class="o">.</span><span class="na">getLog</span><span class="o">(</span><span class="n">S3EnvironmentRepository</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+
+    <span class="kd">public</span> <span class="nf">S3EnvironmentRepository</span><span class="o">(</span><span class="n">ConfigurableEnvironment</span> <span class="n">environment</span><span class="o">)</span> <span class="o">{</span>
+        <span class="kd">super</span><span class="o">(</span><span class="n">environment</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kd">synchronized</span> <span class="n">Locations</span> <span class="nf">getLocations</span><span class="o">(</span><span class="n">String</span> <span class="n">application</span><span class="o">,</span>
+            <span class="n">String</span> <span class="n">profile</span><span class="o">,</span> <span class="n">String</span> <span class="n">label</span><span class="o">)</span> <span class="o">{</span> <span class="c1">// (3)</span>
+
+        <span class="n">AmazonS3</span> <span class="n">amazonS3</span> <span class="o">=</span> <span class="n">AmazonS3ClientBuilder</span><span class="o">.</span><span class="na">defaultClient</span><span class="o">();</span>
+        <span class="n">TransferManager</span> <span class="n">tm</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+        <span class="k">try</span> <span class="o">{</span>
+            <span class="n">String</span> <span class="n">bucketName</span> <span class="o">=</span> <span class="k">new</span> <span class="n">AmazonS3URI</span><span class="o">(</span><span class="n">getUri</span><span class="o">()).</span><span class="na">getBucket</span><span class="o">();</span>
+            <span class="n">tm</span> <span class="o">=</span> <span class="n">TransferManagerBuilder</span><span class="o">.</span><span class="na">standard</span><span class="o">().</span><span class="na">withS3Client</span><span class="o">(</span><span class="n">amazonS3</span><span class="o">)</span>
+                 <span class="o">.</span><span class="na">build</span><span class="o">();</span>
+            <span class="n">logger</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">&quot;local temp dir:&quot;</span> <span class="o">+</span> <span class="n">getBasedir</span><span class="o">().</span><span class="na">getAbsolutePath</span><span class="o">());</span>
+            <span class="n">MultipleFileDownload</span> <span class="n">download</span> <span class="o">=</span> <span class="n">tm</span><span class="o">.</span><span class="na">downloadDirectory</span><span class="o">(</span><span class="n">bucketName</span><span class="o">,</span>
+                    <span class="kc">null</span><span class="o">,</span> <span class="n">getBasedir</span><span class="o">());</span>
+            <span class="n">download</span><span class="o">.</span><span class="na">waitForCompletion</span><span class="o">();</span>
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">InterruptedException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">Thread</span><span class="o">.</span><span class="na">currentThread</span><span class="o">().</span><span class="na">interrupt</span><span class="o">();</span>
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">Throwable</span> <span class="n">t</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="n">IllegalStateException</span><span class="o">(</span><span class="s">&quot;Cannot download s3&quot;</span><span class="o">,</span> <span class="n">t</span><span class="o">);</span>
+        <span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">tm</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+                <span class="n">tm</span><span class="o">.</span><span class="na">shutdownNow</span><span class="o">();</span>
+            <span class="o">}</span>
+
+        <span class="o">}</span>
+
+        <span class="k">return</span> <span class="k">new</span> <span class="n">Locations</span><span class="o">(</span><span class="n">application</span><span class="o">,</span> <span class="n">profile</span><span class="o">,</span> <span class="n">label</span><span class="o">,</span> <span class="kc">null</span><span class="o">,</span> <span class="n">getSearchLocations</span><span class="o">(</span>
+                <span class="n">getWorkingDirectory</span><span class="o">(),</span> <span class="n">application</span><span class="o">,</span> <span class="n">profile</span><span class="o">,</span> <span class="n">label</span><span class="o">));</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">afterPropertiesSet</span><span class="o">()</span> <span class="o">{</span> <span class="c1">// (4)</span>
+        <span class="n">Assert</span><span class="o">.</span><span class="na">state</span><span class="o">(</span><span class="n">getUri</span><span class="o">()</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">,</span>
+                <span class="s">&quot;You need to configure a uri for the s3 bucket (e.g. &#39;s3://bucket/&#39;)&quot;</span><span class="o">);</span>
+        <span class="c1">// S3 URIを検証するためにインスタンス化</span>
+        <span class="k">new</span> <span class="n">AmazonS3URI</span><span class="o">(</span><span class="n">getUri</span><span class="o">());</span>
+    <span class="o">}</span>
+
+
+<span class="o">}</span>
+</pre></div>
+</div>
+<table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">&#64;ConfigurationProperties</span></code>を付与して、対応するプロパティ値の設定を行う。インジェクション対象は<code class="docutils literal"><span class="pre">SearchPathLocator</span></code>。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(2)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">AbstractScmEnvironmentRepository</span></code>を継承して、SCM環境リポジトリのテンプレートパターンで拡張実装する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(3)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">getLocations</span></code>メソッドは、対象となる環境リポジトリから、ファイルをダウンロードおよびチェックアウトして、ローカルの一時ディレクトリに保存して、ロケーションを返却する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(4)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">指定された設定値の検証が必要であれば<code class="docutils literal"><span class="pre">InitializingBean#afterPropertiesSet</span></code>を実装してチェックを実施する。</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+</div>
+<div class="section" id="id14">
+<h4><a class="toc-backref" href="#id32">3.8.3.2.3. 拡張環境リポジトリの設定</a><a class="headerlink" href="#id14" title="Permalink to this headline">¶</a></h4>
+<p>拡張実装に応じた環境リポジトリ設定を行う。</p>
+<ul class="simple">
+<li><code class="file docutils literal"><span class="pre">application.yml</span></code></li>
+</ul>
+<blockquote>
+<div><div class="highlight-yaml"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">spring</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">cloud</span><span class="p p-Indicator">:</span>
+    <span class="l l-Scalar l-Scalar-Plain">config</span><span class="p p-Indicator">:</span>
+      <span class="l l-Scalar l-Scalar-Plain">server</span><span class="p p-Indicator">:</span>
+        <span class="l l-Scalar l-Scalar-Plain">s3</span><span class="p p-Indicator">:</span> <span class="c1">#(1)</span>
+          <span class="l l-Scalar l-Scalar-Plain">uri</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">s3://xxx.config.repo</span>
+          <span class="l l-Scalar l-Scalar-Plain">searchPaths</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">{</span><span class="nv">application</span><span class="p p-Indicator">}</span>
+  <span class="l l-Scalar l-Scalar-Plain">profiles</span><span class="p p-Indicator">:</span>
+    <span class="l l-Scalar l-Scalar-Plain">active</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">s3</span> <span class="c1">#(2)</span>
+<span class="l l-Scalar l-Scalar-Plain">cloud.aws</span><span class="p p-Indicator">:</span> <span class="c1">#(3)</span>
+  <span class="l l-Scalar l-Scalar-Plain">region</span><span class="p p-Indicator">:</span>
+    <span class="l l-Scalar l-Scalar-Plain">static</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">ap-northeast-1</span>
+    <span class="l l-Scalar l-Scalar-Plain">auto</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">false</span>
+</pre></div>
+</div>
+<table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">spring.cloud.config.server.s3</span></code>は使用する環境リポジトリを表す識別子を指定する。下位階層の設定はデフォルトで用意されている項目と同様の設定を行う。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(2)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">spring.profiles.active</span></code>にアプリケーション起動時に使用するプロファイルを指定する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(3)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">cloud.aws</span></code>は、拡張実装した環境リポジトリ固有の設定を行っている。サンプルはAWS S3を使用しているためAWSの設定を行っている。</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+</div>
+</div>
+</div>
+<div class="section" id="appendix">
+<h2><a class="toc-backref" href="#id33">3.8.4. Appendix</a><a class="headerlink" href="#appendix" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="customizeprojectforconfigserver">
+<span id="id15"></span><h3><a class="toc-backref" href="#id34">3.8.4.1. Config Server用にプロジェクトの設定を変更する</a><a class="headerlink" href="#customizeprojectforconfigserver" title="Permalink to this headline">¶</a></h3>
+<div class="line-block">
+<div class="line">Config Serverを作成する場合、ブランクプロジェクトにconfigプロジェクトを追加することを推奨する。</div>
+<div class="line">以下にその方法を記述する。</div>
+</div>
+<div class="line-block">
+<div class="line">ブランクプロジェクトは初期状態は以下の構成になっている。</div>
+<div class="line">なお、artifactIdにはブランクプロジェクト作成時に指定したartifactIdが設定される。</div>
+</div>
+<div class="highlight-console"><div class="highlight"><pre><span></span><span class="go">artifactId</span>
+<span class="go">├── pom.xml</span>
+<span class="go">├── artifactId-domain</span>
+<span class="go">├── artifactId-env</span>
+<span class="go">├── artifactId-initdb</span>
+<span class="go">├── artifactId-selenium</span>
+<span class="go">└── artifactId-web</span>
+</pre></div>
+</div>
+<p>以下のようなプロジェクト構成にする。</p>
+<div class="highlight-console"><div class="highlight"><pre><span></span><span class="go">artifactId</span>
+<span class="go">├── pom.xml</span>
+<span class="go">├── artifactId-domain</span>
+<span class="go">├── artifactId-env</span>
+<span class="go">├── artifactId-initdb</span>
+<span class="go">├── artifactId-selenium</span>
+<span class="go">├── artifactId-web</span>
+<span class="go">└── artifactId-config</span>
+</pre></div>
+</div>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+</div>
+<div class="section" id="config">
+<h3><a class="toc-backref" href="#id35">3.8.4.2. configプロジェクトの作成</a><a class="headerlink" href="#config" title="Permalink to this headline">¶</a></h3>
+<p>configプロジェクトの構成について説明する。
+Spring Bootプロジェクトについては、<a class="reference external" href="http://docs.spring.io/spring-boot/docs/1.5.20.RELEASE/reference/htmlsingle/#using-boot">公式リファレンスの”Using Spring Boot”</a>を参照されたい。</p>
+<div class="highlight-console"><div class="highlight"><pre><span></span><span class="go">artifactId-config</span>
+<span class="go">    ├── pom.xml  ... (1)</span>
+</pre></div>
+</div>
+<table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head"><div class="first last line-block">
+<div class="line">項番</div>
+</div>
+</th>
+<th class="head"><div class="first last line-block">
+<div class="line">説明</div>
+</div>
+</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><p class="first">configモジュールの構成を定義するPOM(Project Object Model)ファイル。
+このファイルでは、以下の定義を行う。</p>
+<ul class="last simple">
+<li>依存ライブラリとビルド用プラグインの定義</li>
+<li>jarファイルを作成するための定義</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="line-block">
+<div class="line">pom.xmlの記述イメージを以下に示す。</div>
+</div>
+<div class="highlight-xml"><div class="highlight"><pre><span></span><span class="nt">&lt;project</span> <span class="na">xmlns=</span><span class="s">&quot;http://maven.apache.org/POM/4.0.0&quot;</span> <span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
+    <span class="na">xsi:schemaLocation=</span><span class="s">&quot;http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd&quot;</span><span class="nt">&gt;</span>
+    <span class="c">&lt;!-- (1) --&gt;</span>
+    <span class="nt">&lt;modelVersion&gt;</span>4.0.0<span class="nt">&lt;/modelVersion&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>artifactId-config<span class="nt">&lt;/artifactId&gt;</span>
+    <span class="nt">&lt;name&gt;</span>${project.artifactId}<span class="nt">&lt;/name&gt;</span>
+    <span class="nt">&lt;packaging&gt;</span>jar<span class="nt">&lt;/packaging&gt;</span>
+    <span class="nt">&lt;parent&gt;</span>
+        <span class="nt">&lt;groupId&gt;</span>groupId<span class="nt">&lt;/groupId&gt;</span>
+        <span class="nt">&lt;artifactId&gt;</span>artifactId-parent<span class="nt">&lt;/artifactId&gt;</span>
+        <span class="nt">&lt;version&gt;</span>1.0.0-SNAPSHOT<span class="nt">&lt;/version&gt;</span>
+        <span class="nt">&lt;relativePath&gt;</span>../pom.xml<span class="nt">&lt;/relativePath&gt;</span>
+    <span class="nt">&lt;/parent&gt;</span>
+    <span class="c">&lt;!-- (2) --&gt;</span>
+    <span class="nt">&lt;build&gt;</span>
+        <span class="nt">&lt;plugins&gt;</span>
+            <span class="nt">&lt;plugin&gt;</span>
+                <span class="nt">&lt;groupId&gt;</span>org.springframework.boot<span class="nt">&lt;/groupId&gt;</span>
+                <span class="nt">&lt;artifactId&gt;</span>spring-boot-maven-plugin<span class="nt">&lt;/artifactId&gt;</span>
+                <span class="nt">&lt;executions&gt;</span>
+                    <span class="nt">&lt;execution&gt;</span>
+                        <span class="nt">&lt;goals&gt;</span>
+                            <span class="nt">&lt;goal&gt;</span>repackage<span class="nt">&lt;/goal&gt;</span>
+                        <span class="nt">&lt;/goals&gt;</span>
+                    <span class="nt">&lt;/execution&gt;</span>
+                <span class="nt">&lt;/executions&gt;</span>
+                <span class="nt">&lt;configuration&gt;</span>
+                    <span class="c">&lt;!-- Configurations for local PC --&gt;</span>
+                    <span class="nt">&lt;jvmArguments&gt;</span>
+                        ${jvmargs.profiles}
+                        ${jvmargs.location}
+                        ${jvmargs.region}
+                        ${jvmargs.region.auto}
+                    <span class="nt">&lt;/jvmArguments&gt;</span>
+                <span class="nt">&lt;/configuration&gt;</span>
+            <span class="nt">&lt;/plugin&gt;</span>
+        <span class="nt">&lt;/plugins&gt;</span>
+    <span class="nt">&lt;/build&gt;</span>
+    <span class="c">&lt;!-- (3) --&gt;</span>
+    <span class="nt">&lt;dependencies&gt;</span>
+        <span class="nt">&lt;dependency&gt;</span>
+            <span class="nt">&lt;groupId&gt;</span>org.springframework.cloud<span class="nt">&lt;/groupId&gt;</span>
+            <span class="nt">&lt;artifactId&gt;</span>spring-cloud-config-server<span class="nt">&lt;/artifactId&gt;</span>
+        <span class="nt">&lt;/dependency&gt;</span>
+        <span class="nt">&lt;dependency&gt;</span>
+            <span class="nt">&lt;groupId&gt;</span>org.springframework.boot<span class="nt">&lt;/groupId&gt;</span>
+            <span class="nt">&lt;artifactId&gt;</span>spring-boot-starter-actuator<span class="nt">&lt;/artifactId&gt;</span>
+        <span class="nt">&lt;/dependency&gt;</span>
+        <span class="nt">&lt;dependency&gt;</span>
+            <span class="nt">&lt;groupId&gt;</span>org.springframework.boot<span class="nt">&lt;/groupId&gt;</span>
+            <span class="nt">&lt;artifactId&gt;</span>spring-boot-starter<span class="nt">&lt;/artifactId&gt;</span>
+        <span class="nt">&lt;/dependency&gt;</span>
+        <span class="nt">&lt;dependency&gt;</span>
+            <span class="nt">&lt;groupId&gt;</span>org.springframework.cloud<span class="nt">&lt;/groupId&gt;</span>
+            <span class="nt">&lt;artifactId&gt;</span>spring-cloud-starter-aws<span class="nt">&lt;/artifactId&gt;</span>
+        <span class="nt">&lt;/dependency&gt;</span>
+        <span class="nt">&lt;dependency&gt;</span>
+            <span class="nt">&lt;groupId&gt;</span>org.springframework.boot<span class="nt">&lt;/groupId&gt;</span>
+            <span class="nt">&lt;artifactId&gt;</span>spring-boot-configuration-processor<span class="nt">&lt;/artifactId&gt;</span>
+            <span class="nt">&lt;optional&gt;</span>true<span class="nt">&lt;/optional&gt;</span>
+        <span class="nt">&lt;/dependency&gt;</span>
+        <span class="nt">&lt;dependency&gt;</span>
+            <span class="nt">&lt;groupId&gt;</span>javax.inject<span class="nt">&lt;/groupId&gt;</span>
+            <span class="nt">&lt;artifactId&gt;</span>javax.inject<span class="nt">&lt;/artifactId&gt;</span>
+        <span class="nt">&lt;/dependency&gt;</span>
+        <span class="nt">&lt;dependency&gt;</span>
+            <span class="nt">&lt;groupId&gt;</span>${project.groupId}<span class="nt">&lt;/groupId&gt;</span>
+            <span class="nt">&lt;artifactId&gt;</span>xxx-common<span class="nt">&lt;/artifactId&gt;</span>
+        <span class="nt">&lt;/dependency&gt;</span>
+    <span class="nt">&lt;/dependencies&gt;</span>
+    <span class="c">&lt;!-- (4) --&gt;</span>
+    <span class="nt">&lt;profiles&gt;</span>
+        <span class="nt">&lt;profile&gt;</span>
+            <span class="nt">&lt;id&gt;</span>s3-default<span class="nt">&lt;/id&gt;</span>
+            <span class="nt">&lt;activation&gt;</span>
+                <span class="nt">&lt;activeByDefault&gt;</span>true<span class="nt">&lt;/activeByDefault&gt;</span> <span class="c">&lt;!-- (5) --&gt;</span>
+            <span class="nt">&lt;/activation&gt;</span>
+            <span class="c">&lt;!-- (6) --&gt;</span>
+            <span class="nt">&lt;properties&gt;</span>
+                <span class="nt">&lt;jvmargs.profiles&gt;&lt;/jvmargs.profiles&gt;</span>
+                <span class="nt">&lt;jvmargs.location&gt;</span>-Dspring.cloud.config.server.s3.uri=s3://xxx.config.repo<span class="nt">&lt;/jvmargs.location&gt;</span>
+                <span class="nt">&lt;jvmargs.region&gt;</span>-Dcloud.aws.region.static=ap-northeast-1<span class="nt">&lt;/jvmargs.region&gt;</span>
+                <span class="nt">&lt;jvmargs.region.auto&gt;</span>-Dcloud.aws.region.auto=false<span class="nt">&lt;/jvmargs.region.auto&gt;</span>
+            <span class="nt">&lt;/properties&gt;</span>
+        <span class="nt">&lt;/profile&gt;</span>
+        <span class="nt">&lt;profile&gt;</span>
+            <span class="nt">&lt;id&gt;</span>native<span class="nt">&lt;/id&gt;</span>
+            <span class="nt">&lt;properties&gt;</span>
+                <span class="nt">&lt;jvmargs.profiles&gt;</span>-Dspring.profiles.active=native<span class="nt">&lt;/jvmargs.profiles&gt;</span>
+                <span class="nt">&lt;jvmargs.location&gt;</span>-Dspring.cloud.config.server.native.searchLocations=file:${project.basedir}/../xxx-env/configs/repository/{application},file:${project.basedir}/../xxx-back/xxx-back-env/configs/repository/{application}<span class="nt">&lt;/jvmargs.location&gt;</span>
+                <span class="nt">&lt;jvmargs.region&gt;</span>-Dcloud.aws.region.static=ap-northeast-1<span class="nt">&lt;/jvmargs.region&gt;</span>
+                <span class="nt">&lt;jvmargs.region.auto&gt;</span>-Dcloud.aws.region.auto=false<span class="nt">&lt;/jvmargs.region.auto&gt;</span>
+            <span class="nt">&lt;/properties&gt;</span>
+        <span class="nt">&lt;/profile&gt;</span>
+    <span class="nt">&lt;/profiles&gt;</span>
+
+    <span class="nt">&lt;properties&gt;</span>
+        <span class="nt">&lt;project.root.basedir&gt;</span>${project.parent.basedir}<span class="nt">&lt;/project.root.basedir&gt;</span>
+    <span class="nt">&lt;/properties&gt;</span>
+
+<span class="nt">&lt;/project&gt;</span>
+</pre></div>
+</div>
+<table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">プロジェクトに関する情報を記述する。</div>
+<div class="line">なお、<code class="docutils literal"><span class="pre">artifactId-config</span></code>の<code class="docutils literal"><span class="pre">artifactId</span></code>、<code class="docutils literal"><span class="pre">artifactId-parent</span></code>の<code class="docutils literal"><span class="pre">artifactId</span></code>、<code class="docutils literal"><span class="pre">groupId</span></code>は、ブランクプロジェクト作成時に指定した値を使用する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(2)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">ビルド時に使用するプラグインを記述する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(3)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">プロジェクトで使用するライブラリを、依存ライブラリとして記述する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(4)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">Mavenプロファイルによる設定値切り替えを行う。</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(5)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">&lt;activeByDefault&gt;</span></code>に<code class="docutils literal"><span class="pre">true</span></code>を設定する事で、<code class="docutils literal"><span class="pre">s3-default</span></code>がデフォルトのMavenプロファイルとして動作する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(6)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">このMavenプロファイルが有効になった場合に使用されるプロパティ設定を記述する。</div>
+<div class="line">ここでは、AWSのS3を環境リポジトリとして使用した場合のプロパティ設定例を記載している。</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="HealthCheck.html" title="3.9. ヘルスチェック"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="Queuing/PriorityQueue.html" title="3.7.2. 非同期実行（優先順位の設定）"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Macchinetta Server Framework Cloud Extension Development Guideline 1.0.2.RELEASE documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >3. アプリケーション開発</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2017 NTT Corporation.
+    Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.6.3.Theme by <a href="http://github.com/vkvn">vkvn</a>
+    </div>
+    
+    <script>
+    
+    $(function() {
+    	var $sidebar	= $('.sphinxsidebar'),
+    		$window		= $(window),
+    		offset		= $sidebar.offset(),
+    		topPadding	= 3,
+    		$scroll		= $('#scroll');
+    	
+    	$window.scroll(function() {
+    		if ($scroll.is(':checked')) {
+				if ($window.scrollTop() > offset.top) {
+					$sidebar.stop().animate({
+						marginTop:$window.scrollTop() - offset.top + topPadding
+					});
+				} else {
+					$sidebar.stop().animate({
+						marginTop:0
+					});
+				}
+			}
+		});
+    	
+    	var $navList = $('ul:first', $sidebar);
+    	$('li:first', $navList).addClass('open');
+    	
+    	$navList.treeview({
+    		persist: "location",
+    		collapsed: true,
+    		unique: false
+    	});
+    	
+	});
+    </script>
+  </body>
+</html>

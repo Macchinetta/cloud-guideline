@@ -1,0 +1,1465 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>3.3. セッション外部管理 &#8212; Macchinetta Server Framework Cloud Extension Development Guideline 1.0.2.RELEASE documentation</title>
+    <link rel="stylesheet" href="../_static/solar.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.0.2.RELEASE',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="3.4. ファイル管理" href="FileManagement/index.html" />
+    <link rel="prev" title="3.2. オンライン版クラウド拡張開発プロジェクトの作成" href="CreateWebApplicationProject.html" /><script src="../_static/jquery.treeview.js" type="text/javascript"></script>
+<!-- <link href='http://fonts.googleapis.com/css?family=Source+Code+Pro|Open+Sans:300italic,400italic,700italic,400,300,700' rel='stylesheet' type='text/css'> -->
+<link href="../_static/solarized-dark.css" rel="stylesheet">
+<link href="../_static/jquery.treeview.css" rel="stylesheet">
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="FileManagement/index.html" title="3.4. ファイル管理"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="CreateWebApplicationProject.html" title="3.2. オンライン版クラウド拡張開発プロジェクトの作成"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Macchinetta Server Framework Cloud Extension Development Guideline 1.0.2.RELEASE documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">3. アプリケーション開発</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><label><input id="scroll" type="checkbox" checked> scroll sidebar</label>
+
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">3.3. セッション外部管理</a><ul>
+<li><a class="reference internal" href="#overview">3.3.1. Overview</a><ul>
+<li><a class="reference internal" href="#session-management-label">3.3.1.1. セッション外部管理方式</a></li>
+<li><a class="reference internal" href="#session-management-constitution">3.3.1.2. セッション外部管理構成</a></li>
+<li><a class="reference internal" href="#id5">3.3.1.3. セッション同期タイミング</a></li>
+<li><a class="reference internal" href="#limit-session-management">3.3.1.4. 制約事項</a></li>
+<li><a class="reference internal" href="#redis-cluster">3.3.1.5. Redis Clusterの一貫性保証</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#how-to-use">3.3.2. How to use</a><ul>
+<li><a class="reference internal" href="#id9">3.3.2.1. 依存ライブラリの追加</a></li>
+<li><a class="reference internal" href="#spring-session">3.3.2.2. Spring Sessionの設定</a></li>
+<li><a class="reference internal" href="#spring-data-redis">3.3.2.3. Spring Data Redisの設定</a><ul>
+<li><a class="reference internal" href="#session-management-endpoint-label">3.3.2.3.1. エンドポイントの設定</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id14">3.3.2.4. クラウドベンダの利用</a><ul>
+<li><a class="reference internal" href="#amazon-web-service">3.3.2.4.1. Amazon Web Service</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#how-to-extend">3.3.3. How to extend</a><ul>
+<li><a class="reference internal" href="#id15">3.3.3.1. セッション永続化タイミングの変更</a></li>
+<li><a class="reference internal" href="#httpsessionlistener">3.3.3.2. HttpSessionListenerを利用する場合の設定方法</a></li>
+<li><a class="reference internal" href="#transactiontoken">3.3.3.3. TransactionTokenの拡張方法</a><ul>
+<li><a class="reference internal" href="#id18">3.3.3.3.1. テーブル構成例</a></li>
+<li><a class="reference internal" href="#repository">3.3.3.3.2. Repositoryインタフェースおよびマッピングファイル</a></li>
+<li><a class="reference internal" href="#transactiontokenstore">3.3.3.3.3. TransactionTokenStoreの実装</a></li>
+<li><a class="reference internal" href="#id20">3.3.3.3.4. HttpSessionListenerの実装</a></li>
+<li><a class="reference internal" href="#id21">3.3.3.3.5. アプリケーションでの利用方法</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="CreateWebApplicationProject.html"
+                        title="previous chapter">3.2. オンライン版クラウド拡張開発プロジェクトの作成</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="FileManagement/index.html"
+                        title="next chapter">3.4. ファイル管理</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/ImplementationAtEachLayer/SessionManagement.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="id1">
+<h1>3.3. セッション外部管理<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h1>
+<div class="contents local topic" id="id2">
+<p class="topic-title first">目次</p>
+<ul class="simple">
+<li><a class="reference internal" href="#overview" id="id23">Overview</a><ul>
+<li><a class="reference internal" href="#session-management-label" id="id24">セッション外部管理方式</a></li>
+<li><a class="reference internal" href="#session-management-constitution" id="id25">セッション外部管理構成</a></li>
+<li><a class="reference internal" href="#id5" id="id26">セッション同期タイミング</a></li>
+<li><a class="reference internal" href="#limit-session-management" id="id27">制約事項</a></li>
+<li><a class="reference internal" href="#redis-cluster" id="id28">Redis Clusterの一貫性保証</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#how-to-use" id="id29">How to use</a><ul>
+<li><a class="reference internal" href="#id9" id="id30">依存ライブラリの追加</a></li>
+<li><a class="reference internal" href="#spring-session" id="id31">Spring Sessionの設定</a></li>
+<li><a class="reference internal" href="#spring-data-redis" id="id32">Spring Data Redisの設定</a><ul>
+<li><a class="reference internal" href="#session-management-endpoint-label" id="id33">エンドポイントの設定</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id14" id="id34">クラウドベンダの利用</a><ul>
+<li><a class="reference internal" href="#amazon-web-service" id="id35">Amazon Web Service</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#how-to-extend" id="id36">How to extend</a><ul>
+<li><a class="reference internal" href="#id15" id="id37">セッション永続化タイミングの変更</a></li>
+<li><a class="reference internal" href="#httpsessionlistener" id="id38">HttpSessionListenerを利用する場合の設定方法</a></li>
+<li><a class="reference internal" href="#transactiontoken" id="id39">TransactionTokenの拡張方法</a><ul>
+<li><a class="reference internal" href="#id18" id="id40">テーブル構成例</a></li>
+<li><a class="reference internal" href="#repository" id="id41">Repositoryインタフェースおよびマッピングファイル</a></li>
+<li><a class="reference internal" href="#transactiontokenstore" id="id42">TransactionTokenStoreの実装</a></li>
+<li><a class="reference internal" href="#id20" id="id43">HttpSessionListenerの実装</a></li>
+<li><a class="reference internal" href="#id21" id="id44">アプリケーションでの利用方法</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="overview">
+<h2><a class="toc-backref" href="#id23">3.3.1. Overview</a><a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>クラウド環境でオートスケーリングを利用した場合に、スケールイン発生時にセッションなどのアプリケーションサーバインスタンス固有の情報は失われてしまう。
+その為、ロードバランサによるロードバランシングにおいてスティッキーセッションはOFFとし、アプリケーションの構造としてどのアプリケーションサーバインスタンスに
+リクエストが割り振られた場合でも業務継続可能とする為のセッション外部管理方式を示す。</p>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<div class="section" id="session-management-label">
+<span id="id3"></span><h3><a class="toc-backref" href="#id24">3.3.1.1. セッション外部管理方式</a><a class="headerlink" href="#session-management-label" title="Permalink to this headline">¶</a></h3>
+<p>セッション外部管理を行うために、<a class="reference external" href="http://docs.spring.io/spring-session/docs/1.3.5.RELEASE/reference/html5/#httpsession-redis">Spring Session with Redis</a>を利用した方式を以下に示す。
+Redis構成は、ユーザ数（同時セッション数）が後々スケールできるようシャーディングを用いた構成で紹介している。</p>
+<div class="figure">
+<a class="reference internal image-reference" href="../_images/SessionManagementOverview.png"><img alt="Screen image of Session Mamanagement." src="../_images/SessionManagementOverview.png" style="width: 100%;" /></a>
+</div>
+<table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">ユーザは、同一のセッションIDでアクセスを行う。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(2)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">SessionRepositoryFilter</span></code>はセッションをラップする。</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(3)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">アプリケーションで作成したコントローラからgetSessionメソッドなどで、セッションへのアクセスを行った場合に、ラップ済みのセッションを通じてセッションを取得する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(4)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">ラップ済みのセッションは、ローカルサーバのキャッシュにセッション情報が存在しない時はRedisから取得する。一度アクセスを行うと、そのリクエストの間はローカルにセッション情報をキャッシュする。シャーディングされたRedisからの取得は、データに対してkeyのhashを計算して、該当するhash slotにアクセスして取得する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(5)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">レスポンスがコミットされたタイミングでRedisにセッション情報を格納する。</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">本ガイドラインで採用しているSpring Session 1.3.5.RELEASEを使用する場合、デフォルトではCookieを用いてセッションIDを参照する<cite>CookieHttpSessionStrategy</cite>が使用されるが、当該バージョンにはセッションIDを設定したCookieが複数ある場合に、いずれか一つしか採用されない不具合が存在する。そのため、path属性を用いて複数のセッションIDを使い分けるような使い方はできない。詳細はSpring Sessionのissue <a class="reference external" href="https://github.com/spring-projects/spring-session/issues/275">CookieHttpSessionStrategy should look at all cookies not just the first</a>を参照されたい。</p>
+</div>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+</div>
+<div class="section" id="session-management-constitution">
+<span id="id4"></span><h3><a class="toc-backref" href="#id25">3.3.1.2. セッション外部管理構成</a><a class="headerlink" href="#session-management-constitution" title="Permalink to this headline">¶</a></h3>
+<p>セッション外部管理を行う為の基本的な構成を以下に示す。</p>
+<div class="figure">
+<a class="reference internal image-reference" href="../_images/SessionManagementArchitectonics.png"><img alt="Screen image of Session management." src="../_images/SessionManagementArchitectonics.png" style="width: 100%;" /></a>
+</div>
+<table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">ロードバランサのリクエスト振り分けはスティッキーセッションを使用せず、動的なスケーリンググループ内のAPサーバに対して均等に振り分ける。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(2)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">アプリケーションではSpring Session with Redisを介してセッションへのアクセスを行う。</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(3)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">Spring Session with Redisは、Sharding Redis Clusterのいずれかのシャードに対してセッションの保存を行う。各シャードでは、可用性向上のための非同期のレプリケーションが行われる。</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+</div>
+<div class="section" id="id5">
+<h3><a class="toc-backref" href="#id26">3.3.1.3. セッション同期タイミング</a><a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
+<p>リクエスト中に、一度取得したセッション情報はキャッシュされていて、以降はキャッシュからセッション情報を取得する為、他のリクエストでのセッション情報への変更は反映されない。
+Redisへ永続化を行うタイミングで各リクエストで行ったセッション情報の変更は上書きで保存されるため、後から永続化が行われたリクエストのセッション情報が反映される。</p>
+<p>また、Redisへのセッションの永続化のタイミングは、デフォルトがレスポンスのコミット時となっている。</p>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+</div>
+<div class="section" id="limit-session-management">
+<span id="id6"></span><h3><a class="toc-backref" href="#id27">3.3.1.4. 制約事項</a><a class="headerlink" href="#limit-session-management" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<div><ul>
+<li><p class="first">セッションの外部管理を行った場合は、「<a class="reference external" href="https://macchinetta.github.io/server-guideline/1.5.2.RELEASE/ja/ArchitectureInDetail/WebApplicationDetail/SessionManagement.html#id25">同一セッション内のリクエストの同期化</a>」のような方法でリクエストを同期化することができないため、セッション情報の完全な同期が必要なケースは、セッションで情報を管理しないこと。</p>
+<blockquote>
+<div><div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>二重送信防止で、セッションを利用したトランザクショントークンチェックは、トランザクショントークンの変更が即座に同期されないため、リクエストのタイミングに因っては、意図した動作をしないケースが存在する。
+そのため、セッションの外部管理を行う場合は、セッションを利用したトランザクショントークンチェックの機能面で制限が発生する点に注意する。
+代替手段としては、トランザクショントークンの永続化先をデータベースに変更してロックを使用した排他制御を行うか、アプリケーションを冪等に実装して二重送信が発生しても問題がないようにするとよい（後者の場合は二重送防止処理自体が不要になる）。</p>
+<p class="last">本ガイドラインでは、トランザクショントークンの永続化先をデータベースに変更する拡張方法について説明している。拡張方法については、 <a class="reference internal" href="#extend-transactiontoken-label"><span class="std std-ref">TransactionTokenの拡張方法</span></a> を参照。</p>
+</div>
+</div></blockquote>
+</li>
+<li><p class="first">Spring Session with Redisは、Keyspace Notificationsを使用してセッション生成・破棄イベントをアプリケーションに通知することが出来る。
+イベント通知は全てのアプリケーションサーバに対して行われ、各サーバにおいて<code class="docutils literal"><span class="pre">HttpSessionListener</span></code>が実行されるため、<code class="docutils literal"><span class="pre">HttpSessionListener</span></code>は冪等に実装する必要がある。
+また、RedisはKeyspace NotificationsがOFFになっているので、破棄イベントを実装する場合はKeyspace NotificationsをONに設定する必要がある。
+詳細は、<a class="reference external" href="http://docs.spring.io/spring-session/docs/1.3.5.RELEASE/reference/html5/#api-redisoperationssessionrepository-sessiondestroyedevent">SessionDeletedEvent and SessionExpiredEvent</a>を参照されたい。</p>
+</li>
+<li><p class="first">Servlet仕様では、セッションIDを示すHTTP Cookieの名称は、「JSESSIONID」だが、Spring Sessionを使用した場合のデフォルトは「SESSION」となる。
+変更方法は、<a class="reference external" href="http://docs.spring.io/spring-session/docs/1.3.5.RELEASE/reference/html5/guides/custom-cookie.html">Spring Session - Custom Cookie</a>を参照されたい。</p>
+</li>
+</ul>
+</div></blockquote>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+</div>
+<div class="section" id="redis-cluster">
+<h3><a class="toc-backref" href="#id28">3.3.1.5. Redis Clusterの一貫性保証</a><a class="headerlink" href="#redis-cluster" title="Permalink to this headline">¶</a></h3>
+<p><a class="reference internal" href="#session-management-constitution"><span class="std std-ref">セッション外部管理構成</span></a> で説明したとおり、Redis Clusterにおける各シャードでは、マスタノードからスレーブノードへの非同期のレプリケーションが行われている。
+以下の条件を満たす場合、データの書き込み完了をクライアントに通知したにもかかわらず、データを失う可能性がある。</p>
+<ol class="arabic simple">
+<li>クライアントがマスタノードへの書き込み要求を行う。</li>
+<li>マスタノードは書き込み処理を行い、書き込み完了をクライアントに通知する。</li>
+<li>マスタノードからスレーブノードへのレプリケーションが完了する前にマスタノードがダウンする。</li>
+<li>スレーブノードがマスタノードへ昇格する。</li>
+</ol>
+<p>この時、レプリケーションされなかったデータについては消失することになる。
+また、クライアントが書き込み要求を行っているマスタノードがシャードから分断された場合についても書き込み要求を行っていたノードのダウンが発生するため、レプリケーションが行われなかったデータは消失する。</p>
+<p>Redis Clusterを使用したセッションの外部管理を行う場合は、データ消失の可能性がある点に留意すること。</p>
+<p>より詳しい情報は、<a class="reference external" href="https://redis.io/topics/cluster-tutorial#redis-cluster-consistency-guarantees">Redis Cluster consistency guarantees</a>を参照されたい。</p>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+</div>
+</div>
+<div class="section" id="how-to-use">
+<h2><a class="toc-backref" href="#id29">3.3.2. How to use</a><a class="headerlink" href="#how-to-use" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="http://docs.spring.io/spring-session/docs/1.3.5.RELEASE/reference/html5/#httpsession-redis">Spring Session with Redis</a>の利用方法を示す。</p>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<div class="section" id="id9">
+<h3><a class="toc-backref" href="#id30">3.3.2.1. 依存ライブラリの追加</a><a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h3>
+<p>セッション外部管理では、<a class="reference external" href="http://docs.spring.io/spring-session/docs/1.3.5.RELEASE/reference/html5/#httpsession-redis">Spring Session with Redis</a>を使用するための依存ライブラリを追加する必要がある。
+定義方法は、以下を参照されたい。</p>
+<ul class="simple">
+<li><code class="file docutils literal"><span class="pre">pom.xml</span></code></li>
+</ul>
+<blockquote>
+<div><div class="highlight-xml"><div class="highlight"><pre><span></span><span class="nt">&lt;dependencies&gt;</span>
+        <span class="c">&lt;!-- (1) --&gt;</span>
+        <span class="nt">&lt;dependency&gt;</span>
+                <span class="nt">&lt;groupId&gt;</span>org.springframework.session<span class="nt">&lt;/groupId&gt;</span>
+                <span class="nt">&lt;artifactId&gt;</span>spring-session<span class="nt">&lt;/artifactId&gt;</span>
+        <span class="nt">&lt;/dependency&gt;</span>
+        <span class="c">&lt;!-- (2) --&gt;</span>
+        <span class="nt">&lt;dependency&gt;</span>
+                <span class="nt">&lt;groupId&gt;</span>org.springframework.boot<span class="nt">&lt;/groupId&gt;</span>
+                <span class="nt">&lt;artifactId&gt;</span>spring-boot-starter-data-redis<span class="nt">&lt;/artifactId&gt;</span>
+        <span class="nt">&lt;/dependency&gt;</span>
+<span class="nt">&lt;/dependencies&gt;</span>
+</pre></div>
+</div>
+<table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">依存ライブラリに<code class="docutils literal"><span class="pre">spring-session</span></code>を追加する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(2)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">依存ライブラリに<code class="docutils literal"><span class="pre">spring-boot-starter-data-redis</span></code>を追加する。</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+</div>
+<div class="section" id="spring-session">
+<span id="springsessionrepositoryfilter-label"></span><h3><a class="toc-backref" href="#id31">3.3.2.2. Spring Sessionの設定</a><a class="headerlink" href="#spring-session" title="Permalink to this headline">¶</a></h3>
+<p>セッション外部管理を行うために、<a class="reference external" href="http://docs.spring.io/spring-session/docs/1.3.5.RELEASE/reference/html5/#httpsession-redis">Spring Session with Redis</a>を利用する。</p>
+<ul class="simple">
+<li><code class="file docutils literal"><span class="pre">application.yml</span></code></li>
+</ul>
+<blockquote>
+<div><div class="highlight-yaml"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">spring</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">session</span><span class="p p-Indicator">:</span>
+    <span class="c1"># (1)</span>
+    <span class="l l-Scalar l-Scalar-Plain">store-type</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">redis</span>
+    <span class="c1"># (2)</span>
+    <span class="l l-Scalar l-Scalar-Plain">timeoutSecond</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">1800</span>
+
+  <span class="c1"># (3)</span>
+  <span class="l l-Scalar l-Scalar-Plain">redis</span><span class="p p-Indicator">:</span>
+    <span class="l l-Scalar l-Scalar-Plain">listener</span><span class="p p-Indicator">:</span>
+      <span class="l l-Scalar l-Scalar-Plain">concurrencyLimit</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">2</span>
+</pre></div>
+</div>
+<table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">spring.session.store-type</span></code>にredisを指定する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(2)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">セッションタイムアウトまでの時間を秒で設定する。ここでは、セッションタイムアウトまでの時間を1800秒(30分)に設定している。</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(3)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">spring.redis.listener.concurrencyLimit</span></code>にSubscribe処理の際に使用するスレッドの上限を設定する。</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<ul class="simple">
+<li><code class="file docutils literal"><span class="pre">application-context.xml</span></code></li>
+</ul>
+<blockquote>
+<div><div class="highlight-xml"><div class="highlight"><pre><span></span><span class="c">&lt;!-- (1) --&gt;</span>
+<span class="nt">&lt;context:annotation-config/&gt;</span>
+<span class="nt">&lt;bean</span> <span class="na">class=</span><span class="s">&quot;org.springframework.session.data.redis.config.annotation.web.http.RedisHttpSessionConfiguration&quot;</span><span class="nt">&gt;</span>
+   <span class="c">&lt;!-- (2) --&gt;</span>
+   <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;maxInactiveIntervalInSeconds&quot;</span> <span class="na">value=</span><span class="s">&quot;${spring.session.timeoutSecond}&quot;</span><span class="nt">/&gt;</span>
+<span class="nt">&lt;/bean&gt;</span>
+</pre></div>
+</div>
+<table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">&lt;context：annotation-config</span> <span class="pre">/&gt;</span></code>と<code class="docutils literal"><span class="pre">RedisHttpSessionConfiguration</span></code>の組み合わせで、<code class="docutils literal"><span class="pre">springSessionRepositoryFilter</span></code>のという名前のSpring Beanを作成する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(2)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">RedisHttpSessionConfiguration</span></code>の <code class="docutils literal"><span class="pre">maxInactiveIntervalInSeconds</span></code>に<code class="docutils literal"><span class="pre">application.yml</span></code>で設定したセッションタイムアウトまでの時間を設定する。</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<ul class="simple">
+<li><code class="file docutils literal"><span class="pre">xxx-env.xml</span></code></li>
+</ul>
+<blockquote>
+<div><div class="highlight-xml"><div class="highlight"><pre><span></span><span class="c">&lt;!-- (1) --&gt;</span>
+ <span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;springSessionRedisTaskExecutor&quot;</span> <span class="na">class=</span><span class="s">&quot;org.springframework.core.task.SimpleAsyncTaskExecutor&quot;</span><span class="nt">&gt;</span>
+     <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;concurrencyLimit&quot;</span> <span class="na">value=</span><span class="s">&quot;${spring.redis.listener.concurrencyLimit}&quot;</span> <span class="nt">/&gt;</span>
+ <span class="nt">&lt;/bean&gt;</span>
+</pre></div>
+</div>
+<table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">RedisMessageListenerContainer</span></code>が使用する<code class="docutils literal"><span class="pre">TaskExecutor</span></code>のBean定義を行う。</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last"><code class="docutils literal"><span class="pre">RedisMessageListenerContainer</span></code>は、Subscribe処理の際に<code class="docutils literal"><span class="pre">springSessionRedisTaskExecutor</span></code>のBean名で定義された<code class="docutils literal"><span class="pre">TaskExecutor</span></code>を使用し、Redis上のデータへアクセスを行う。
+デフォルトで使用される<code class="docutils literal"><span class="pre">SimpleAsyncTaskExecutor</span></code>はSubscribeの都度、無制限に新規にスレッドを作成し、Redisのコネクションを取得するため、作成されるスレッド数を制限しておくことを推奨する。
+上記の例では、デフォルトで使用される<code class="docutils literal"><span class="pre">SimpleAsyncTaskExecutor</span></code>に対して<code class="docutils literal"><span class="pre">concurrencyLimit</span></code>を設定することで、作成されるスレッド数に上限を設定している。</p>
+</div>
+</div></blockquote>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<ul class="simple">
+<li><code class="file docutils literal"><span class="pre">web.xml</span></code></li>
+</ul>
+<blockquote>
+<div><div class="highlight-xml"><div class="highlight"><pre><span></span><span class="c">&lt;!-- (1) --&gt;</span>
+<span class="nt">&lt;filter&gt;</span>
+    <span class="nt">&lt;filter-name&gt;</span>springSessionRepositoryFilter<span class="nt">&lt;/filter-name&gt;</span>
+    <span class="nt">&lt;filter-class&gt;</span>org.springframework.web.filter.DelegatingFilterProxy<span class="nt">&lt;/filter-class&gt;</span>
+<span class="nt">&lt;/filter&gt;</span>
+<span class="nt">&lt;filter-mapping&gt;</span>
+    <span class="nt">&lt;filter-name&gt;</span>springSessionRepositoryFilter<span class="nt">&lt;/filter-name&gt;</span>
+    <span class="nt">&lt;url-pattern&gt;</span>/*<span class="nt">&lt;/url-pattern&gt;</span>
+    <span class="nt">&lt;dispatcher&gt;</span>REQUEST<span class="nt">&lt;/dispatcher&gt;</span>
+    <span class="nt">&lt;dispatcher&gt;</span>ERROR<span class="nt">&lt;/dispatcher&gt;</span>
+<span class="nt">&lt;/filter-mapping&gt;</span>
+
+・・・
+
+<span class="nt">&lt;session-config&gt;</span>
+   ...
+
+   <span class="c">&lt;!-- (2) --&gt;</span>
+   <span class="nt">&lt;session-timeout&gt;</span>30<span class="nt">&lt;/session-timeout&gt;</span>
+
+   ...
+ <span class="nt">&lt;/session-config&gt;</span>
+</pre></div>
+</div>
+<table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">DelegatingFilterProxy</span></code>を使用して<code class="docutils literal"><span class="pre">springSessionRepositoryFilter</span></code>を登録する。また、セッションが存在しない状態でフィルタを通過する前にエラーが発生した場合にも<code class="docutils literal"><span class="pre">springSessionRepositoryFilter</span></code>が適用されるよう、<code class="docutils literal"><span class="pre">dispatcher</span></code>に<code class="docutils literal"><span class="pre">ERROR</span></code>も設定する。設定については、<a class="reference external" href="http://docs.spring.io/spring-session/docs/1.3.5.RELEASE/reference/html5/guides/httpsession-xml.html#xml-servlet-container-initialization">XML Servlet Container Initialization</a>を参照されたい。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(2)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">セッションタイムアウトの時間は、<code class="docutils literal"><span class="pre">RedisHttpSessionConfiguration</span></code>で設定しているので、 <code class="docutils literal"><span class="pre">web.xml</span></code>に <code class="docutils literal"><span class="pre">session-timeout</span></code>項目があれば、削除する。</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last"><code class="docutils literal"><span class="pre">dispatcher</span></code>に指定する値はシステム要件に応じて全てのリクエストに対して<code class="docutils literal"><span class="pre">springSessionRepositoryFilter</span></code>が適用されるよう設定すること。
+例えば、JSPのincludeを行っている場合は<code class="docutils literal"><span class="pre">dispatcher</span></code>に<code class="docutils literal"><span class="pre">INCLUDE</span></code>を追加する必要がある。</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last"><code class="docutils literal"><span class="pre">DelegatingFilterProxy</span></code>は<code class="docutils literal"><span class="pre">filter-name</span></code>で指定した名前(上記の例では<code class="docutils literal"><span class="pre">springSessionRepositoryFilter</span></code>)でDIコンテナからBeanを取得して、処理を委譲する。対象のBeanは<code class="docutils literal"><span class="pre">Filter</span></code>を実装する必要がある。Springの下で統一的に<code class="docutils literal"><span class="pre">Filter</span></code>が管理でき、コンテナ上の各種Beanを利用して<code class="docutils literal"><span class="pre">Filter</span></code>が実装できるなどのメリットがある。</p>
+</div>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last"><code class="docutils literal"><span class="pre">springSessionRepositoryFilter</span></code>の登録順序は、<code class="docutils literal"><span class="pre">HttpSession</span></code>を使用する他の <code class="docutils literal"><span class="pre">Filter</span></code>より前に登録する必要がある。</p>
+</div>
+</div></blockquote>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+</div>
+<div class="section" id="spring-data-redis">
+<span id="spring-data-redis-setting-label"></span><h3><a class="toc-backref" href="#id32">3.3.2.3. Spring Data Redisの設定</a><a class="headerlink" href="#spring-data-redis" title="Permalink to this headline">¶</a></h3>
+<p><code class="docutils literal"><span class="pre">spring-boot-starter-data-redis</span></code>を使用している為、基本的な設定はAutoConfigurationにて行われる。
+詳細な設定については、Spring Boot Reference Guideの <a class="reference external" href="https://docs.spring.io/spring-boot/docs/1.5.20.RELEASE/reference/html/common-application-properties.html#common-application-properties">Common application properties</a>の# REDIS (RedisProperties)を参照されたい。</p>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<div class="section" id="session-management-endpoint-label">
+<span id="id12"></span><h4><a class="toc-backref" href="#id33">3.3.2.3.1. エンドポイントの設定</a><a class="headerlink" href="#session-management-endpoint-label" title="Permalink to this headline">¶</a></h4>
+<p>エンドポイント設定は、Spring Data Redisの設定にて定義する。
+詳細は、<a class="reference external" href="http://docs.spring.io/spring-data/redis/docs/1.8.20.RELEASE/reference/html/#cluster">Redis Cluster</a>を参照されたい。</p>
+<ul class="simple">
+<li><code class="file docutils literal"><span class="pre">application.yml</span></code></li>
+</ul>
+<blockquote>
+<div><div class="highlight-yaml"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">spring</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">redis</span><span class="p p-Indicator">:</span>
+    <span class="l l-Scalar l-Scalar-Plain">cluster</span><span class="p p-Indicator">:</span>
+      <span class="c1"># (1)</span>
+      <span class="l l-Scalar l-Scalar-Plain">nodes</span><span class="p p-Indicator">:</span>
+        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">127.0.0.1:30001</span>
+        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">127.0.0.1:30002</span>
+        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">127.0.0.1:30003</span>
+</pre></div>
+</div>
+</div></blockquote>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<blockquote>
+<div><table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">spring.redis.cluster.nodes</span></code>にすべてのノードを追加する。
+詳細は、<a class="reference external" href="http://docs.spring.io/spring-data/redis/docs/1.8.20.RELEASE/reference/html/#_enabling_redis_cluster">Enabling Redis Cluster</a>を参照されたい。</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+</div>
+</div>
+<div class="section" id="id14">
+<h3><a class="toc-backref" href="#id34">3.3.2.4. クラウドベンダの利用</a><a class="headerlink" href="#id14" title="Permalink to this headline">¶</a></h3>
+<p>クラウドベンダ提供の環境を利用する場合のガイドラインについて記載箇所を示しておく。</p>
+<div class="section" id="amazon-web-service">
+<h4><a class="toc-backref" href="#id35">3.3.2.4.1. Amazon Web Service</a><a class="headerlink" href="#amazon-web-service" title="Permalink to this headline">¶</a></h4>
+<p>クラウドベンダとしてAWSを使用する場合のセッション外部管理については、
+<a class="reference internal" href="../AWSCollaboration/SessionManagement.html"><span class="doc">セッション外部管理</span></a>
+を参照されたい。</p>
+</div>
+</div>
+</div>
+<div class="section" id="how-to-extend">
+<h2><a class="toc-backref" href="#id36">3.3.3. How to extend</a><a class="headerlink" href="#how-to-extend" title="Permalink to this headline">¶</a></h2>
+<p>本ガイドラインでは、拡張方法や応用的な使用方法を示す。</p>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<div class="section" id="id15">
+<h3><a class="toc-backref" href="#id37">3.3.3.1. セッション永続化タイミングの変更</a><a class="headerlink" href="#id15" title="Permalink to this headline">¶</a></h3>
+<p>セッション永続化のタイミングは、デフォルトでレスポンスのコミット時になっているが、以下の様に定義することで<code class="docutils literal"><span class="pre">setAttribute</span></code>および<code class="docutils literal"><span class="pre">removeAttribute</span></code>メソッド呼び出し時に変更することができる。</p>
+<ul class="simple">
+<li><code class="file docutils literal"><span class="pre">application.yml</span></code></li>
+</ul>
+<blockquote>
+<div><div class="highlight-yaml"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">spring</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">session</span><span class="p p-Indicator">:</span>
+    <span class="l l-Scalar l-Scalar-Plain">redis</span><span class="p p-Indicator">:</span>
+      <span class="l l-Scalar l-Scalar-Plain">flush-mode</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">immediate</span> <span class="c1">#(1)</span>
+</pre></div>
+</div>
+</div></blockquote>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<blockquote>
+<div><table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">spring.session.redis.flush-mode</span></code>に<code class="docutils literal"><span class="pre">immediate</span></code>を設定する。デフォルトは、<code class="docutils literal"><span class="pre">on-save</span></code>となっている。</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p><code class="docutils literal"><span class="pre">immediate</span></code>を設定する際の注意事項を以下に示す。</p>
+<blockquote class="last">
+<div><ul class="simple">
+<li><code class="docutils literal"><span class="pre">setAttrubute</span></code>の実行回数が多い場合は、頻繁にIOが発生するため性能に影響が出る。</li>
+<li><code class="docutils literal"><span class="pre">setAttrubute</span></code>が複数実行される処理に並行し、readしている人が別にいた場合に、変更途中のセッションが読まれてしまう可能性が高まる。</li>
+<li><code class="docutils literal"><span class="pre">getAttribute</span></code>を使用して取得したオブジェクトに対する変更を行っても永続化は行われない。ただし、他の属性に対する<code class="docutils literal"><span class="pre">setAttribute</span></code>および<code class="docutils literal"><span class="pre">removeAttribute</span></code>メソッド実行時に全てのセッション情報が永続化される。</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last"><code class="docutils literal"><span class="pre">immediate</span></code>を設定している場合でも、レスポンスのコミット時の永続化は行われる。</p>
+</div>
+</div></blockquote>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+</div>
+<div class="section" id="httpsessionlistener">
+<h3><a class="toc-backref" href="#id38">3.3.3.2. HttpSessionListenerを利用する場合の設定方法</a><a class="headerlink" href="#httpsessionlistener" title="Permalink to this headline">¶</a></h3>
+<p>HttpSessionListenerを使用する場合の設定方法を以下に示す。詳細は、<a class="reference external" href="http://docs.spring.io/spring-session/docs/1.3.5.RELEASE/reference/html5/#httpsession-httpsessionlistener">HttpSessionListener</a>を参照されたい。</p>
+<ul class="simple">
+<li><code class="file docutils literal"><span class="pre">applicationContext.xml</span></code></li>
+</ul>
+<blockquote>
+<div><div class="highlight-xml"><div class="highlight"><pre><span></span><span class="c">&lt;!-- (1) --&gt;</span>
+<span class="nt">&lt;bean</span> <span class="na">class=</span><span class="s">&quot;org.terasoluna.gfw.web.logging.HttpSessionEventLoggingListener&quot;</span> <span class="nt">/&gt;</span>
+</pre></div>
+</div>
+</div></blockquote>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<blockquote>
+<div><table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">使用する<code class="docutils literal"><span class="pre">HttpSessionListener</span></code>をBean定義する。</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+</div>
+<div class="section" id="transactiontoken">
+<span id="extend-transactiontoken-label"></span><h3><a class="toc-backref" href="#id39">3.3.3.3. TransactionTokenの拡張方法</a><a class="headerlink" href="#transactiontoken" title="Permalink to this headline">¶</a></h3>
+<p>Macchinetta Server Framework for Java (1.x) Development Guideline <a class="reference external" href="https://macchinetta.github.io/server-guideline/1.5.2.RELEASE/ja/ArchitectureInDetail/WebApplicationDetail/DoubleSubmitProtection.html#id1">4.5. 二重送信防止</a> にて説明しているトランザクショントークンチェックについて、共通ライブラリから提供しているトランザクショントークンチェック機能はトークン情報の格納先をセッションとしている。
+そのため、Spring Sessionによるセッションの外部管理を行う場合、セッションの同期化を行うことができないことにより二重送信を防止できないケースがある。
+本ガイドラインでは、MyBatis3を使用してトークン情報の格納先をデータベースへ変更する拡張方法について説明する。</p>
+<p>実装が必要な要素は以下のとおり。</p>
+<ul class="simple">
+<li>トランザクショントークン情報を格納するテーブル</li>
+<li>DBアクセスを行うRepositoryインタフェースおよびマッピングファイル</li>
+<li>トランザクショントークン情報の生成およびテーブルへの格納を行う<code class="docutils literal"><span class="pre">TransactionTokenStore</span></code>インタフェースの実装クラス</li>
+<li>セッション破棄時にトランザクショントークン情報の削除を行う<code class="docutils literal"><span class="pre">EventListener</span></code>クラス</li>
+<li>アプリケーションから利用するためのBean定義</li>
+</ul>
+<div class="section" id="id18">
+<h4><a class="toc-backref" href="#id40">3.3.3.3.1. テーブル構成例</a><a class="headerlink" href="#id18" title="Permalink to this headline">¶</a></h4>
+<p>本ガイドラインで紹介する拡張方法では、以下のようなテーブルにトランザクショントークン情報を格納する実装を行う。</p>
+<ul class="simple">
+<li><code class="file docutils literal"><span class="pre">createtable.sql</span></code></li>
+</ul>
+<blockquote>
+<div><div class="highlight-sql"><div class="highlight"><pre><span></span><span class="k">create</span> <span class="k">table</span> <span class="n">transaction_token</span> <span class="p">(</span>
+    <span class="n">token_name</span> <span class="nb">varchar</span><span class="p">(</span><span class="mi">256</span><span class="p">)</span> <span class="k">not</span> <span class="k">null</span><span class="p">,</span>
+    <span class="n">token_key</span> <span class="nb">varchar</span><span class="p">(</span><span class="mi">32</span><span class="p">)</span> <span class="k">not</span> <span class="k">null</span><span class="p">,</span>
+    <span class="n">token_value</span> <span class="nb">varchar</span><span class="p">(</span><span class="mi">32</span><span class="p">)</span> <span class="k">not</span> <span class="k">null</span><span class="p">,</span>
+    <span class="n">session_id</span>  <span class="nb">varchar</span><span class="p">(</span><span class="mi">256</span><span class="p">)</span> <span class="k">not</span> <span class="k">null</span><span class="p">,</span>
+    <span class="n">sequence</span> <span class="nb">bigint</span><span class="p">,</span>
+    <span class="k">constraint</span> <span class="n">pk_transaction_token</span> <span class="k">primary</span> <span class="k">key</span> <span class="p">(</span><span class="n">token_name</span><span class="p">,</span> <span class="n">token_key</span><span class="p">,</span> <span class="n">session_id</span><span class="p">)</span>
+<span class="p">);</span>
+
+<span class="k">create</span> <span class="k">index</span> <span class="n">transaction_token_index_delete_older</span> <span class="k">on</span> <span class="n">transaction_token</span><span class="p">(</span><span class="n">token_name</span><span class="p">,</span> <span class="n">session_id</span><span class="p">);</span>
+<span class="k">create</span> <span class="k">index</span> <span class="n">transaction_token_index_delete_older_sequence</span> <span class="k">on</span> <span class="n">transaction_token</span><span class="p">(</span><span class="n">sequence</span><span class="p">);</span>
+<span class="k">create</span> <span class="k">index</span> <span class="n">transaction_token_index_clean</span> <span class="k">on</span> <span class="n">transaction_token</span><span class="p">(</span><span class="n">session_id</span><span class="p">);</span>
+
+<span class="k">create</span> <span class="n">sequence</span> <span class="n">transaction_token_sequence</span><span class="p">;</span>
+</pre></div>
+</div>
+</div></blockquote>
+</div>
+<div class="section" id="repository">
+<h4><a class="toc-backref" href="#id41">3.3.3.3.2. Repositoryインタフェースおよびマッピングファイル</a><a class="headerlink" href="#repository" title="Permalink to this headline">¶</a></h4>
+<p>DBアクセスを行うRepositoryインタフェースおよびマッピングファイルを作成する。</p>
+<ul class="simple">
+<li><code class="file docutils literal"><span class="pre">StoredTransactionTokenRepository.java</span></code></li>
+</ul>
+<blockquote>
+<div><div class="highlight-java"><div class="highlight"><pre><span></span><span class="kd">public</span> <span class="kd">interface</span> <span class="nc">StoredTransactionTokenRepository</span> <span class="o">{</span>
+
+    <span class="c1">// (1)</span>
+    <span class="n">StoredTransactionToken</span> <span class="nf">findOneForUpdate</span><span class="o">(</span><span class="nd">@Param</span><span class="o">(</span><span class="s">&quot;tokenName&quot;</span><span class="o">)</span> <span class="n">String</span> <span class="n">tokenName</span><span class="o">,</span> <span class="nd">@Param</span><span class="o">(</span><span class="s">&quot;tokenKey&quot;</span><span class="o">)</span> <span class="n">String</span> <span class="n">tokenKey</span><span class="o">,</span> <span class="nd">@Param</span><span class="o">(</span><span class="s">&quot;sessionId&quot;</span><span class="o">)</span> <span class="n">String</span> <span class="n">sessionId</span><span class="o">);</span>
+
+    <span class="c1">// (2)</span>
+    <span class="kt">void</span> <span class="nf">delete</span><span class="o">(</span><span class="nd">@Param</span><span class="o">(</span><span class="s">&quot;tokenName&quot;</span><span class="o">)</span> <span class="n">String</span> <span class="n">tokenName</span><span class="o">,</span> <span class="nd">@Param</span><span class="o">(</span><span class="s">&quot;tokenKey&quot;</span><span class="o">)</span> <span class="n">String</span> <span class="n">tokenKey</span><span class="o">,</span> <span class="nd">@Param</span><span class="o">(</span><span class="s">&quot;sessionId&quot;</span><span class="o">)</span> <span class="n">String</span> <span class="n">sessionId</span><span class="o">);</span>
+
+    <span class="c1">// (3)</span>
+    <span class="kt">void</span> <span class="nf">insert</span><span class="o">(</span><span class="n">StoredTransactionToken</span> <span class="n">token</span><span class="o">);</span>
+
+    <span class="c1">// (4)</span>
+    <span class="kt">void</span> <span class="nf">deleteOlderThanLatest</span><span class="o">(</span><span class="nd">@Param</span><span class="o">(</span><span class="s">&quot;tokenName&quot;</span><span class="o">)</span> <span class="n">String</span> <span class="n">tokenName</span><span class="o">,</span> <span class="nd">@Param</span><span class="o">(</span><span class="s">&quot;sessionId&quot;</span><span class="o">)</span> <span class="n">String</span> <span class="n">sessionId</span><span class="o">,</span> <span class="nd">@Param</span><span class="o">(</span><span class="s">&quot;num&quot;</span><span class="o">)</span> <span class="kt">int</span> <span class="n">num</span><span class="o">);</span>
+
+    <span class="c1">// (5)</span>
+    <span class="kt">void</span> <span class="nf">deleteBySessionId</span><span class="o">(</span><span class="nd">@Param</span><span class="o">(</span><span class="s">&quot;sessionId&quot;</span><span class="o">)</span> <span class="n">String</span> <span class="n">sessionId</span><span class="o">);</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+<table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">トークン名およびトークンキーを元にレコードを取得するメソッド。</div>
+<div class="line"><code class="docutils literal"><span class="pre">StoredTransactionToken</span></code>は、テーブル構成に対応するEntityクラスである。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(2)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">トークン名およびトークンキーを元にレコードを削除するメソッド。</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(3)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">レコードを1件挿入するメソッド。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(4)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">トークン名およびセッションIDを元に、タイムスタンプ降順で指定件数以降のレコードを削除するメソッド。</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(5)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">セッション破棄時に、セッションIDに紐づくレコードを削除するメソッド。</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+<ul class="simple">
+<li><code class="file docutils literal"><span class="pre">StoredTransactionTokenRepository.xml</span></code></li>
+</ul>
+<blockquote>
+<div><div class="highlight-xml"><div class="highlight"><pre><span></span><span class="nt">&lt;mapper</span> <span class="na">namespace=</span><span class="s">&quot;com.example.domain.repository.StoredTransactionTokenRepository&quot;</span><span class="nt">&gt;</span>
+
+        <span class="nt">&lt;resultMap</span> <span class="na">id=</span><span class="s">&quot;storedTransactionTokenresultMap&quot;</span> <span class="na">type=</span><span class="s">&quot;StoredTransactionToken&quot;</span><span class="nt">&gt;</span>
+            <span class="nt">&lt;id</span> <span class="na">property=</span><span class="s">&quot;tokenName&quot;</span> <span class="na">column=</span><span class="s">&quot;token_name&quot;</span> <span class="nt">/&gt;</span>
+            <span class="nt">&lt;id</span> <span class="na">property=</span><span class="s">&quot;tokenKey&quot;</span> <span class="na">column=</span><span class="s">&quot;token_key&quot;</span> <span class="nt">/&gt;</span>
+            <span class="nt">&lt;result</span> <span class="na">property=</span><span class="s">&quot;tokenValue&quot;</span> <span class="na">column=</span><span class="s">&quot;token_value&quot;</span> <span class="nt">/&gt;</span>
+            <span class="nt">&lt;result</span> <span class="na">property=</span><span class="s">&quot;sessionId&quot;</span> <span class="na">column=</span><span class="s">&quot;session_id&quot;</span> <span class="nt">/&gt;</span>
+            <span class="nt">&lt;result</span> <span class="na">property=</span><span class="s">&quot;sequence&quot;</span> <span class="na">column=</span><span class="s">&quot;sequence&quot;</span> <span class="nt">/&gt;</span>
+        <span class="nt">&lt;/resultMap&gt;</span>
+
+        <span class="c">&lt;!-- (1) --&gt;</span>
+        <span class="nt">&lt;select</span> <span class="na">id=</span><span class="s">&quot;findOneForUpdate&quot;</span> <span class="na">resultMap=</span><span class="s">&quot;storedTransactionTokenresultMap&quot;</span><span class="nt">&gt;</span>
+            <span class="cp">&lt;![CDATA[</span>
+<span class="cp">                SELECT</span>
+<span class="cp">                    token_name,</span>
+<span class="cp">                    token_key,</span>
+<span class="cp">                    token_value,</span>
+<span class="cp">                    session_id,</span>
+<span class="cp">                    sequence</span>
+<span class="cp">                FROM</span>
+<span class="cp">                    transaction_token</span>
+<span class="cp">                WHERE</span>
+<span class="cp">                    token_name = #{tokenName}</span>
+<span class="cp">                AND</span>
+<span class="cp">                    token_key = #{tokenKey}</span>
+<span class="cp">                AND</span>
+<span class="cp">                    session_id = #{sessionId}</span>
+<span class="cp">                FOR UPDATE</span>
+<span class="cp">            ]]&gt;</span>
+        <span class="nt">&lt;/select&gt;</span>
+
+        <span class="c">&lt;!-- (2) --&gt;</span>
+        <span class="nt">&lt;delete</span> <span class="na">id=</span><span class="s">&quot;delete&quot;</span><span class="nt">&gt;</span>
+            <span class="cp">&lt;![CDATA[</span>
+<span class="cp">                DELETE FROM transaction_token</span>
+<span class="cp">                WHERE</span>
+<span class="cp">                    token_name = #{tokenName}</span>
+<span class="cp">                AND</span>
+<span class="cp">                    token_key = #{tokenKey}</span>
+<span class="cp">                AND</span>
+<span class="cp">                    session_id = #{sessionId}</span>
+<span class="cp">            ]]&gt;</span>
+        <span class="nt">&lt;/delete&gt;</span>
+
+        <span class="c">&lt;!-- (3) --&gt;</span>
+        <span class="nt">&lt;insert</span> <span class="na">id=</span><span class="s">&quot;insert&quot;</span> <span class="na">parameterType=</span><span class="s">&quot;StoredTransactionToken&quot;</span><span class="nt">&gt;</span>
+            <span class="cp">&lt;![CDATA[</span>
+<span class="cp">                INSERT INTO transaction_token</span>
+<span class="cp">                (</span>
+<span class="cp">                    token_name,</span>
+<span class="cp">                    token_key,</span>
+<span class="cp">                    token_value,</span>
+<span class="cp">                    session_id,</span>
+<span class="cp">                    sequence</span>
+<span class="cp">                )</span>
+<span class="cp">                VALUES</span>
+<span class="cp">                (</span>
+<span class="cp">                    #{tokenName},</span>
+<span class="cp">                    #{tokenKey},</span>
+<span class="cp">                    #{tokenValue},</span>
+<span class="cp">                    #{sessionId},</span>
+<span class="cp">                    nextval(&#39;transaction_token_sequence&#39;)</span>
+<span class="cp">                )</span>
+<span class="cp">            ]]&gt;</span>
+        <span class="nt">&lt;/insert&gt;</span>
+
+        <span class="c">&lt;!-- (4) --&gt;</span>
+        <span class="nt">&lt;delete</span> <span class="na">id=</span><span class="s">&quot;deleteOlderThanLatest&quot;</span><span class="nt">&gt;</span>
+            <span class="cp">&lt;![CDATA[</span>
+<span class="cp">                DELETE FROM transaction_token</span>
+<span class="cp">                WHERE sequence IN (</span>
+<span class="cp">                SELECT sequence FROM transaction_token</span>
+<span class="cp">                WHERE</span>
+<span class="cp">                    token_name = #{tokenName}</span>
+<span class="cp">                AND</span>
+<span class="cp">                    session_id = #{sessionId}</span>
+<span class="cp">                ORDER BY sequence DESC</span>
+<span class="cp">                OFFSET #{num}</span>
+<span class="cp">                )</span>
+<span class="cp">            ]]&gt;</span>
+        <span class="nt">&lt;/delete&gt;</span>
+
+        <span class="c">&lt;!-- (5) --&gt;</span>
+        <span class="nt">&lt;delete</span> <span class="na">id=</span><span class="s">&quot;deleteBySessionId&quot;</span><span class="nt">&gt;</span>
+            <span class="cp">&lt;![CDATA[</span>
+<span class="cp">                DELETE FROM transaction_token</span>
+<span class="cp">                WHERE</span>
+<span class="cp">                    session_id = #{sessionId}</span>
+<span class="cp">            ]]&gt;</span>
+        <span class="nt">&lt;/delete&gt;</span>
+<span class="nt">&lt;/mapper&gt;</span>
+</pre></div>
+</div>
+<table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">findOneForUpdate</span></code>メソッドに対応するSQL。</div>
+<div class="line">SELECT FOR UPDATEを使用し、ロックを取得することでトランザクショントークンのチェック処理に対して排他制御を行う。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(2)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">delete</span></code>メソッドに対応するSQL。</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(3)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">insert</span></code>メソッドに対応するSQL。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(4)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">deleteOlderThanLatest</span></code>メソッドに対応するSQL。</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(5)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">deleteBySessionId</span></code>メソッドに対応するSQL。</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+</div>
+<div class="section" id="transactiontokenstore">
+<h4><a class="toc-backref" href="#id42">3.3.3.3.3. TransactionTokenStoreの実装</a><a class="headerlink" href="#transactiontokenstore" title="Permalink to this headline">¶</a></h4>
+<p>トークン情報の格納を行う<code class="docutils literal"><span class="pre">TransactionTokenStore</span></code>インタフェースの実装クラスを作成する。
+実装する各メソッドの役割については、<a class="reference external" href="https://github.com/terasolunaorg/terasoluna-gfw/blob/release/5.4.2.RELEASE/terasoluna-gfw-common-libraries/terasoluna-gfw-web/src/main/java/org/terasoluna/gfw/web/token/transaction/TransactionTokenStore.java">TransactionTokenStore</a>インタフェースを参照のこと。</p>
+<ul class="simple">
+<li><code class="file docutils literal"><span class="pre">MyBatisTransactionTokenStore.java</span></code></li>
+</ul>
+<blockquote>
+<div><div class="highlight-java"><div class="highlight"><pre><span></span><span class="kd">public</span> <span class="kd">class</span> <span class="nc">MyBatisTransactionTokenStore</span> <span class="kd">implements</span> <span class="n">TransactionTokenStore</span> <span class="o">{</span>
+
+    <span class="nd">@Inject</span>
+    <span class="n">StoredTransactionTokenRepository</span> <span class="n">tokenRepository</span><span class="o">;</span>
+
+    <span class="nd">@Inject</span>
+    <span class="n">JodaTimeDateFactory</span> <span class="n">dateFactory</span><span class="o">;</span>
+
+    <span class="kd">private</span> <span class="kd">final</span> <span class="kt">int</span> <span class="n">transactionTokenSizePerTokenName</span><span class="o">;</span>
+
+    <span class="kd">private</span> <span class="kd">final</span> <span class="n">TokenStringGenerator</span> <span class="n">generator</span><span class="o">;</span>
+
+    <span class="kd">public</span> <span class="nf">MyBatisTransactionTokenStore</span><span class="o">(</span><span class="kt">int</span> <span class="n">transactionTokenSizePerTokenName</span><span class="o">,</span> <span class="n">TokenStringGenerator</span> <span class="n">generator</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">transactionTokenSizePerTokenName</span> <span class="o">=</span> <span class="n">transactionTokenSizePerTokenName</span><span class="o">;</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">generator</span> <span class="o">=</span> <span class="n">generator</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="nf">MyBatisTransactionTokenStore</span><span class="o">(</span><span class="kt">int</span> <span class="n">transactionTokenSizePerTokenName</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">(</span><span class="n">transactionTokenSizePerTokenName</span><span class="o">,</span> <span class="k">new</span> <span class="n">TokenStringGenerator</span><span class="o">());</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="nf">MyBatisTransactionTokenStore</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">(</span><span class="mi">10</span><span class="o">,</span> <span class="k">new</span> <span class="n">TokenStringGenerator</span><span class="o">());</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="nd">@Transactional</span><span class="o">(</span><span class="n">propagation</span> <span class="o">=</span> <span class="n">Propagation</span><span class="o">.</span><span class="na">REQUIRES_NEW</span><span class="o">)</span>
+    <span class="kd">public</span> <span class="n">String</span> <span class="nf">getAndClear</span><span class="o">(</span><span class="n">TransactionToken</span> <span class="n">transactionToken</span><span class="o">)</span> <span class="o">{</span> <span class="c1">// (1)</span>
+        <span class="n">String</span> <span class="n">name</span> <span class="o">=</span> <span class="n">transactionToken</span><span class="o">.</span><span class="na">getTokenName</span><span class="o">();</span>
+        <span class="n">String</span> <span class="n">key</span> <span class="o">=</span> <span class="n">transactionToken</span><span class="o">.</span><span class="na">getTokenKey</span><span class="o">();</span>
+        <span class="n">String</span> <span class="n">sessionId</span> <span class="o">=</span> <span class="n">getSession</span><span class="o">().</span><span class="na">getId</span><span class="o">();</span>
+
+        <span class="k">try</span> <span class="o">{</span>
+            <span class="n">StoredTransactionToken</span> <span class="n">token</span> <span class="o">=</span> <span class="n">tokenRepository</span><span class="o">.</span><span class="na">findOneForUpdate</span><span class="o">(</span><span class="n">name</span><span class="o">,</span> <span class="n">key</span><span class="o">,</span> <span class="n">sessionId</span><span class="o">);</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">token</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+                <span class="k">return</span> <span class="kc">null</span><span class="o">;</span>
+            <span class="o">}</span>
+
+            <span class="n">tokenRepository</span><span class="o">.</span><span class="na">delete</span><span class="o">(</span><span class="n">name</span><span class="o">,</span> <span class="n">key</span><span class="o">,</span> <span class="n">sessionId</span><span class="o">);</span>
+            <span class="k">return</span> <span class="n">token</span><span class="o">.</span><span class="na">getTokenValue</span><span class="o">();</span>
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">PessimisticLockingFailureException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+        <span class="o">}</span>
+        <span class="k">return</span> <span class="kc">null</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="nd">@Transactional</span><span class="o">(</span><span class="n">propagation</span> <span class="o">=</span> <span class="n">Propagation</span><span class="o">.</span><span class="na">REQUIRES_NEW</span><span class="o">)</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">remove</span><span class="o">(</span><span class="n">TransactionToken</span> <span class="n">transactionToken</span><span class="o">)</span> <span class="o">{</span> <span class="c1">// (2)</span>
+        <span class="n">String</span> <span class="n">name</span> <span class="o">=</span> <span class="n">transactionToken</span><span class="o">.</span><span class="na">getTokenName</span><span class="o">();</span>
+        <span class="n">String</span> <span class="n">key</span> <span class="o">=</span> <span class="n">transactionToken</span><span class="o">.</span><span class="na">getTokenKey</span><span class="o">();</span>
+        <span class="n">String</span> <span class="n">sessionId</span> <span class="o">=</span> <span class="n">getSession</span><span class="o">().</span><span class="na">getId</span><span class="o">();</span>
+        <span class="n">tokenRepository</span><span class="o">.</span><span class="na">delete</span><span class="o">(</span><span class="n">name</span><span class="o">,</span> <span class="n">key</span><span class="o">,</span> <span class="n">sessionId</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="nd">@Transactional</span><span class="o">(</span><span class="n">propagation</span> <span class="o">=</span> <span class="n">Propagation</span><span class="o">.</span><span class="na">REQUIRES_NEW</span><span class="o">)</span>
+    <span class="kd">public</span> <span class="n">String</span> <span class="nf">createAndReserveTokenKey</span><span class="o">(</span><span class="n">String</span> <span class="n">tokenName</span><span class="o">)</span> <span class="o">{</span> <span class="c1">// (3)</span>
+        <span class="n">String</span> <span class="n">sessionId</span> <span class="o">=</span> <span class="n">getSession</span><span class="o">().</span><span class="na">getId</span><span class="o">();</span>
+        <span class="n">tokenRepository</span><span class="o">.</span><span class="na">deleteOlderThanLatest</span><span class="o">(</span><span class="n">tokenName</span><span class="o">,</span> <span class="n">sessionId</span><span class="o">,</span> <span class="n">transactionTokenSizePerTokenName</span> <span class="o">-</span> <span class="mi">1</span><span class="o">);</span>
+        <span class="k">return</span> <span class="n">generator</span><span class="o">.</span><span class="na">generate</span><span class="o">(</span><span class="n">UUID</span><span class="o">.</span><span class="na">randomUUID</span><span class="o">().</span><span class="na">toString</span><span class="o">());</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="nd">@Transactional</span><span class="o">(</span><span class="n">propagation</span> <span class="o">=</span> <span class="n">Propagation</span><span class="o">.</span><span class="na">REQUIRES_NEW</span><span class="o">)</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">store</span><span class="o">(</span><span class="n">TransactionToken</span> <span class="n">transactionToken</span><span class="o">)</span> <span class="o">{</span> <span class="c1">// (4)</span>
+        <span class="n">StoredTransactionToken</span> <span class="n">token</span> <span class="o">=</span> <span class="k">new</span> <span class="n">StoredTransactionToken</span><span class="o">();</span>
+        <span class="n">token</span><span class="o">.</span><span class="na">setTokenName</span><span class="o">(</span><span class="n">transactionToken</span><span class="o">.</span><span class="na">getTokenName</span><span class="o">());</span>
+        <span class="n">token</span><span class="o">.</span><span class="na">setTokenKey</span><span class="o">(</span><span class="n">transactionToken</span><span class="o">.</span><span class="na">getTokenKey</span><span class="o">());</span>
+        <span class="n">token</span><span class="o">.</span><span class="na">setTokenValue</span><span class="o">(</span><span class="n">transactionToken</span><span class="o">.</span><span class="na">getTokenValue</span><span class="o">());</span>
+        <span class="n">token</span><span class="o">.</span><span class="na">setSessionId</span><span class="o">(</span><span class="n">getSession</span><span class="o">().</span><span class="na">getId</span><span class="o">());</span>
+        <span class="n">tokenRepository</span><span class="o">.</span><span class="na">insert</span><span class="o">(</span><span class="n">token</span><span class="o">);</span>
+
+        <span class="n">getSession</span><span class="o">();</span>
+    <span class="o">}</span>
+
+    <span class="n">HttpSession</span> <span class="nf">getSession</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">getRequest</span><span class="o">().</span><span class="na">getSession</span><span class="o">(</span><span class="kc">true</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="n">HttpServletRequest</span> <span class="nf">getRequest</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="o">((</span><span class="n">ServletRequestAttributes</span><span class="o">)</span> <span class="n">RequestContextHolder</span>
+                <span class="o">.</span><span class="na">currentRequestAttributes</span><span class="o">()).</span><span class="na">getRequest</span><span class="o">();</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+<table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">getAndClear</span></code>メソッドを実装する。</div>
+<div class="line">データベースに格納したトランザクショントークン情報のレコードをロックした上で取得し、トランザクショントークン情報をデータベースから削除する。</div>
+<div class="line">当該メソッドはトランザクショントークンチェック時に動作し、チェックに使用するレコードをロックして排他制御を行うことで、同一のトランザクショントークン情報が複数回使用されないことを保証する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(2)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">remove</span></code>メソッドを実装する。</div>
+<div class="line">当該メソッドは<code class="docutils literal"><span class="pre">&#64;TransactionTokenCheck</span></code>を付与したメソッド終了後に動作し、トランザクショントークン情報の削除を行う。</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(3)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">createAndReserveTokenKey</span></code>メソッドを実装する。</div>
+<div class="line">当該メソッドは<code class="docutils literal"><span class="pre">&#64;TransactionTokenCheck</span></code>を付与したメソッド終了後に動作し、次回チェック用のトランザクショントークン情報の生成を行うとともに、トークン名およびセッションIDに紐づく古い世代のレコードを削除する。</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line">(4)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">store</span></code>メソッドを実装する。</div>
+<div class="line">当該メソッドはトランザクショントークン情報のデータベースへの格納を行う。</div>
+<div class="line">セッションが無効になった際に格納されたトランザクショントークン情報の削除を行うため、INSERTを行った後にセッションを取得し、<code class="docutils literal"><span class="pre">ApplicationEvent</span></code>による通知を行う。</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+</div>
+<div class="section" id="id20">
+<h4><a class="toc-backref" href="#id43">3.3.3.3.4. HttpSessionListenerの実装</a><a class="headerlink" href="#id20" title="Permalink to this headline">¶</a></h4>
+<p>セッション破棄時の<code class="docutils literal"><span class="pre">HttpSessionDestroyedEvent</span></code>を検知してトランザクショントークン情報の削除を行う<code class="docutils literal"><span class="pre">EventListener</span></code>クラスを作成する。</p>
+<ul class="simple">
+<li><code class="file docutils literal"><span class="pre">TransactionTokenCleaningListener.java</span></code></li>
+</ul>
+<blockquote>
+<div><div class="highlight-java"><div class="highlight"><pre><span></span><span class="kd">public</span> <span class="kd">class</span> <span class="nc">TransactionTokenCleaningListener</span> <span class="o">{</span>
+
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">Logger</span> <span class="n">logger</span> <span class="o">=</span> <span class="n">LoggerFactory</span><span class="o">.</span><span class="na">getLogger</span><span class="o">(</span><span class="n">TransactionTokenCleaningListener</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+
+    <span class="nd">@Inject</span>
+    <span class="n">StoredTransactionTokenRepository</span> <span class="n">tokenRepository</span><span class="o">;</span>
+
+    <span class="nd">@EventListener</span> <span class="c1">// (1)</span>
+    <span class="nd">@Transactional</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">sessionDestroyed</span><span class="o">(</span><span class="n">HttpSessionDestroyedEvent</span> <span class="n">event</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">String</span> <span class="n">sessionId</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="na">getSession</span><span class="o">().</span><span class="na">getId</span><span class="o">();</span>
+        <span class="k">try</span> <span class="o">{</span>
+            <span class="n">tokenRepository</span><span class="o">.</span><span class="na">deleteBySessionId</span><span class="o">(</span><span class="n">sessionId</span><span class="o">);</span>
+            <span class="n">logger</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">&quot;Transaction tokens created by sessionId={} have been cleaned.&quot;</span><span class="o">,</span> <span class="n">sessionId</span><span class="o">);</span>
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">DataAccessException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">logger</span><span class="o">.</span><span class="na">warn</span><span class="o">(</span><span class="s">&quot;Failed to clean abandoned transaction tokens created by sessionId={}.&quot;</span><span class="o">,</span> <span class="n">sessionId</span><span class="o">,</span> <span class="n">e</span><span class="o">);</span>
+            <span class="c1">// ignore</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+<table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">&#64;EventListener</span></code>アノテーションを付与し、セッション破棄時にPublishされる<code class="docutils literal"><span class="pre">HttpSessionDestroyedEvent</span></code>を検知してセッションIDによるトランザクショントークン情報の削除を行うメソッドを実装する。</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+</div>
+<div class="section" id="id21">
+<h4><a class="toc-backref" href="#id44">3.3.3.3.5. アプリケーションでの利用方法</a><a class="headerlink" href="#id21" title="Permalink to this headline">¶</a></h4>
+<p>本ガイドラインで紹介する拡張方法を使用した場合においても、ControllerやJSPからの利用方法は同一である。詳細は、<a class="reference external" href="https://macchinetta.github.io/server-guideline/1.5.2.RELEASE/ja/ArchitectureInDetail/WebApplicationDetail/DoubleSubmitProtection.html#controller">トランザクショントークンチェックのControllerでの利用方法</a> および <a class="reference external" href="https://macchinetta.github.io/server-guideline/1.5.2.RELEASE/ja/ArchitectureInDetail/WebApplicationDetail/DoubleSubmitProtection.html#view-jsp">トランザクショントークンチェックのView(JSP)での利用方法</a> を参照されたい。</p>
+<p>本ガイドラインでは、アプリケーションから利用するためのBean定義方法について説明する。</p>
+<p>Macchinetta Server Framework for Java (1.x) Development Guideline <a class="reference external" href="https://macchinetta.github.io/server-guideline/1.5.2.RELEASE/ja/ArchitectureInDetail/WebApplicationDetail/DoubleSubmitProtection.html#setting">4.5.2.3.5. トランザクショントークンチェックを使用するための設定</a> にて説明している、<code class="docutils literal"><span class="pre">HandlerInterceptor</span></code>の設定について、<code class="docutils literal"><span class="pre">TransactionTokenInterceptor</span></code>で使用される<code class="docutils literal"><span class="pre">TransactionTokenStore</span></code>の実装クラスが作成した<code class="docutils literal"><span class="pre">MyBatisTransactionTokenStore</span></code>となるようBean定義を行う。</p>
+<ul class="simple">
+<li><code class="file docutils literal"><span class="pre">spring-mvc.xml</span></code></li>
+</ul>
+<blockquote>
+<div><div class="highlight-xml"><div class="highlight"><pre><span></span><span class="nt">&lt;mvc:interceptor&gt;</span>
+    <span class="nt">&lt;mvc:mapping</span> <span class="na">path=</span><span class="s">&quot;/**&quot;</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;mvc:exclude-mapping</span> <span class="na">path=</span><span class="s">&quot;/resources/**&quot;</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;mvc:exclude-mapping</span> <span class="na">path=</span><span class="s">&quot;/**/*.html&quot;</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;bean</span>
+        <span class="na">class=</span><span class="s">&quot;org.terasoluna.gfw.web.token.transaction.TransactionTokenInterceptor&quot;</span><span class="nt">&gt;</span>
+        <span class="c">&lt;!-- (1) --&gt;</span>
+        <span class="nt">&lt;constructor-arg</span> <span class="na">index=</span><span class="s">&quot;0&quot;</span><span class="nt">&gt;</span>
+            <span class="nt">&lt;bean</span> <span class="na">class=</span><span class="s">&quot;org.terasoluna.gfw.web.token.TokenStringGenerator&quot;</span> <span class="nt">/&gt;</span>
+        <span class="nt">&lt;/constructor-arg&gt;</span>
+        <span class="nt">&lt;constructor-arg</span> <span class="na">index=</span><span class="s">&quot;1&quot;</span><span class="nt">&gt;</span>
+            <span class="nt">&lt;bean</span> <span class="na">class=</span><span class="s">&quot;org.terasoluna.gfw.web.token.transaction.TransactionTokenInfoStore&quot;</span> <span class="nt">/&gt;</span>
+        <span class="nt">&lt;/constructor-arg&gt;</span>
+        <span class="nt">&lt;constructor-arg</span> <span class="na">index=</span><span class="s">&quot;2&quot;</span><span class="nt">&gt;</span>
+            <span class="nt">&lt;bean</span> <span class="na">class=</span><span class="s">&quot;com.example.token.MyBatisTransactionTokenStore&quot;</span> <span class="nt">/&gt;</span>
+        <span class="nt">&lt;/constructor-arg&gt;</span>
+    <span class="nt">&lt;/bean&gt;</span>
+<span class="nt">&lt;/mvc:interceptor&gt;</span>
+</pre></div>
+</div>
+<table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal"><span class="pre">TransactionTokenInterceptor</span></code>のコンストラクタとして、<code class="docutils literal"><span class="pre">TokenStringGenerator</span></code>、<code class="docutils literal"><span class="pre">TransactionTokenInfoStore</span></code>および作成した<code class="docutils literal"><span class="pre">MyBatisTransactionTokenStore</span></code>を指定する。</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+<p><cite>HttpSessionListener</cite>によるトークン削除を有効化するため、以下の設定を行う。</p>
+<ul class="simple">
+<li><code class="file docutils literal"><span class="pre">applicationContext.xml</span></code></li>
+</ul>
+<blockquote>
+<div><div class="highlight-xml"><div class="highlight"><pre><span></span><span class="c">&lt;!-- (1) --&gt;</span>
+<span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;transactionTokenCleaningListener&quot;</span> <span class="na">class=</span><span class="s">&quot;com.example.token.TransactionTokenCleaningListener&quot;</span> <span class="nt">/&gt;</span>
+</pre></div>
+</div>
+<table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">項番</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line">(1)</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">作成した<code class="docutils literal"><span class="pre">TransactionTokenCleaningListener</span></code>のBean定義を行う。</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="FileManagement/index.html" title="3.4. ファイル管理"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="CreateWebApplicationProject.html" title="3.2. オンライン版クラウド拡張開発プロジェクトの作成"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Macchinetta Server Framework Cloud Extension Development Guideline 1.0.2.RELEASE documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >3. アプリケーション開発</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2017 NTT Corporation.
+    Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.6.3.Theme by <a href="http://github.com/vkvn">vkvn</a>
+    </div>
+    
+    <script>
+    
+    $(function() {
+    	var $sidebar	= $('.sphinxsidebar'),
+    		$window		= $(window),
+    		offset		= $sidebar.offset(),
+    		topPadding	= 3,
+    		$scroll		= $('#scroll');
+    	
+    	$window.scroll(function() {
+    		if ($scroll.is(':checked')) {
+				if ($window.scrollTop() > offset.top) {
+					$sidebar.stop().animate({
+						marginTop:$window.scrollTop() - offset.top + topPadding
+					});
+				} else {
+					$sidebar.stop().animate({
+						marginTop:0
+					});
+				}
+			}
+		});
+    	
+    	var $navList = $('ul:first', $sidebar);
+    	$('li:first', $navList).addClass('open');
+    	
+    	$navList.treeview({
+    		persist: "location",
+    		collapsed: true,
+    		unique: false
+    	});
+    	
+	});
+    </script>
+  </body>
+</html>
