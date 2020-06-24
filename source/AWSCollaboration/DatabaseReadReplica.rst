@@ -57,7 +57,7 @@ Overview
 
 RDSのリードレプリカの詳細は `AWS 公式サイト <https://aws.amazon.com/jp/rds/details/read-replicas/>`_ 、
 マルチAZ配置によるフェイルオーバーについては `AWS ユーザーガイド <https://docs.aws.amazon.com/ja_jp/AmazonRDS/latest/UserGuide/Concepts.MultiAZ.html>`_、
-Spring Cloud AWSの詳細は `Spring 公式サイト <https://cloud.spring.io/spring-cloud-static/spring-cloud-aws/2.1.0.RELEASE/single/spring-cloud-aws.html#_read_replica_configuration>`_ を参照されたい。
+Spring Cloud AWSの詳細は `Spring 公式サイト <https://cloud.spring.io/spring-cloud-static/spring-cloud-aws/2.2.1.RELEASE/reference/html/#read-replica-configuration>`_ を参照されたい。
 
 .. warning::
 
@@ -113,7 +113,7 @@ Spring Cloud AWSを利用してRDSへのアクセスを行うための依存ラ�
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Spring Cloud AWS JDBCを利用してRDSへのアクセスを行うためのBean定義を行う。
-Bean定義の詳細については、 Spring Cloud AWS `Data Access with JDBC <https://cloud.spring.io/spring-cloud-static/spring-cloud-aws/2.1.0.RELEASE/single/spring-cloud-aws.html#_data_access_with_jdbc>`_ を参照されたい。
+Bean定義の詳細については、 Spring Cloud AWS `Data Access with JDBC <https://cloud.spring.io/spring-cloud-static/spring-cloud-aws/2.2.1.RELEASE/reference/html/#data-access-with-jdbc>`_ を参照されたい。
 
 - xxx-domain.xml
 
@@ -161,12 +161,12 @@ Bean定義の詳細については、 Spring Cloud AWS `Data Access with JDBC <h
       - | リードレプリカを使用するかどうかを設定する。\ ``true``\ を指定した場合、読み取り専用トランザクションはレプリカDBにルーティングされ、書き込み操作時にはマスタDBにルーティングされる。
     * - | (3)
       - | \ ``jdbc:pool-attributes``\
-      - | データソースのコネクションプールのプロパティを設定することができる。詳細はSpring公式サイト\ `Data source pool configuration <https://cloud.spring.io/spring-cloud-static/spring-cloud-aws/2.1.0.RELEASE/single/spring-cloud-aws.html#_data_source_pool_configuration>`_\ を参照されたい。
+      - | データソースのコネクションプールのプロパティを設定することができる。詳細はSpring公式サイト\ `Data source pool configuration <https://cloud.spring.io/spring-cloud-static/spring-cloud-aws/2.2.1.RELEASE/reference/html/#data-source-pool-configuration>`_\ を参照されたい。
 
   .. note::
       \ ``jdbc:data-source``\ 内の設定値はプロパティファイルに書き出して読み込ませることができない。
       環境によって設定値を変更する場合Springのプロファイルの仕組みを使って実現することができる。
-      詳細はSpring公式サイト\ `XML bean definition profiles <https://docs.spring.io/spring/docs/5.1.4.RELEASE/spring-framework-reference/core.html#beans-definition-profiles-xml>`_\ を参照されたい。
+      詳細はSpring公式サイト\ `XML bean definition profiles <https://docs.spring.io/spring/docs/5.2.3.RELEASE/spring-framework-reference/core.html#beans-definition-profiles-xml>`_\ を参照されたい。
 
 .. _rdd_settings_for_using_datasource:
 
@@ -222,7 +222,7 @@ Bean定義の詳細については、 Spring Cloud AWS `Data Access with JDBC <h
   .. code-block:: xml
 
     <!-- (1) -->
-    <bean id="realDataSource" class="org.apache.commons.dbcp2.BasicDataSource"
+    <bean id="dataSource" class="org.apache.commons.dbcp2.BasicDataSource"
         destroy-method="close">
         <property name="driverClassName" value="${database.driverClassName}" />
         <property name="url" value="${database.url}" />
@@ -236,17 +236,12 @@ Bean定義の詳細については、 Spring Cloud AWS `Data Access with JDBC <h
     </bean>
 
     <!-- (2) -->
-    <bean id="dataSource" class="net.sf.log4jdbc.Log4jdbcProxyDataSource">
-        <constructor-arg index="0" ref="realDataSource" />
-    </bean>
-
-    <!-- (3) -->
     <jdbc:initialize-database data-source="dataSource" ignore-failures="ALL">
         <jdbc:script location="classpath:/database/${database}-schema.sql" encoding="UTF-8" />
         <jdbc:script location="classpath:/database/${database}-dataload.sql" encoding="UTF-8" />
     </jdbc:initialize-database>
 
-    <!-- (4) -->
+    <!-- (3) -->
     <bean id="transactionManager"
         class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
         <property name="dataSource" ref="dataSource" />
@@ -261,15 +256,12 @@ Bean定義の詳細については、 Spring Cloud AWS `Data Access with JDBC <h
     <!-- 削除 -->
 
     <!-- (2) -->
-    <!-- 削除 -->
-
-    <!-- (3) -->
     <jdbc:initialize-database data-source="${rds.dbInstanceIdentifier}" ignore-failures="ALL">
         <jdbc:script location="classpath:/database/${database}-schema.sql" encoding="UTF-8" />
         <jdbc:script location="classpath:/database/${database}-dataload.sql" encoding="UTF-8" />
     </jdbc:initialize-database>
 
-    <!-- (4) -->
+    <!-- (3) -->
     <bean id="transactionManager"
         class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
         <property name="dataSource" ref="${rds.dbInstanceIdentifier}" />
@@ -286,16 +278,8 @@ Bean定義の詳細については、 Spring Cloud AWS `Data Access with JDBC <h
     * - | (1)
       - | 旧DataSource設定は不要のため削除する。
     * - | (2)
-      - | データソースをラップしていると、データソースの情報が正しく認識できずレプリカノードを正しく参照できなくなるため削除する。
-
-        .. warning::
-
-              spring-cloud-aws-jdbcを用いてリードレプリカ方式を実現する場合はデータソースをラップしないことを推奨する。
-              例えば、ログ出力の為に\ ``net.sf.log4jdbc.Log4jdbcProxyDataSource``\等でデータソースをラップしていると、データソースの情報が正しく認識できずレプリカノードを正しく参照できなくなる。
-
-    * - | (3)
       - | \ ``jdbc:initialize-database``\ の\ ``data-source``\ 属性にDBインスタンス識別子を設定する。
-    * - | (4)
+    * - | (3)
       - | \ ``transactionManager``\ の\ ``dataSource``\ のref属性にDBインスタンス識別子を設定する。
 
 |

@@ -9,8 +9,8 @@
 
 ## Fix Version/s
 (To be written later by project member)
-- [ ] 1.1.0_ja (master)
-- [ ] 1.0.2_ja (1.0.x)
+- [ ] 1.2.0_ja (master)
+- [ ] 1.1.2_ja (1.1.x)
 
 ## Final Solution
 (To be written later by project member)

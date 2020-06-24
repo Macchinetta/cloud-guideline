@@ -15,7 +15,7 @@ Overview
 
 セッションを外部管理化するためにキャッシュを利用する方法については、 :doc:`../../AWSCollaboration/SessionManagement` を参照されたい。
 
-Springのガイドについては、 `Spring Cache Abstraction <https://docs.spring.io/spring/docs/5.1.4.RELEASE/spring-framework-reference/integration.html#cache>`_ を参照されたい。
+Springのガイドについては、 `Spring Cache Abstraction <https://docs.spring.io/spring/docs/5.2.3.RELEASE/spring-framework-reference/integration.html#cache>`_ を参照されたい。
 
 .. _cache-local-heap:
 
@@ -151,7 +151,7 @@ Spring Cache Abstractionの設定
 
   .. note::
       ローカルヒープ領域における「入れ物」の実装は、\ ``ConcurrentMapCacheFactoryBean``\以外のものもSpringに用意されている。
-      詳細は `Springのリファレンス Configuring the cache storage <https://docs.spring.io/spring/docs/5.1.4.RELEASE/spring-framework-reference/integration.html#cache-store-configuration>`_ を参照されたい。
+      詳細は `Springのリファレンス Configuring the cache storage <https://docs.spring.io/spring/docs/5.2.3.RELEASE/spring-framework-reference/integration.html#cache-store-configuration>`_ を参照されたい。
 
 .. _cache-redis-setting:
 
@@ -224,7 +224,7 @@ Redisを使用したキャッシュの設定
       - アノテーションでのキャッシュを有効にする。ローカルヒープを使用したキャッシュと同様に\ ``order="-1"``\を設定する。
     * - | (2)
       - キャッシュデータの格納場所にRedisを使用する場合は、Spring Data Redisが提供する\ ``RedisCacheManager``\をキャッシュマネージャとして使用する。
-        \ ``RedisCacheManager``\の設定方法は `Support for the Spring Cache Abstraction <https://docs.spring.io/spring-data/redis/docs/2.1.4.RELEASE/reference/html/#redis:support:cache-abstraction>`_ を参照されたい。
+        \ ``RedisCacheManager``\の設定方法は `Support for the Spring Cache Abstraction <https://docs.spring.io/spring-data/redis/docs/2.2.4.RELEASE/reference/html/#redis:support:cache-abstraction>`_ を参照されたい。
     * - | (3)
       - キャッシュマネージャで利用する\ ``redisConnectionFactory``\を設定する。
 
@@ -297,34 +297,9 @@ Spring Cache Abstractionでは、メソッドにアノテーションを定義�
 
     Spring Cache Abstractionのアノテーションを使用する場合は、\ ``@Cacheable``\、\ ``@CachePut``\と\ ``@CacheEvict``\アノテーションの属性 *value* (または *cacheNames* )の値は、Spring frameworkがキャッシュオペレーション作成時に必須の値となるため設定すること。
 
-    また、インタフェースにSpring Cache Abstractionのアノテーションを付与することは基本的に推奨していない。理由としては、インタフェースのメソッドの引数名はデフォルトでは取得できないためである。この制約に対しSpringは代替手段として、インタフェースしか実装しない場合(Proxyとなるインタフェース、例えばDynamoDBのリポジトリ等)にメソッドの\ ``@Cacheable``\を付与する際は、メソッド引数のインデックスを指定することで引数へのアクセスを実現することが可能である。
+    また、インタフェースにSpring Cache Abstractionのアノテーションを付与することは基本的に推奨していない。理由としては、インタフェースのメソッドの引数名はデフォルトでは取得できないためである。
 
-    以下に、インデックス指定の例を示す。
-
-      .. code-block:: java
-
-        @CacheConfig(cacheNames = "shardids")
-        @EnableScan
-        public interface AccountShardKeyRepository
-                                                extends
-                                                CrudRepository<ShardingAccount, String> {
-          @Override
-          // (1)
-          @Cacheable(key = "'shardid/' + #a0")
-          Optional<ShardingAccount> findById(String id);
-        }
-
-      .. tabularcolumns:: |p{0.10\linewidth}|p{0.90\linewidth}|
-      .. list-table::
-        :header-rows: 1
-        :widths: 10 90
-
-        * - 項番
-          - 説明
-        * - | (1)
-          - \ ``Cacheable``\アノテーションの属性\ ``key``\で設定している、\ ``#a0``\がメソッド\ ``findById``\の引数0番目(id)を指定している。
-
-            詳細は `Springのリファレンス Available caching SpEL evaluation context <https://docs.spring.io/spring/docs/5.1.4.RELEASE/spring-framework-reference/integration.html#cache-spel-context>`_ を参照されたい。
+    詳細な内容については `Spring Cache AbstractionのリファレンスのTips <https://docs.spring.io/spring/docs/5.2.3.RELEASE/spring-framework-reference/integration.html#cache-annotation-enable>`_\ を参照されたい。
 
 キャッシュしたデータの削除
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -475,7 +450,7 @@ How to extend
         .. note::
 
          \ `JedisConnectionFactory`\のコンストラクタに\ `RedisClusterConfiguration`\を指定する場合、接続先のRedisはクラスタ構成であることが必須となる。スタンドアローン構成のRedisに接続する場合は\ `JedisConnectionFactory`\に直接接続先のServerとPortを指定すること。
-         指定方法については、`Spring Data Redisのリファレンス <https://docs.spring.io/spring-data/redis/docs/2.1.4.RELEASE/reference/html/#redis:connectors:jedis>`_ を参照されたい。
+         指定方法については、`Spring Data Redisのリファレンス <https://docs.spring.io/spring-data/redis/docs/2.2.4.RELEASE/reference/html/#redis:connectors:jedis>`_ を参照されたい。
 
     * - | (3)
       - \ `RedisClusterConfiguration`\のBean定義を行う。コンストラクタの引数に接続先のノードを指定する。
@@ -540,7 +515,7 @@ How to extend
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Spring Cache Abstractionでは、複数のキャッシュマネージャを別のBean名で定義しておき、\ `@Cacheable`\アノテーションの\ `cacheManager`\属性に指定することで、キャッシュ対象データ毎に使用するキャッシュマネージャを指定することが可能である。
-詳細は、`Custom cache resolution <Custom cache resolution <https://docs.spring.io/spring/docs/5.1.4.RELEASE/spring-framework-reference/integration.html#cache-annotations-cacheable-cache-resolver>`_ を参照されたい。
+詳細は、`Custom cache resolution <Custom cache resolution <https://docs.spring.io/spring/docs/5.2.3.RELEASE/spring-framework-reference/integration.html#cache-annotations-cacheable-cache-resolver>`_ を参照されたい。
 
 .. raw:: latex
 

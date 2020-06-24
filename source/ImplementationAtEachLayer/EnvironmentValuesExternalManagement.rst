@@ -49,6 +49,14 @@ Overview
   Config Serverは、アプリケーションの環境設定値を保持しているため、SPOFにならないように注意が必要。
   具体的な構成としては、手前にLoad Balancerなどを配備して、冗長化を行うなどの対策が必要。
 
+.. warning::
+
+  Spring Cloud ConfigにはSnakeYAMLが依存関係に含まれているため、
+  SnakeYAMLのデフォルト設定に由来する脆弱性から、信頼されていない外部との通信しないように注意が必要。
+  具体的には、環境リポジトリを外部公開しない、通信制限を設けるなどの対策が必要。
+  YAMLに特別なステートメントが含まれている場合、デフォルトでクラスのインスタンス化が可能になるため、
+  YAMLファイルが信頼できないソースからロードされた場合、ホストアプリケーションの制御外でコードをロードして実行する可能性があり。
+
 設定ファイル分割方針
 ^^^^^^^^^^^^^^^^^^^^
 
@@ -81,7 +89,7 @@ How to use
 Config Serverの構築
 """"""""""""""""""""""""""""""""
 Spring Frameworkから提供されている「Spring Cloud Config Server」機能を使用した、環境依存値の一元管理方法について説明する。
-「Spring Cloud Config Server」の構築の詳細については、\ `公式リファレンスの"Spring Cloud Config Server" <https://cloud.spring.io/spring-cloud-static/spring-cloud-config/2.1.0.RELEASE/single/spring-cloud-config.html>`_\ を参照されたい。
+「Spring Cloud Config Server」の構築の詳細については、\ `公式リファレンスの"Spring Cloud Config Server" <https://cloud.spring.io/spring-cloud-static/spring-cloud-config/2.2.2.RELEASE/reference/html/#_spring_cloud_config_server>`_\ を参照されたい。
 
 pom.xmlで必要なjarを設定する。
 
@@ -590,7 +598,7 @@ configプロジェクトの作成
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 configプロジェクトの構成について説明する。
-Spring Bootプロジェクトについては、\ `公式リファレンスの"Using Spring Boot" <https://docs.spring.io/spring-boot/docs/2.1.2.RELEASE/reference/htmlsingle/#using-boot>`_\ を参照されたい。
+Spring Bootプロジェクトについては、\ `公式リファレンスの"Using Spring Boot" <https://docs.spring.io/spring-boot/docs/2.2.4.RELEASE/reference/htmlsingle/#using-boot>`_\ を参照されたい。
 
 .. code-block:: console
 
@@ -704,7 +712,7 @@ Spring Bootプロジェクトについては、\ `公式リファレンスの"Us
                <id>native</id>
                <properties>
                    <jvmargs.profiles>-Dspring.profiles.active=native</jvmargs.profiles>
-                   <jvmargs.location>-Dspring.cloud.config.server.native.searchLocations=file:${project.basedir}/../xxx-env/configs/repository/{application},file:${project.basedir}/../xxx-back/xxx-back-env/configs/repository/{application}</jvmargs.location>
+                   <jvmargs.location>-Dspring.cloud.config.server.native.searchLocations=file:${project.parent.basedir}/xxx-env/configs/repository/{application},file:${project.parent.basedir}/xxx-back/xxx-back-env/configs/repository/{application}</jvmargs.location>
                    <jvmargs.region>-Dcloud.aws.region.static=ap-northeast-1</jvmargs.region>
                    <jvmargs.region.auto>-Dcloud.aws.region.auto=false</jvmargs.region.auto>
                </properties>

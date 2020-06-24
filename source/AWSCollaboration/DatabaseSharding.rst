@@ -12,7 +12,7 @@ Overview
 
 本ガイドラインでは、AWSを使用したデータベースシャーディングについて説明する。
 
-:doc:`../ImplementationAtEachLayer/PersistenceLayerScalability` や :doc:`../ArchitectureInDetail/DataAccessDetail/DataAccessMyBatis3` で説明したシャーディング方式を実現するにあたり、AWS上でシャーディングを実現する場合はシャードにはRDSを、シャードキー管理のための記憶装置にはKVS(Key-Value Store)であるDynamoDBを使用する。また、DynamoDBに格納するシャードキー情報は読み込み頻度が高く、値の更新の機会が少ないため、キャッシュ方式によりアクセスの負荷を低減する。DynamoDBへのアクセスにはSpring Data DynamoDBを使用する。シャードキー情報のキャッシュ化には :doc:`../ArchitectureInDetail/DataAccessDetail/CacheAbstraction` を使用する。
+:doc:`../ImplementationAtEachLayer/PersistenceLayerScalability` や :doc:`../ArchitectureInDetail/DataAccessDetail/DataAccessMyBatis3` で説明したシャーディング方式を実現するにあたり、AWS上でシャーディングを実現する場合はシャードにはRDSを、シャードキー管理のための記憶装置にはKVS(Key-Value Store)であるDynamoDBを使用する。また、DynamoDBに格納するシャードキー情報は読み込み頻度が高く、値の更新の機会が少ないため、キャッシュ方式によりアクセスの負荷を低減する。DynamoDBへのアクセスにはAWS Java SDK DynamoDBを使用する。シャードキー情報のキャッシュ化には :doc:`../ArchitectureInDetail/DataAccessDetail/CacheAbstraction` を使用する。
 
 本ガイドラインでは、以下に示すイメージの赤枠破線部分について説明する。
 
@@ -66,8 +66,6 @@ AWSを使用する場合、:doc:`../ArchitectureInDetail/DataAccessDetail/DataAc
 
 DynamoDBへアクセスする\ :ref:`aws-implementation-repository-setting`\と\ :ref:`aws-implementation-repository`\について説明する。
 
-Spring Data module for DynamoDBの詳細については、 `Spring Data DynamoDB <https://github.com/derjust/spring-data-dynamodb>`_ を参照されたい。
-
 |
 
 .. _aws-implementation-repository-setting:
@@ -77,44 +75,6 @@ Spring Data module for DynamoDBの詳細については、 `Spring Data DynamoDB
 
 以下に、pom.xmlで依存ライブラリの設定例を示す。
 
-- \ ``xxx-parent/pom.xml``\
-
-.. code-block:: xml
-
-    <dependencyManagement>
-      <dependencies>
-        ・・・
-        <!-- == Begin DynamoDB == -->
-        <!-- (1) -->
-        <dependency>
-          <groupId>com.github.derjust</groupId>
-          <artifactId>spring-data-dynamodb</artifactId>
-          <version>${org.springframework.data.dynamodb-dependencies.version}</version>
-        </dependency>
-        <!-- == End DynamoDB == -->
-      </dependencies>
-    </dependencyManagement>
-    <properties>
-      ・・・
-      <!-- (2) -->
-      <org.springframework.data.dynamodb-dependencies.version>5.0.4</org.springframework.data.dynamodb-dependencies.version>
-      ・・・
-    </properties>
-
-.. tabularcolumns:: |p{0.10\linewidth}|p{0.90\linewidth}|
-.. list-table::
-  :header-rows: 1
-  :widths: 10 90
-
-  * - 項番
-    - 説明
-  * - | (1)
-    - spring-data-dynamodbをバージョン指定で設定する。
-
-      子pomでバージョン指定が不要になる。
-  * - | (2)
-    - spring-data-dynamodbのバージョンを設定する。
-
 - \ ``xxx-domain/pom.xml``\
 
 .. code-block:: xml
@@ -122,8 +82,8 @@ Spring Data module for DynamoDBの詳細については、 `Spring Data DynamoDB
   ・・・
   <!-- (1) -->
   <dependency>
-    <groupId>com.github.derjust</groupId>
-    <artifactId>spring-data-dynamodb</artifactId>
+    <groupId>com.amazonaws</groupId>
+    <artifactId>aws-java-sdk-dynamodb</artifactId>
   </dependency>
   ・・・
 
@@ -135,7 +95,7 @@ Spring Data module for DynamoDBの詳細については、 `Spring Data DynamoDB
   * - 項番
     - 説明
   * - | (1)
-    - spring-data-dynamodbを設定する。
+    - aws-java-sdk-dynamodbを設定する。
 
 |
 
@@ -175,8 +135,8 @@ Spring Data module for DynamoDBの詳細については、 `Spring Data DynamoDB
      <constructor-arg index ="0" value="${cloud.aws.dynamodb.region}" />
    </bean>
   <!-- (3) -->
-  <dynamodb:repositories base-package="com.example.xxx.domain.common.shard.repository"
-    amazon-dynamodb-ref="amazonDynamoDB" />
+  <bean id="AccountShardKeyRepository"
+    class="com.example.xxx.domain.common.shard.repository.AccountShardKeyRepositoryImpl" />
 
 .. tabularcolumns:: |p{0.10\linewidth}|p{0.90\linewidth}|
 .. list-table::
@@ -191,7 +151,7 @@ Spring Data module for DynamoDBの詳細については、 `Spring Data DynamoDB
   * - | (2)
     - DynamoDBリージョンをコンストラクタ引数で設定する。
   * - | (3)
-    - シャードキーリポジトリのパッケージをスキャン対象に設定する。
+    - シャードキーリポジトリの実クラスをスキャン対象に設定する。
 
 |
 
@@ -246,8 +206,6 @@ Spring Data module for DynamoDBの詳細については、 `Spring Data DynamoDB
 
   DynamoDBは、AWSアカウントとリージョンの組み合わせの単位でテーブル名がユニークとなっている必要がある。そのため、たとえば開発環境とテスト環境で同一のAWSアカウントとリージョンを使用して、データを排他的に管理したい場合は同名のテーブルを使用することができない。
 
-  一方で、\ ``@DynamoDBTable``\ に設定するテーブル名を、変数化やプロファイル対応させてプログラマティックに動的に変更することは、DynamoDBのSDKやSpring Data DynamoDBの仕様上難しい。
-
   そのため、同一アプリケーションを複数の排他的な環境で実行したい場合には、AWSアカウントもしくはリージョンを別にすることを推奨する。
 
 |
@@ -263,19 +221,12 @@ DynamoDBへアクセスする為には、テーブルデータに対応したエ
 
   import java.io.Serializable;
 
-  import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBAttribute;
-  import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey;
-  import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
-  // (1)
-  @DynamoDBTable(tableName = "ShardAccount")
   public class ShardingAccount implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    // (2)
-    @DynamoDBHashKey(attributeName = "user_id")
+    // (1)
     private String id;
-    // (3)
-    @DynamoDBAttribute(attributeName = "data_source_key")
+    // (2)
     private String dataSourceKey;
     // setter and getter
   }
@@ -288,12 +239,8 @@ DynamoDBへアクセスする為には、テーブルデータに対応したエ
   * - 項番
     - 説明
   * - | (1)
-    - DynamoDBエンティティとして使用するためのアノテーション\ ``DynamoDBTable``\を付与しテーブル名を設定する。
-  * - | (2)
     - ユーザID(ハッシュキー)の項目名を定義する。
-
-      アノテーション\ ``DynamoDBHashKey``\
-  * - | (3)
+  * - | (2)
     - データソースキーの項目名を定義する。
 
 |
@@ -304,18 +251,81 @@ DynamoDBへアクセスする為には、テーブルデータに対応したエ
 
   package com.example.xxx.domain.common.shard.repository;
 
-  import org.socialsignin.spring.data.dynamodb.repository.EnableScan;
   import org.springframework.data.repository.CrudRepository;
 
   import com.example.xxx.domain.common.shard.model.ShardingAccount;
-  // (1)
-  @EnableScan
-  // (2)
-  public interface AccountShardKeyRepository extends CrudRepository<ShardingAccount, String> {
-    // (3)
-    @Override
-    @Cacheable(key = "'shardid/' + #a0")
+
+  public interface AccountShardKeyRepository {
+
     Optional<ShardingAccount> findById(String id);
+
+    void save(ShardingAccount entity);
+  }
+
+|
+
+シャードキーリポジトリの使用
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+シャードキーリポジトリを利用するために実クラス\ ``AccountShardKeyRepositoryImpl``\の実装例を示す。
+
+詳細については `AWS SDK for Java を使用した DynamoDB の例 <https://docs.aws.amazon.com/ja_jp/sdk-for-java/v2/developer-guide/examples-dynamodb.html>`_ を参考されたい。
+
+- リポジトリ実クラス\ ``AccountShardKeyRepositoryImpl``\
+
+.. code-block:: java
+
+  package com.example.xxx.domain.common.shard.repository;
+
+  import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
+  import com.amazonaws.services.dynamodbv2.model.AttributeValue;
+  import com.amazonaws.services.dynamodbv2.model.GetItemRequest;
+  import com.amazonaws.services.dynamodbv2.model.GetItemResult;
+  import com.amazonaws.services.dynamodbv2.model.PutItemRequest;
+
+  import com.example.xxx.domain.common.shard.model.ShardingAccount;
+
+  public class AccountSharedKeyRepositoryImpl implements AccountShardKeyRepository {
+
+      private final AmazonDynamoDB amazonDynamoDB;
+      // (1)
+      private static final String DYNAMODB_TABLENAME = "ShardAccount";
+      // (2)
+      private static final String DYNAMODB_PRIMARYKEY = "user_id";
+      // (3)
+      private static final String DYNAMODB_ATTRIBUTE = "data_source_key";
+
+      public AccountSharedKeyRepositoryImpl(AmazonDynamoDB amazonDynamoDB) {
+          this.amazonDynamoDB = amazonDynamoDB;
+      }
+
+      @Override
+      public Optional<ShardingAccount> findById(String id) {
+          final ShardingAccount shardingAccount = new ShardingAccount();
+          shardingAccount.setId(id);
+
+          final Map<String, AttributeValue> key = new HashMap<>();
+          key.put(DYNAMODB_PRIMARYKEY, new AttributeValue().withS(id));
+          final GetItemRequest request = new GetItemRequest()
+                  .withTableName(DYNAMODB_TABLENAME)
+                  .withKey(key);
+
+          final GetItemResult item = amazonDynamoDB.getItem(request);
+          shardingAccount.setDataSourceKey(item.getItem().get(DYNAMODB_ATTRIBUTE).getS());
+
+          return Optional.of(shardingAccount);
+      }
+
+      @Override
+      public void save(ShardingAccount shardingAccount) {
+
+          final PutItemRequest request = new PutItemRequest()
+                  .withTableName(DYNAMODB_TABLENAME)
+                  .addItemEntry(DYNAMODB_PRIMARYKEY, new AttributeValue(shardingAccount.getId()))
+                  .addItemEntry(DYNAMODB_ATTRIBUTE, new AttributeValue(shardingAccount.getDataSourceKey()));
+
+          amazonDynamoDB.putItem(request);
+      }
   }
 
 .. tabularcolumns:: |p{0.10\linewidth}|p{0.90\linewidth}|
@@ -326,20 +336,13 @@ DynamoDBへアクセスする為には、テーブルデータに対応したエ
   * - 項番
     - 説明
   * - | (1)
-    - DynamoDBリポジトリとして使用するためのアノテーション\ ``EnableScan``\を付与する。
+    - DynamoDBのテーブルを定義する。
   * - | (2)
-    - \ ``CrudRepository``\のサブインタフェースとして実装する。
+    - ユーザID(ハッシュキー)の項目名を定義する。
   * - | (3)
-    - キャッシュの為、メソッドをオーバーライドしている。キャッシュの詳細は、:doc:`../ArchitectureInDetail/DataAccessDetail/CacheAbstraction` を、\ ``@Cacheable``\アノテーションの属性\ ``key``\で設定している\ ``#a0``\については、\ :ref:`cache-data-regist`\を参照されたい。
-
-      キャッシュが不要な場合は、本メソッドのオーバーライドは不要である。
+    - データソースキーの項目名を定義する。
 
 |
-
-シャードキーリポジトリの使用
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-シャードキーリポジトリは\ :ref:`aws-implementation-repository`\で説明したように、\ ``CrudRepository``\のサブインタフェースとして実装し\ ``CrudRepository``\をそのまま使用するため追加実装は不要である。
 
 .. raw:: latex
 

@@ -157,7 +157,7 @@ AWSの公式ドキュメントでは、下記のどちらかにアクセスキ�
   * AWSインスタンスプロファイルの認証情報
 
   詳細はSpring Cloud AWSの公式リファレンス
-  `SDK credentials configuration <https://cloud.spring.io/spring-cloud-static/spring-cloud-aws/2.1.0.RELEASE/single/spring-cloud-aws.html#_sdk_credentials_configuration>`_
+  `SDK credentials configuration <https://cloud.spring.io/spring-cloud-static/spring-cloud-aws/2.2.1.RELEASE/reference/html/#sdk-credentials-configuration>`_
   を参照されたい。
 
 .. warning::

@@ -18,3 +18,9 @@
 
 * Macchinetta は、NTTの登録商標です。
 * その他の会社名、製品名は、各社の登録商標または商標です。
+
+.. include:: Include_TermOfUseMacchinetta.txt
+
+.. raw:: latex
+
+   \newpage

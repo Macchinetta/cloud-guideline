@@ -53,7 +53,7 @@ CloudWatch Logsについては、\ `Amazon CloudWatch Logs の概念 <https://do
 
 How to use
 --------------------------------------------------------------------------------
-AWS環境での使用方法を示す。AWSのログ収集の仕組みは、ファイルシステムに出力されたログを別プロセスであるエージェントが監視収集する方法である。ゆえに、ログ出力の方法自体は |base_framework_name| Development Guidelineの「\ `ロギング <https://macchinetta.github.io/server-guideline/1.6.1.RELEASE/ja/ArchitectureInDetail/GeneralFuncDetail/Logging.html>`_\」に記載している方法をそのまま使用できる。
+AWS環境での使用方法を示す。AWSのログ収集の仕組みは、ファイルシステムに出力されたログを別プロセスであるエージェントが監視収集する方法である。ゆえに、ログ出力の方法自体は |base_framework_name| Development Guidelineの「\ `ロギング <https://macchinetta.github.io/server-guideline/1.7.0.RELEASE/ja/ArchitectureInDetail/GeneralFuncDetail/Logging.html>`_\」に記載している方法をそのまま使用できる。
 
 |
 
@@ -66,6 +66,10 @@ CloudWatch Logs エージェントのインストール及び設定や、どの�
 
   CloudWatch上でログを確認する際に、ログの識別を行うための、log_group_nameでグループ分けを行い、障害発生時の障害発生インスタンスを特定するために、log_stream_nameでinstance_idなど設定することが望ましい。
 
+.. note::
+
+  本ガイドラインで説明する方法以外にも、ログ管理の方法として \ `統合CloudWatchエージェント <https://docs.aws.amazon.com/ja_jp/AmazonCloudWatch/latest/logs/UseCloudWatchUnifiedAgent.html>`_\ が存在する。
+  詳細は、 \ `CloudWatch エージェントのリファレンス <https://docs.aws.amazon.com/ja_jp/AmazonCloudWatch/latest/monitoring/Install-CloudWatch-Agent.html>`_\ を参照されたい。
 
 
 |

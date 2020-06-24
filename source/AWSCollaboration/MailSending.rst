@@ -52,7 +52,7 @@ Spring Cloud AWSのコンポーネントを使用したAmazon SESの利用
 | Spring Cloudが提供する Spring Cloud for Amazon Web Services(以下、Spring Cloud AWS)を利用することで、設定ファイルの記述量を抑えてAmazon SESへのメール送信アプリケーションを実装することができる。
 | **本ガイドラインでは、このSpring Cloud AWSを利用した実装方法について紹介する。**
 
-Spring Cloud AWSを利用したメール送信については、Spring Cloud AWSのドキュメント\ `Sending mails <https://cloud.spring.io/spring-cloud-static/spring-cloud-aws/2.1.0.RELEASE/single/spring-cloud-aws.html#_sending_mails>`_\ に紹介されている為、本ガイドラインと合わせて参照されたい。
+Spring Cloud AWSを利用したメール送信については、Spring Cloud AWSのドキュメント\ `Sending mails <https://cloud.spring.io/spring-cloud-static/spring-cloud-aws/2.2.1.RELEASE/reference/html/#sending-mails>`_\ に紹介されている為、本ガイドラインと合わせて参照されたい。
 
 .. _UseSESWithSpring:
 
@@ -60,7 +60,7 @@ Spring Frameworkのコンポーネントを使用したAmazon SESの利用
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 | Spring Frameworkはメール送信を行うためのコンポーネント（\ ``org.springframework.mail``\ パッケージ）を提供している。
 | このパッケージに含まれるコンポーネントはメール送信に係る詳細なロジックを隠蔽し、低レベルのAPIハンドリング(JavaMailのAPI呼び出し)を代行する。
-| 詳しくは、|base_framework_name| のガイドライン\ `Spring FrameworkのMail連携用コンポーネントについて <https://macchinetta.github.io/server-guideline/1.6.1.RELEASE/ja/ArchitectureInDetail/MessagingDetail/Email.html#spring-frameworkmail>`_\ に紹介されている為、参照されたい。
+| 詳しくは、|base_framework_name| のガイドライン\ `Spring FrameworkのMail連携用コンポーネントについて <https://macchinetta.github.io/server-guideline/1.7.0.RELEASE/ja/ArchitectureInDetail/MessagingDetail/Email.html#spring-frameworkmail>`_\ に紹介されている為、参照されたい。
 
 本ガイドラインで使用するコンポーネントを以下に示す。
 
@@ -139,6 +139,11 @@ Amazon SESの設定
               <groupId>com.sun.mail</groupId>
               <artifactId>javax.mail</artifactId>
           </dependency>
+          <!-- (4) -->
+          <dependency>
+              <groupId>com.sun.activation</groupId>
+              <artifactId>javax.activation</artifactId>
+          </dependency>
 
       </dependencies>
 
@@ -155,6 +160,8 @@ Amazon SESの設定
         - | \ ``aws-java-sdk-ses``\ をdependenciesに追加する。
       * - | (3)
         - | \ ``javax.mail``\ をdependenciesに追加する。
+      * - | (4)
+        - | \ ``javax.activation``\ をdependenciesに追加する。
 
 
 Spring Cloud AWSの設定
@@ -254,14 +261,14 @@ SimpleMailMessageによるメール送信方法
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 英文のプレーンテキストメール（エンコードの指定や添付ファイル等が不要なメール）を送信する場合は、Springが提供している\ ``SimpleMailMessage``\クラスを使用する。
 
-実装例については、|base_framework_name| のガイドライン\ `SimpleMailMessageによるメール送信方法 <https://macchinetta.github.io/server-guideline/1.6.1.RELEASE/ja/ArchitectureInDetail/MessagingDetail/Email.html#simplemailmessage>`_\ を参照されたい。
+実装例については、|base_framework_name| のガイドライン\ `SimpleMailMessageによるメール送信方法 <https://macchinetta.github.io/server-guideline/1.7.0.RELEASE/ja/ArchitectureInDetail/MessagingDetail/Email.html#simplemailmessage>`_\ を参照されたい。
 
 MimeMessageによるメール送信方法
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 英文以外のメールやHTMLメール、添付ファイルの送信を行う場合、\ ``javax.mail.internet.MimeMessage``\ クラスを使用する。
 本ガイドラインでは\ ``MimeMessageHelper``\ クラスを使用してMimeMessageを作成する方法を推奨している。
 
-実装例については、|base_framework_name| のガイドライン\ `MimeMessageによるメール送信方法 <https://macchinetta.github.io/server-guideline/1.6.1.RELEASE/ja/ArchitectureInDetail/MessagingDetail/Email.html#id8>`_\ を参照されたい。
+実装例については、|base_framework_name| のガイドライン\ `MimeMessageによるメール送信方法 <https://macchinetta.github.io/server-guideline/1.7.0.RELEASE/ja/ArchitectureInDetail/MessagingDetail/Email.html#id8>`_\ を参照されたい。
 
 .. raw:: latex
 

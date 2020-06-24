@@ -14,8 +14,8 @@ Overview
 .. note::
 
     本ガイドラインでは、クラウド環境を利用する場合の留意点のみを説明し、ファイルアップロードを行う機能そのものの実装方法については説明しない。
-    
-    ファイルアップロードを行う機能の実装方法については |base_framework_name| Development Guideline `ファイルアップロード <https://macchinetta.github.io/server-guideline/1.6.1.RELEASE/ja/ArchitectureInDetail/WebApplicationDetail/FileUpload.html>`_  を参照されたい。
+
+    ファイルアップロードを行う機能の実装方法については |base_framework_name| Development Guideline `ファイルアップロード <https://macchinetta.github.io/server-guideline/1.7.0.RELEASE/ja/ArchitectureInDetail/WebApplicationDetail/FileUpload.html>`_  を参照されたい。
 
 仮アップロードファイルの保存
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -35,10 +35,10 @@ Overview
 .. note::
 
     仮アップロードファイルに限らず、最終的なファイルの保存先についてもストレージサービスを利用することで、以下のメリットがある。
-    
+
     * システムの運用中であってもストレージサイズの拡張を自動的に行うことが出来る。
     * ファイルを保存する物理的なストレージを分散させることでファイルI/Oが特定のストレージに集中することを防ぐ事ができるため、RDBなどに保存するよりも効率的な負荷分散を行うことが可能である。
-    
+
     具体的な利用方法についてはクラウドベンダのリファレンスを参照されたい。
 
 How to use
@@ -54,10 +54,9 @@ Amazon Web Service
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 クラウドベンダとしてAWSを使用する場合、Spring Cloud for Amazon Web Services、AWS SDK for JavaおよびAmazon Simple Storage Serviceを使用してストレージサービスへのファイル保存を行う事ができる。
-    
+
 実装方法については :doc:`../../AWSCollaboration/FileManagement/UploadFileManagement` を参照。
 
 .. raw:: latex
 
    \newpage
-

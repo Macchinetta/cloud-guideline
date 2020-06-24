@@ -22,7 +22,7 @@
 --------------------------------------------------------------------------------
 
 開発プロジェクトの作成方法は、
-|base_framework_name| Development Guideline `開発プロジェクトの作成 <https://macchinetta.github.io/server-guideline/1.6.1.RELEASE/ja/ImplementationAtEachLayer/CreateWebApplicationProject.html#createwebapplicationproject>`_
+|base_framework_name| Development Guideline `開発プロジェクトの作成 <https://macchinetta.github.io/server-guideline/1.7.0.RELEASE/ja/ImplementationAtEachLayer/CreateWebApplicationProject.html#createwebapplicationproject>`_
 を参照されたい。
 
 .. _create_project_customize:
@@ -49,12 +49,12 @@ Spring Bootの利用
 Spring Bootを使用すると、プロジェクトのアーカイブ方式として「実行可能jarファイル」と「デプロイ可能warファイル」が選択できるが、
 本ガイドラインでは、|base_framework_name| のノウハウを活用するため、**デプロイ可能warファイル** を採用する。
 Spring Bootを使用したデプロイ可能warファイルの作成方法の詳細はSpring Bootの公式リファレンス
-`Traditional deployment <https://docs.spring.io/spring-boot/docs/2.1.2.RELEASE/reference/html/howto-traditional-deployment.html>`_
+`Traditional deployment <https://docs.spring.io/spring-boot/docs/2.2.4.RELEASE/reference/html/howto.html#howto-traditional-deployment>`_
 を参照されたい。
 
 Spring Bootを使用するとBean定義など多くの設定が自動で行われる。
 このような自動設定の仕組みのことを\ ``Spring Boot Auto-configuration``\ といい、アプリケーション開発者は最小限の設定を行うだけでアプリケーションを構築することができる。
-詳しくはSpring Bootの公式リファレンス `Auto-configuration <https://docs.spring.io/spring-boot/docs/2.1.2.RELEASE/reference/html/using-boot-auto-configuration.html>`_ を参照されたい。
+詳しくはSpring Bootの公式リファレンス `Auto-configuration <https://docs.spring.io/spring-boot/docs/2.2.4.RELEASE/reference/html/using-spring-boot.html#using-boot-auto-configuration>`_ を参照されたい。
 
 .. _create_project_adding_dependencies:
 
@@ -70,7 +70,7 @@ Spring Bootを使用するとBean定義など多くの設定が自動で行わ�
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-dependencies</artifactId>
-            <version>Greenwich.RELEASE</version>
+            <version>Hoxton.SR3</version>
             <type>pom</type>
             <scope>import</scope>
         </dependency>
@@ -121,7 +121,7 @@ Spring Bootを使用するとBean定義など多くの設定が自動で行わ�
      - \ ``spring-boot-configuration-processor``\ の依存ライブラリを追加することで、
        Spring Bootの\ ``@ConfigurationProperties``\ アノテーションを使用して定義したプロパティのメタデータを生成することができる。
        詳細については、Spring Boot公式リファレンス
-       `Generating your own meta-data using the annotation processor <https://docs.spring.io/spring-boot/docs/2.1.2.RELEASE/reference/html/configuration-metadata.html#configuration-metadata-annotation-processor>`_
+       `Generating your own meta-data using the annotation processor <https://docs.spring.io/spring-boot/docs/2.2.4.RELEASE/reference/html/appendix-configuration-metadata.html#configuration-metadata-annotation-processor>`_
        を参照されたい。
    * - | (4)
      - \ ``spring-cloud-config-client``\
@@ -214,7 +214,7 @@ Spring Bootを利用して、デプロイ可能なwarファイルを作成する
            これを回避するには\ ``DataSourceAutoConfiguration``\ をAuto-configurationから除外するか、
            データソースの１つに\ ``primary=true``\ を設定する必要がある。
            このクラスを除外せずに複数のデータソースを定義する方法は、Spring Boot公式リファレンス
-           `Configure Two DataSource <https://docs.spring.io/spring-boot/docs/2.1.2.RELEASE/reference/htmlsingle/#howto-two-datasources>`_ を参照されたい。
+           `Configure Two DataSource <https://docs.spring.io/spring-boot/docs/2.2.4.RELEASE/reference/htmlsingle/#howto-two-datasources>`_ を参照されたい。
        * - | \ ``JmxAutoConfiguration``\
          - JMXを設定するAuto-configurationクラス。デフォルトでは同一サーバに複数のAPを起動した場合、
            JMXのドメインが重複してBeanが登録できず\ ``UnableToRegisterMBeanException``\ が発生するため除外する。
@@ -334,17 +334,17 @@ Spring BootではLogbackの拡張を行っており追加の設定を行うこ�
 
 この拡張を利用するには、Spring Bootではデフォルトのファイル名ではなく、\ ``-spring``\ のサフィックスを付けた\ ``logback-spring.xml``\ を使用する必要がある。
 
-詳細は、Spring Bootの公式リファレンス `Custom log configuration <https://docs.spring.io/spring-boot/docs/2.1.2.RELEASE/reference/html/boot-features-logging.html#boot-features-custom-log-configuration>`_
+詳細は、Spring Bootの公式リファレンス `Custom log configuration <https://docs.spring.io/spring-boot/docs/2.2.4.RELEASE/reference/html/spring-boot-features.html#boot-features-custom-log-configuration>`_
 を参照されたい。
 
 また、Logbackの設定例は |base_framework_name| Development Guideline
-`Logbackの設定 <https://macchinetta.github.io/server-guideline/1.6.1.RELEASE/ja/ArchitectureInDetail/GeneralFuncDetail/Logging.html#id5>`_
+`Logbackの設定 <https://macchinetta.github.io/server-guideline/1.7.0.RELEASE/ja/ArchitectureInDetail/GeneralFuncDetail/Logging.html#id5>`_
 を参照されたい。
 
 .. warning::
 
    Spring Cloud Configを利用し\ ``logging.path``\ の設定値をConfigサーバに持たせる場合、Configサーバからプロパティを取得まするまでの間のログが意図しないディレクトリに出力されてしまう。
-   これは\ `Custom log configuration <https://docs.spring.io/spring-boot/docs/2.1.2.RELEASE/reference/html/boot-features-logging.html#boot-features-custom-log-configuration>`_\
+   これは\ `Custom log configuration <https://docs.spring.io/spring-boot/docs/2.2.4.RELEASE/reference/html/spring-boot-features.html#boot-features-custom-log-configuration>`_\
    に記載されているような設定ファイル名が存在するとSpring Bootが自動で読み込んでしまうが、\ ``logging.path``\ が未解決のためログの出力先を制御することができないため発生する。
    logbackを利用する場合、\ ``logback.xml``\ と\ ``logback-spring.xml``\ 以外の名前を利用すれば良い。
    設定ファイル名をSpring Bootが読み込みに行かない独自のファイル名に設定し、\ ``logging.config``\ のプロパティを設定することで意図しないログ出力を制御することができる。
@@ -378,6 +378,7 @@ Spring Bootで組み込みTomcatを使用しない場合の制約事項
 
 DIコンテナの構築タイミングによりSpring Bootの機能が一部動作しない
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
 DIコンテナの構築タイミングによって、Spring Bootの機能が一部動作しないことがある。
 例えば、\ ``DispatcherServlet``\ で行われたコンポーネントスキャンでは、Spring Boot ActuatorにCustom HealthIndicatorを\ ``@Component``\ で定義しても動作させることができない。
 
@@ -391,84 +392,6 @@ Spring Bootではエントリポイントで、\ ``ContextLoaderListener``\ を�
 .. note::
 
    Custom HealthIndicatorの例はあくまで一例であり、類似の意図しない動作が発生する可能性があるためDIコンテナの構築には注意されたい。
-
-.. _create_project_constrait_embeddedtomcat_transactiontoken:
-
-トランザクショントークンチェックを使用するための設定方法が異なる
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-|base_framework_name| Development Guideline `トランザクショントークンチェックを使用するための設定 <https://macchinetta.github.io/server-guideline/1.6.1.RELEASE/ja/ArchitectureInDetail/WebApplicationDetail/DoubleSubmitProtection.html#setting>`_
-に記載されている設定方法を使用してもトランザクショントークンチェックが正常に動作しない。
-これは、組み込みTomcatを使用しない場合にSpring BootによるrequestDataValueProcessorの
-上書きが行われることにより、JSPにトランザクショントークンが埋め込まれないためである。
-
-参考：`spring-boot#4676 <https://github.com/spring-projects/spring-boot/issues/4676>`_
-
-以下のような実装を行うことでトランザクショントークンチェックを有効にすることが可能である。
-
-* RequestDataValueProcessorPostProcessor
-
-.. code-block:: java
-
-  // (1)
-  public class RequestDataValueProcessorPostProcessor implements BeanDefinitionRegistryPostProcessor {
-
-      @Override
-      public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
-      }
-
-      @Override
-      public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException {
-
-          // (2)
-          ConstructorArgumentValues cav = new ConstructorArgumentValues();
-          List<RequestDataValueProcessor> values = new ArrayList<RequestDataValueProcessor>();
-          values.add(new TransactionTokenRequestDataValueProcessor());
-          values.add(new CsrfRequestDataValueProcessor());
-          cav.addGenericArgumentValue(values);
-          RootBeanDefinition rootBeanDefinition = new RootBeanDefinition(CompositeRequestDataValueProcessor.class, cav, null);
-
-          // (3)
-          registry.removeBeanDefinition("requestDataValueProcessor");
-          registry.registerBeanDefinition("requestDataValueProcessor", rootBeanDefinition);
-      }
-  }
-
-.. tabularcolumns:: |p{0.10\linewidth}|p{0.90\linewidth}|
-.. list-table::
-    :header-rows: 1
-    :widths: 10 90
-
-    * - 項番
-      - 内容
-    * - | (1)
-      - | \ ``BeanDefinitionRegistryPostProcessor``\ を実装することで、Beanのインスタンス化前にBean定義の変更を行うことができる。
-    * - | (2)
-      - | Bean定義を行うオブジェクトを生成する。
-        | ここでは、\ ``TransactionTokenRequestDataValueProcessor``\ と\ ``CsrfRequestDataValueProcessor``\ を併用する \ ``CompositeRequestDataValueProcessor``\ を定義している。
-
-        .. note::
-          トランザクショントークンチェックとCSRFトークンチェックを併用したい場合、\ ``CsrfRequestDataValueProcessor``\ を追加する必要があるので留意されたい。
-
-    * - | (3)
-      - | 作成した\ ``CompositeRequestDataValueProcessor``\ オブジェクトでDIコンテナにrequestDataValueProcessorのBean名で登録されたオブジェクトを上書きする。
-
-* xxx-web/src/main/resources/META-INF/spring/spring-mvc.xml
-
-.. code-block:: xml
-
-  <!-- (1) -->
-  <bean class="com.example.xxx.app.RequestDataValueProcessorPostProcessor"/>
-
-.. tabularcolumns:: |p{0.10\linewidth}|p{0.90\linewidth}|
-.. list-table::
-    :header-rows: 1
-    :widths: 10 90
-
-    * - 項番
-      - 内容
-    * - | (1)
-      - 作成したBean定義の上書きを行うクラスのBean定義を行う。
 
 .. _create_project_constrait_embeddedtomcat_actuator:
 
@@ -574,7 +497,7 @@ Spring BootのAuto-configurationにより設定される\ ``WebMvcAutoConfigurat
 ViewResolverが上書きされViewの解決ができない
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-|base_framework_name| Development Guideline `HTMLを応答する <https://macchinetta.github.io/server-guideline/1.6.1.RELEASE/ja/ImplementationAtEachLayer/ApplicationLayer.html#html>`_
+|base_framework_name| Development Guideline `HTMLを応答する <https://macchinetta.github.io/server-guideline/1.7.0.RELEASE/ja/ImplementationAtEachLayer/ApplicationLayer.html#html>`_
 に従いTilesの連携におけるBean定義\ ``<mvc:view-resolvers>``\ を使用していると、Viewの解決ができなくなる不具合が発生する。
 
 これは、Spring Bootを非組み込みTomcatで使用する場合に、``<mvc:view-resolvers>``\ で定義した

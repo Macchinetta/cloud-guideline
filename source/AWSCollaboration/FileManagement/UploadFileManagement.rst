@@ -16,7 +16,7 @@ Overview
 
     本ガイドラインでは、アップロードファイルをS3のストレージに保存する方法および留意点のみを説明する。
 
-    AWS環境におけるファイルアップロードの実装方法は |base_framework_name| Development Guideline `ファイルアップロード <https://macchinetta.github.io/server-guideline/1.6.1.RELEASE/ja/ArchitectureInDetail/WebApplicationDetail/FileUpload.html>`_  に記載の内容と基本的に同様であり、アップロードファイルの保存先をAWSが提供するストレージサービスであるS3に保存する点のみが異なる。
+    AWS環境におけるファイルアップロードの実装方法は |base_framework_name| Development Guideline `ファイルアップロード <https://macchinetta.github.io/server-guideline/1.7.0.RELEASE/ja/ArchitectureInDetail/WebApplicationDetail/FileUpload.html>`_  に記載の内容と基本的に同様であり、アップロードファイルの保存先をAWSが提供するストレージサービスであるS3に保存する点のみが異なる。
 
 .. note::
 
@@ -67,7 +67,7 @@ S3へのアクセスはSpring Cloud AWSまたはAmazon SDK for Javaを使用す�
 
 Spring Cloud AWSによる実装では、Spring Frameworkが提供する\ ``Resource``\ インタフェースによるリソースアクセスの抽象化が利用可能である。
 そのため、実装の標準化の観点からSpring Cloud AWSを使用して実装可能な機能については同ライブラリを使用して実装することが望ましい。
-\ ``Resource``\ インターフェースの詳細については、Spring Framework Reference Documentation `Resources <https://docs.spring.io/spring/docs/5.1.4.RELEASE/spring-framework-reference/core.html#resources>`_ を参照されたい。
+\ ``Resource``\ インターフェースの詳細については、Spring Framework Reference Documentation `Resources <https://docs.spring.io/spring/docs/5.2.3.RELEASE/spring-framework-reference/core.html#resources>`_ を参照されたい。
 
 ただし、Spring Cloud AWSでは以下のオブジェクト操作のみ実装可能である。
 
@@ -127,7 +127,7 @@ Spring Cloud AWSを利用したS3へのアクセスを行うための依存ラ�
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 Spring Frameworkの\ ``Resource``\ インターフェースを利用したS3へのアクセスを行うためのBean定義を行う。
-Bean定義の詳細については、 Spring Cloud AWS `Resource handling <https://cloud.spring.io/spring-cloud-static/spring-cloud-aws/2.1.0.RELEASE/single/spring-cloud-aws.html#_resource_handling>`_ を参照されたい。
+Bean定義の詳細については、 Spring Cloud AWS `Resource handling <https://cloud.spring.io/spring-cloud-static/spring-cloud-aws/2.2.1.RELEASE/reference/html/#resource-handling>`_ を参照されたい。
 
 - :file:`xxx-domain/src/main/resources/META-INF/spring/xxx-domain.xml`
 
@@ -212,7 +212,7 @@ S3のマルチパートアップロードについては Amazon Simple Storage S
       - | -
       - | マルチパートアップロードを行うための\ ``task-executor``\ を定義する。
 
-詳細については Spring Cloud AWS `9.3.1. Uploading multi-part files <https://cloud.spring.io/spring-cloud-static/spring-cloud-aws/2.1.0.RELEASE/single/spring-cloud-aws.html#_uploading_multi_part_files>`_ を参照されたい。
+詳細については Spring Cloud AWS `9.3.1. Uploading multi-part files <https://cloud.spring.io/spring-cloud-static/spring-cloud-aws/2.2.1.RELEASE/reference/html/#uploading-multi-part-files>`_ を参照されたい。
 
 .. warning::
 
@@ -322,7 +322,7 @@ S3のマルチパートアップロードについては Amazon Simple Storage S
 
  .. note::
 
-    S3から取得したファイルをユーザにダウンロードさせる方法については、 |base_framework_name| Development Guideline `ファイルダウンロード <https://macchinetta.github.io/server-guideline/1.6.1.RELEASE/ja/ArchitectureInDetail/WebApplicationDetail/FileDownload.html>`_  を参照されたい。
+    S3から取得したファイルをユーザにダウンロードさせる方法については、 |base_framework_name| Development Guideline `ファイルダウンロード <https://macchinetta.github.io/server-guideline/1.7.0.RELEASE/ja/ArchitectureInDetail/WebApplicationDetail/FileDownload.html>`_  を参照されたい。
 
 - S3上の単一ファイル削除【Amazon SDK for Javaを使用】
 
@@ -389,7 +389,7 @@ How to extend
       - | S3のパスを指定し、\ ``Resource``\ を配列形式で取得する。
         | 検索に使用する文字列はAntパターンで指定する。
 
-        S3内のAntパターンによるオブジェクト検索については `Searching resources <https://cloud.spring.io/spring-cloud-static/spring-cloud-aws/2.1.0.RELEASE/single/spring-cloud-aws.html#_searching_resources>`_  を参照されたい。
+        S3内のAntパターンによるオブジェクト検索については `Searching resources <https://cloud.spring.io/spring-cloud-static/spring-cloud-aws/2.2.1.RELEASE/reference/html/#searching-resources>`_  を参照されたい。
 
 - S3上の複数ファイル削除【Amazon SDK for Javaを使用】
 
@@ -456,7 +456,7 @@ S3では、バケット内のオブジェクトに対してライフサイクル
 
 .. note::
 
-    ライフサイクル管理でHousekeepingの要件を満たせない場合は、オブジェクトの削除機能を実装する必要がある。実装方法については |base_framework_name| Development Guideline `仮アップロード時の不要ファイルのHousekeeping <https://macchinetta.github.io/server-guideline/1.6.1.RELEASE/ja/ArchitectureInDetail/WebApplicationDetail/FileUpload.html#housekeeping>`_  を参照されたい。
+    ライフサイクル管理でHousekeepingの要件を満たせない場合は、オブジェクトの削除機能を実装する必要がある。実装方法については |base_framework_name| Development Guideline `仮アップロード時の不要ファイルのHousekeeping <https://macchinetta.github.io/server-guideline/1.7.0.RELEASE/ja/ArchitectureInDetail/WebApplicationDetail/FileUpload.html#housekeeping>`_  を参照されたい。
 
 Appendix
 --------------------------------------------------------------------------------

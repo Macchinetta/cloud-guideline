@@ -74,7 +74,7 @@ Overview
 | 送信完了後、クライアントに処理を受け付けた旨のレスポンスを返却する。
 |
 | 本ガイドラインでは、メッセージ送信のインタフェースにSpring Frameworkが提供するインタフェースを使用する事を前提としている。実装には、クラウドベンダーが提供するライブラリを利用する。
-| なお、クラウドベンダーがJMS互換のメッセージングをサポートしている場合は、|base_framework_name| のメッセージング連携のノウハウを活用できる為、|base_framework_name| Development Guideline `メッセージを同期送信する場合 <https://macchinetta.github.io/server-guideline/1.6.1.RELEASE/ja/ArchitectureInDetail/MessagingDetail/JMS.html#jmsoverviewsyncsend>`_ を参照されたい。
+| なお、クラウドベンダーがJMS互換のメッセージングをサポートしている場合は、|base_framework_name| のメッセージング連携のノウハウを活用できる為、|base_framework_name| Development Guideline `メッセージを同期送信する場合 <https://macchinetta.github.io/server-guideline/1.7.0.RELEASE/ja/ArchitectureInDetail/MessagingDetail/JMS.html#jmsoverviewsyncsend>`_ を参照されたい。
 
 
 メッセージに持たせる情報
@@ -133,14 +133,14 @@ Overview
   Amazon Web Serviceが提供するAmazon SQSの\ `標準キュー <http://docs.aws.amazon.com/ja_jp/AWSSimpleQueueService/latest/SQSDeveloperGuide/standard-queues.html>`_\のように、メッセージングサービスによっては順序性を担保していない。厳密な順序性が求められる場合は注意されたい。
 
 | 本ガイドラインでは、メッセージ非同期受信のインタフェースにSpring Frameworkが提供するインタフェースを使用する事を前提としている。実装には、クラウドベンダーが提供するライブラリを利用する。
-| なお、クラウドベンダーがJMS互換のメッセージングをサポートしている場合は、|base_framework_name| のメッセージング連携のノウハウを活用できる為、|base_framework_name| Development Guideline `メッセージを非同期受信する場合 <https://macchinetta.github.io/server-guideline/1.6.1.RELEASE/ja/ArchitectureInDetail/MessagingDetail/JMS.html#jmsoverviewasyncreceive>`_ を参照されたい。
+| なお、クラウドベンダーがJMS互換のメッセージングをサポートしている場合は、|base_framework_name| のメッセージング連携のノウハウを活用できる為、|base_framework_name| Development Guideline `メッセージを非同期受信する場合 <https://macchinetta.github.io/server-guideline/1.7.0.RELEASE/ja/ArchitectureInDetail/MessagingDetail/JMS.html#jmsoverviewasyncreceive>`_ を参照されたい。
 
 
 メッセージのトレース
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 メッセージのトレーサビリティ向上のために、各ログにリクエスト単位で一意なメッセージID等をTrackIDとして出力させることを推奨する。
-TrackIDは、logbackのMDCを利用してログ出力する事ができる。TrackIDの利用方については、|base_framework_name| Development Guideline `ログの出力内容 <https://macchinetta.github.io/server-guideline/1.6.1.RELEASE/ja/ArchitectureInDetail/GeneralFuncDetail/Logging.html#id3>`_ を参照されたい。
+TrackIDは、logbackのMDCを利用してログ出力する事ができる。TrackIDの利用方については、|base_framework_name| Development Guideline `ログの出力内容 <https://macchinetta.github.io/server-guideline/1.7.0.RELEASE/ja/ArchitectureInDetail/GeneralFuncDetail/Logging.html#id3>`_ を参照されたい。
 
 処理完了通知
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
